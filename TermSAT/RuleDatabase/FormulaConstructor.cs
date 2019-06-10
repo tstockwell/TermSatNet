@@ -83,7 +83,7 @@ namespace TermSAT.RuleDatabase
 
             _database = database;
             _formulaLength = formulaLength;
-            _negationConstructor = new NegationFormulaConstructor(_formulaLength);
+            _negationConstructor = new NegationFormulaConstructor(_database, _formulaLength);
             _rightLength = formulaLength - 2;
 
 
@@ -113,7 +113,7 @@ namespace TermSAT.RuleDatabase
                     _negationConstructor = null;
                     if (_rightLength < 1)
                         return false;
-                    _ifthenConstructor = new IfThenFormulaConstructor(_formulaLength, _rightLength);
+                    _ifthenConstructor = new IfThenFormulaConstructor(_database, _formulaLength, _rightLength);
                 }
                 else
                 {
@@ -127,7 +127,7 @@ namespace TermSAT.RuleDatabase
                     _ifthenConstructor.Dispose();
                     _ifthenConstructor = null;
                     if (0 < --_rightLength)
-                        _ifthenConstructor = new IfThenFormulaConstructor(_formulaLength, _rightLength);
+                        _ifthenConstructor = new IfThenFormulaConstructor(_database, _formulaLength, _rightLength);
                 }
             }
         }
@@ -158,13 +158,15 @@ namespace TermSAT.RuleDatabase
 
         IEnumerator<Formula> _formulas;
         int _formulaLength;
+        RuleDatabase _database;
 
         public Formula Current { get { return _formulas.Current; } }
 
         object IEnumerator.Current { get { return Current; } }
 
-        public NegationFormulaConstructor(int formulaLength)
+        public NegationFormulaConstructor(RuleDatabase database, int formulaLength)
         {
+            _database= database;
             _formulaLength = formulaLength;
             _formulas = _database.findCanonicalFormulasByLength(_formulaLength - 1).GetEnumerator();
         }
@@ -193,11 +195,13 @@ namespace TermSAT.RuleDatabase
         IEnumerator<Formula> _consequents;
         Formula _antecedent = null;
         int _formulaLength;
-        public IfThenFormulaConstructor(int formulaLength, int lengthOfRightSideFormulas)
+        RuleDatabase _database;
+        public IfThenFormulaConstructor(RuleDatabase database, int formulaLength, int lengthOfRightSideFormulas)
         {
+            _database= database;
             _formulaLength = formulaLength;
-            _rightIterator = _database.findCanonicalFormulasByLength(lengthOfRightSideFormulas).ToEnumerator();
-            _consequents = _database.findCanonicalFormulasByLength(_formulaLength - lengthOfRightSideFormulas - 1).ToEnumerator();
+            _rightIterator = _database.findCanonicalFormulasByLength(lengthOfRightSideFormulas).GetEnumerator();
+            _consequents = _database.findCanonicalFormulasByLength(_formulaLength - lengthOfRightSideFormulas - 1).GetEnumerator();
             if (!_rightIterator.MoveNext())
             {
                 Dispose();
@@ -234,7 +238,7 @@ namespace TermSAT.RuleDatabase
             }
             _antecedent = _rightIterator.Current;
             _consequents.Dispose();
-            _consequents = _database.findCanonicalFormulasByLength(_formulaLength - _antecedent.Length - 1).ToEnumerator();
+            _consequents = _database.findCanonicalFormulasByLength(_formulaLength - _antecedent.Length - 1).GetEnumerator();
             return true;
         }
 

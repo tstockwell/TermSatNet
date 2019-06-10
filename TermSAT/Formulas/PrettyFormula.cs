@@ -15,6 +15,8 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+using System;
+
 namespace TermSAT.Formulas
 {
 
@@ -26,53 +28,6 @@ namespace TermSAT.Formulas
      */
     public class PrettyFormula
     {
-        private static class PrettyParser
-        {
-            int _position = 0;
-            string _formula;
-            PrettyParser(string formula)
-            {
-                _formula = formula;
-                _formula = formula.replaceAll(" ", "");
-            }
-
-            string getFormulaText()
-            {
-                char c = _formula.charAt(_position);
-                if (c == '(')
-                {
-                    _position++;
-                    string antecedent = getFormulaText();
-                    if (!_formula.substring(_position).startsWith("->"))
-                        throw new RuntimeException("Expected -> at position " + _position);
-                    _position += 2;
-                    string consequent = getFormulaText();
-                    return Operator.Implication.getFormulaText() + antecedent + consequent;
-                }
-                else if (c == '~')
-                {
-                    _position++;
-                    string antecedent = getFormulaText();
-                    return Operator.Negation.getFormulaText() + antecedent;
-                }
-                else if (Character.isDigit(c))
-                {
-                    int i = _position;
-                    while (Character.isDigit(_formula.charAt(++_position))) { }
-                    return _formula.substring(i, _position) + Symbol.Variable.getFormulaText();
-                }
-                else if (c == 'T')
-                {
-                    return Symbol.True.getFormulaText();
-                }
-                else if (c == 'F')
-                {
-                    return Symbol.False.getFormulaText();
-                }
-                throw new RuntimeException("Unexpected character '" + c + "' at position " + _position);
-            }
-
-        }
 
         public static string getFormulaText(string prettyText)
         {
@@ -87,19 +42,69 @@ namespace TermSAT.Formulas
         public static string getPrettyText(Formula formula)
         {
             if (formula is Constant)
-			return formula.tostring();
+                return formula.ToString();
             if (formula is Variable)
-			return formula.tostring().replaceAll("\\.", "");
+                return formula.ToString().Replace("\\.", "");
             if (formula is Negation)
-			return "~" + getPrettyText(((Negation)formula).getChild());
-            if (formula is Implication) {
-                Implication i = (Implication)formula;
-                return "(" + getPrettyText(i.getAntecedent()) + "->" + getPrettyText(i.getConsequent()) + ")";
+                return "~" + getPrettyText((formula as Negation).Child);
+            if (formula is Implication)
+            {
+                Implication i = formula as Implication;
+                return "(" + getPrettyText(i.Antecedent) + "->" + getPrettyText(i.Consequent) + ")";
             }
-            throw new RuntimeException("Unknown formula:" + formula);
+            throw new TermSatException("Unknown formula:" + formula);
         }
 
     }
+
+    class PrettyParser
+    {
+        int _position = 0;
+        string _formula;
+        public PrettyParser(string formula)
+        {
+            _formula = formula;
+            _formula = formula.Replace(" ", "");
+        }
+
+        public string getFormulaText()
+        {
+            char c = _formula[_position];
+            if (c == '(')
+            {
+                _position++;
+                string antecedent = getFormulaText();
+                if (!_formula.Substring(_position).StartsWith("->"))
+                    throw new TermSatException("Expected -> at position " + _position);
+                _position += 2;
+                string consequent = getFormulaText();
+                return Symbol.Implication.ToString() + antecedent + consequent;
+            }
+            else if (c == '~')
+            {
+                _position++;
+                string antecedent = getFormulaText();
+                return Symbol.Negation.ToString() + antecedent;
+            }
+            else if (Char.IsDigit(c))
+            {
+                int i = _position;
+                while (Char.IsDigit(_formula[++_position])) { }
+                return _formula.Substring(i, _position - i) + Symbol.Variable.ToString();
+            }
+            else if (c == 'T')
+            {
+                return Symbol.True.ToString();
+            }
+            else if (c == 'F')
+            {
+                return Symbol.False.ToString();
+            }
+            throw new TermSatException("Unexpected character '" + c + "' at position " + _position);
+        }
+
+    }
+
 
 }
 

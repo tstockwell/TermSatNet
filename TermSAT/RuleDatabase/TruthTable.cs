@@ -45,10 +45,12 @@ namespace TermSAT.RuleDatabase
     public class TruthTable
     {
 
+        public const int VARIABLE_COUNT= 3;
+
         static WeakCache<string, TruthTable> __cache = new WeakCache<string, TruthTable>();
         static WeakCache<Formula, TruthTable> __formulaCache = new WeakCache<Formula, TruthTable>();
 
-        private BitArray values = new BitArray(2 ^ (2 ^ RuleDatabase.VARIABLE_COUNT));
+        private BitArray values = new BitArray(2 ^ (2 ^ VARIABLE_COUNT));
 
         private TruthTable(BitArray values)
         {
@@ -59,11 +61,11 @@ namespace TermSAT.RuleDatabase
 
         public static TruthTable newTruthTable(string valueText)
         {
-            return __cache.GetOrCreateValue(valueText, (y) => new TruthTable(valueText));
+            return __cache.GetOrCreateValue(valueText, () => new TruthTable(valueText));
         }
         public static TruthTable newTruthTable(Formula formula)
         {
-            return __formulaCache.GetOrCreateValue(formula, (y) => new TruthTable(formula));
+            return __formulaCache.GetOrCreateValue(formula, () => new TruthTable(formula));
         }
 
         /// <summary>
@@ -71,13 +73,13 @@ namespace TermSAT.RuleDatabase
         /// </summary>
         public static BitArray ToBitArray(Formula formula)
         {
-            var truthTable = new BitArray(2 ^ (2 ^ RuleDatabase.VARIABLE_COUNT));
+            var truthTable = new BitArray(2 ^ (2 ^ VARIABLE_COUNT));
 
             for (int i= 0; i < truthTable.Length; i++)
             {
                 var valuation = new Dictionary<Variable, bool>();
 
-                for (int b= 1; b <= RuleDatabase.VARIABLE_COUNT; b++)
+                for (int b= 1; b <= VARIABLE_COUNT; b++)
                 {
                     var variable = Variable.newVariable(b);
                     var mask = 1 << (b - 1);

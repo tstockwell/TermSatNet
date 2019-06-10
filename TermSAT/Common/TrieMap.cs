@@ -1,14 +1,7 @@
-package com.googlecode.termsat.core.utils;
+using System.Collections.Generic;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+namespace TermSAT.Common
+{
 /**
  * A trie, or prefix tree, is an ordered tree data structure that is used to 
  * store a dynamic set or associative array where the keys are usually strings. 
@@ -22,7 +15,8 @@ import java.util.Set;
  *
  * @param <T> The type of indexed by the trie
  */
-public class TrieMap<T> extends AbstractMap<CharSequence, T> {
+public class TrieMap<TToken,TValue> : IDictionary<IEnumerable<TToken>, TValue> 
+        {
 	
 	
 	
@@ -283,4 +277,6 @@ public class TrieMap<T> extends AbstractMap<CharSequence, T> {
 		_root.accept(key, visitor);
 		return visitor.getResult();
 	}
+}
+
 }

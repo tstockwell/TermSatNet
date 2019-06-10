@@ -75,7 +75,7 @@ public class RuleDatabaseContext : DbContext
 }
 
 
-namespace TermSat.RuleDatabase
+namespace TermSAT.RuleDatabase
 {
 
     /**
@@ -99,9 +99,6 @@ namespace TermSat.RuleDatabase
     public class RuleDatabase
     {
 
-        public const int VARIABLE_COUNT = 3;
-
-
         public const string LIST_FORMULA_LENGTHS = "-listFormulaLengths";
 
         RuleDatabaseContext ruleContext;
@@ -123,7 +120,6 @@ namespace TermSat.RuleDatabase
         public Formula getLastGeneratedFormula()
         {
             var record = this.ruleContext.Formulas
-                .AsNoTracking()
                 .OrderByDescending(f => f.Id)
                 .First();
 
@@ -134,7 +130,6 @@ namespace TermSat.RuleDatabase
         public List<Formula> getCanonicalFormulas(TruthTable truthTable)
         {
             var records = ruleContext.Formulas
-                .AsNoTracking()
                 .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == true)
                 .OrderBy(f => f.Id)
                 .ToList();
@@ -151,7 +146,6 @@ namespace TermSat.RuleDatabase
         public int getLengthOfLongestCanonicalFormula()
         {
             var formula = ruleContext.Formulas
-                .AsNoTracking()
                 .Where(f => f.IsCanonical == true)
                 .OrderByDescending(f => f.Length)
                 .First();
@@ -179,7 +173,6 @@ namespace TermSat.RuleDatabase
         public List<Formula> findCanonicalFormulasByLength(int size)
         {
             var records = ruleContext.Formulas
-                .AsNoTracking()
                 .Where(f => f.Length == size && f.IsCanonical == true)
                 .OrderBy(f => f.Id)
                 .ToList();
@@ -194,7 +187,7 @@ namespace TermSat.RuleDatabase
                 Text = formula.ToString(),
                 IsCanonical = isCanonical,
                 Length = formula.Length,
-                TruthValue = TruthTable.getTruthTable(formula).ToString()
+                TruthValue = TruthTable.newTruthTable(formula).ToString()
             };
 
             ruleContext.Formulas.Add(record);
@@ -204,7 +197,6 @@ namespace TermSat.RuleDatabase
         public List<Formula> getAllNonCanonicalFormulas(int maxLength)
         {
             var records = ruleContext.Formulas
-                .AsNoTracking()
                 .Where(f => f.Length <= maxLength && f.IsCanonical == false)
                 .ToList();
             var formulas = records.Select(r => Formula.CreateFormula(r.Text)).ToList();
@@ -213,7 +205,6 @@ namespace TermSat.RuleDatabase
         public List<Formula> getAllNonCanonicalFormulas()
         {
             var records = ruleContext.Formulas
-                .AsNoTracking()
                 .Where(f => f.IsCanonical == false)
                 .OrderBy(f => f.Length)
                 .ThenBy(f => f.Text)
@@ -224,7 +215,6 @@ namespace TermSat.RuleDatabase
         public List<Formula> getAllCanonicalFormulasInLexicalOrder()
         {
             var records = ruleContext.Formulas
-                .AsNoTracking()
                 .Where(f => f.IsCanonical == true)
                 .OrderBy(f => f.Text)
                 .ToList();
@@ -235,7 +225,6 @@ namespace TermSat.RuleDatabase
         public int getLengthOfCanonicalFormulas(TruthTable truthTable)
         {
             var formula = ruleContext.Formulas
-                .AsNoTracking()
                 .Where(f => f.IsCanonical == true && f.TruthValue == truthTable.ToString())
                 .OrderBy(f => f.Id)
                 .First();
@@ -251,7 +240,7 @@ namespace TermSat.RuleDatabase
          */
         public Formula findCanonicalFormula(Formula formula)
         {
-            var truthTableText = TruthTables.getTruthTable(formula).ToString();
+            var truthTableText = TruthTable.newTruthTable(formula).ToString();
 
             var record = ruleContext.Formulas
                 .AsNoTracking()
@@ -286,32 +275,21 @@ namespace TermSat.RuleDatabase
 
         public long countCanonicalTruthTables()
         {
-            try
-            {
-                string sql = "SELECT COUNT(DISTINCT TRUTHVALUE) as count FROM FORMULA WHERE CANONICAL = 1";
-                Statement s = _connection.createStatement();
-                ResultSet resultSet = null;
-                try
-                {
-                    (resultSet = s.executeQuery(sql)).next();
-                    return resultSet.getLong(1);
-                }
-                finally
-                {
-                    try { resultSet.close(); } catch (Throwable t) { }
-                    try { s.close(); } catch (Throwable t) { }
-                }
-            }
-            catch (SQLException e)
-            {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            var count = ruleContext.Formulas
+                .Where(f => f.IsCanonical == true)
+                .Select(f => f.TruthValue)
+                .Distinct()
+                .Count();
+            return count;
         }
 
-        public ResultIterator<Formula> getAllFormulas(TruthTable truthTable)
+        public List<Formula> getAllFormulas(TruthTable truthTable)
         {
-            return executeQuery("SELECT * FROM FORMULA WHERE TRUTHVALUE = '" + truthTable + "'");
+            var records = ruleContext.Formulas
+                .Where(f => f.TruthValue == truthTable.ToString())
+                .ToList();
+            var formulas = records.Select(r => Formula.CreateFormula(r.Text)).ToList();
+            return formulas;
         }
 
     }
