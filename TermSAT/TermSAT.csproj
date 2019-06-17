@@ -6,6 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Completion\**" />
+    <EmbeddedResource Remove="Completion\**" />
+    <None Remove="Completion\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Common\ServerCommandLineInterface.cs" />
+    <Compile Remove="RuleDatabase\TruthTables.cs" />
+    <Compile Remove="Tests\RuleRepositoryTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include=".\Solver\" />
   </ItemGroup>
 

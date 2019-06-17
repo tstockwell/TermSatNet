@@ -46,6 +46,8 @@ namespace TermSAT.RuleDatabase
     {
 
         public const int VARIABLE_COUNT= 3;
+	    public const int MAX_TRUTH_VALUES= 1 << VARIABLE_COUNT;
+	    public const int MAX_TRUTH_TABLES= 1 << MAX_TRUTH_VALUES;
 
         static WeakCache<string, TruthTable> __cache = new WeakCache<string, TruthTable>();
         static WeakCache<Formula, TruthTable> __formulaCache = new WeakCache<Formula, TruthTable>();

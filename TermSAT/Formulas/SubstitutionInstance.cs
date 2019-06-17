@@ -25,21 +25,26 @@ namespace TermSAT.Formulas
      * A formula and a list of substitutions that will transform the given formula into a 
      * substitution instance of another formula.
      * 
+     * Terminology used in TermSAT... 
+     * ...the result of applying a substitution to a formula, F, is called a substitution instance of formula F.
+     * ...if T is the formula that is the result of applying a substitution to formula F then F is called a 
+     *  generalization of formula T
+     * 
      * @author ted stockwell
      */
     public class SubstitutionInstance
     {
-        public Formula CanonicalFormula { get; }
+        public Formula Generalization { get; }
 
         public IDictionary<Variable, Formula> Substitutions { get; }
 
-        SubstitutionInstance(Formula canonicalFormula, IDictionary<Variable, Formula> substitutions)
+        public SubstitutionInstance(Formula generalization, IDictionary<Variable, Formula> substitutions)
         {
-            CanonicalFormula = canonicalFormula;
+            Generalization = generalization;
 
             if (substitutions == null)
             {
-                substitutions = new Dictionary<Variable, Formula>().ToImmutableDictionary();
+                substitutions = new Dictionary<Variable, Formula>(0).ToImmutableDictionary();
             }
             else
                 substitutions = substitutions.ToImmutableDictionary();

@@ -17,6 +17,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using TermSAT.Formulas;
 
 namespace TermSAT.RuleDatabase
@@ -45,7 +46,7 @@ namespace TermSAT.RuleDatabase
         readonly RuleDatabase _database;
         int _startingLength = 0;
         int _currentLength = 0;
-        ResultIterator<Formula> _currentIterator;
+        IEnumerator<Formula> _currentIterator;
 
         List<Formula> _startingFormulas = new List<Formula>();
 
@@ -54,10 +55,10 @@ namespace TermSAT.RuleDatabase
         {
             _database = database;
 
-            _startingFormulas.add(Constant.FALSE);
-            _startingFormulas.add(Constant.TRUE);
-            for (int i = 1; i <= RuleDatabase.VARIABLE_COUNT; i++)
-                _startingFormulas.add(Variable.newVariable(i));
+            _startingFormulas.Add(Constant.FALSE);
+            _startingFormulas.Add(Constant.TRUE);
+            for (int i = 1; i <= TruthTable.VARIABLE_COUNT; i++)
+                _startingFormulas.Add(Variable.newVariable(i));
         }
 
         public Formula getStartingFormula()
@@ -66,64 +67,47 @@ namespace TermSAT.RuleDatabase
             if (formula == null)
             {
                 _currentLength = 1;
-                _currentIterator = new ResultIterator<Formula>()
-                {
-                    Iterator < Formula > _iterator = _startingFormulas.iterator();
-                public void close()
-                {
-                    // do nothing
-                }
-                public boolean hasNext()
-                {
-                    return _iterator.hasNext();
-                }
-                public Formula next()
-                {
-                    return _iterator.next();
-                }
-                public void remove()
-                {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        } 
-		else {
-			_currentLength= formula.length();
-			_currentIterator= new FormulaConstructor(_database, formula);
-    }
-		return _currentIterator.next();
-	}
-
-    public Formula getNextWellFormedFormula()
-    {
-        if (_currentIterator.hasNext() == false)
-        {
-
-            _currentIterator.close();
-
-            FormulaConstructor nextConstructor = null;
-            while (nextConstructor == null)
-            {
-                _currentLength++;
-                System.out.println("The formulas lengths have been increased to " + _currentLength);
-
-                if (TruthTables.MAX_TRUTH_TABLES <= _database.countCanonicalTruthTables())
-                    if (_database.lengthOfLongestPossibleNonReducableFormula() < _currentLength)
-                    {
-                        System.out.println("!!!!!! The Rule Database is Complete !!!");
-                        return null;
-                    }
-
-                FormulaConstructor fc = new FormulaConstructor(_database, _currentLength);
-                if (fc.hasNext())
-                    nextConstructor = fc;
+                _currentIterator = _startingFormulas.GetEnumerator();
             }
-            _currentIterator = nextConstructor;
-
+            else
+            {
+                _currentLength = formula.Length;
+                _currentIterator = new FormulaConstructor(_database, formula);
+            }
+            _currentIterator.MoveNext();
+            return _currentIterator.Current;
         }
-        return _currentIterator.next();
-    }
 
-}
+        public Formula getNextWellFormedFormula()
+        {
+            if (!_currentIterator.MoveNext())
+            {
+
+                _currentIterator.Dispose();
+
+                FormulaConstructor nextConstructor = null;
+                while (nextConstructor == null)
+                {
+                    _currentLength++;
+                    Trace.WriteLine("The formulas lengths have been increased to " + _currentLength);
+
+                    if (TruthTable.MAX_TRUTH_TABLES <= _database.countCanonicalTruthTables())
+                        if (_database.lengthOfLongestPossibleNonReducableFormula() < _currentLength)
+                        {
+                            Trace.WriteLine("!!!!!! The Rule Database is Complete !!!");
+                            return null;
+                        }
+
+                    FormulaConstructor fc = new FormulaConstructor(_database, _currentLength);
+                    if (fc.MoveNext())
+                        nextConstructor = fc;
+                }
+                _currentIterator = nextConstructor;
+
+            }
+            return _currentIterator.Current;
+        }
+
+    }
 
 }

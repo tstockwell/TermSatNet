@@ -51,10 +51,13 @@ namespace TermSAT.Formulas
         {
             get
             {
-                var vars = new List<Variable>();
-                vars.AddRange(Antecedent.AllVariables);
-                vars.AddRange(Consequent.AllVariables);
-                return Formula.createVariableList(vars);
+                var vars = new HashSet<Variable>();
+                vars.UnionWith(Antecedent.AllVariables);
+                vars.UnionWith(Consequent.AllVariables);
+                var l= new List<Variable>();
+                l.AddRange(vars);
+                l.Sort();
+                return l;
             }
         }
 

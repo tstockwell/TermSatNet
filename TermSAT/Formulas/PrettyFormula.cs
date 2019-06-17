@@ -26,31 +26,30 @@ namespace TermSAT.Formulas
      * 
      * @author Ted Stockwell
      */
-    public class PrettyFormula
+    static public class PrettyFormula
     {
-
-        public static string getFormulaText(string prettyText)
+        public static string ToFormulaString(this string prettyText)
         {
             return new PrettyParser(prettyText).getFormulaText();
         }
 
-        public static string getPrettyText(string formula)
+        public static string ToPrettyString(this string formula)
         {
-            return getPrettyText(Formula.CreateFormula(formula));
+            return ToPrettyString(Formula.CreateFormula(formula));
         }
 
-        public static string getPrettyText(Formula formula)
+        public static string ToPrettyString(this Formula formula)
         {
             if (formula is Constant)
                 return formula.ToString();
             if (formula is Variable)
                 return formula.ToString().Replace("\\.", "");
             if (formula is Negation)
-                return "~" + getPrettyText((formula as Negation).Child);
+                return "~" + ToPrettyString((formula as Negation).Child);
             if (formula is Implication)
             {
                 Implication i = formula as Implication;
-                return "(" + getPrettyText(i.Antecedent) + "->" + getPrettyText(i.Consequent) + ")";
+                return "(" + ToPrettyString(i.Antecedent) + "->" + ToPrettyString(i.Consequent) + ")";
             }
             throw new TermSatException("Unknown formula:" + formula);
         }

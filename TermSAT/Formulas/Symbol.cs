@@ -21,14 +21,28 @@ using TermSAT.Common;
 
 namespace TermSAT.Formulas
 {
+    /// <summary>
+    /// 
+    /// Note that the characters used to represent formulas as strings were 
+    /// specifically chosen so that the string representations of a formula naturally 
+    /// sort in the same order as formulas themselves.  
+    /// That is, formulas that are just a constant come before variables, and variables 
+    /// before negations, and so on.
+    /// So the characters chosen to represent these naturally sort in the same order.
+    /// Also, since implications with simpler antecents are simpler than other implications 
+    /// of the same length, polish notation is used since it will causes formula strings 
+    /// to naturally sort in the same order as the formulas. 
+    /// 
+    /// 
+    /// </summary>
     public class Symbol : EnumType<Symbol, char>
     {
-        public static Symbol True = new Symbol('T');
-        public static Symbol False = new Symbol('F');
+        public static Symbol Variable = new Symbol('.');
         public static Symbol Negation = new Symbol('-');
         public static Symbol Implication = new Symbol('*');
-        public static Symbol Variable = new Symbol('.');
 
+        public static Symbol True = new Symbol('T');
+        public static Symbol False = new Symbol('F');
 
         private string Text { get; }
 
@@ -50,18 +64,14 @@ namespace TermSAT.Formulas
             return c == Variable.Value;
         }
 
-        public static bool isTrue(char c)
-        {
-            return c == True.Value;
-        }
-
         public static bool isFalse(char c)
         {
             return c == False.Value;
         }
-        public static bool isConstant(char c)
+
+        public static bool isTrue(char c)
         {
-            return isTrue(c) || isFalse(c);
+            return c == True.Value;
         }
 
 

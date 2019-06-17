@@ -16,7 +16,7 @@ namespace TermSAT.Formulas
      * For instance, ".1".
      *
      */
-    public class Variable : Formula {
+    public partial class Variable : Formula {
 
         /// <summary>
         /// I would like to use an int as the key to the cache but keys must be reference types

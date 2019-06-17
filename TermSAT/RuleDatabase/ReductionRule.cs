@@ -17,22 +17,22 @@
  ******************************************************************************/
 using TermSAT.Formulas;
 
-namespace TernSat.RuleDatabase
+namespace TermSAT.RuleDatabase
 {
     public class ReductionRule
     {
-        public Formula formula;
-        public Formula reduction;
+        public Formula Formula {  get; private set; }
+        public Formula Reduction {  get; private set; }
 
         public ReductionRule(Formula formula, Formula reduction)
         {
-            this.formula = formula;
-            this.reduction = reduction;
+            this.Formula = formula;
+            this.Reduction = reduction;
         }
 
         override public string ToString()
         {
-            return PrettyFormula.getPrettyText(formula) + " ==> " + PrettyFormula.getPrettyText(reduction);
+            return Formula.ToPrettyString() + " ==> " + Reduction.ToPrettyString();
         }
     }
 
@@ -60,45 +60,44 @@ namespace TernSat.RuleDatabase
             //
             if (formula is Negation)
             {
-                Formula negated = ((Negation)formula).getChild();
+                Formula negated = ((Negation)formula).Child;
                 Formula n = reduceUsingRule(negated, rule);
                 if (n != null)
                 {
-                    reducedFormula = Formula.createNegation(n);
+                    reducedFormula = Negation.newNegation(n);
                     return reducedFormula;
                 }
             }
             else if (formula is Implication)
             {
                 Implication implication = (Implication)formula;
-                Formula antecent = implication.getAntecedent();
-                Formula consequent = implication.getConsequent();
+                Formula antecent = implication.Antecedent;
+                Formula consequent = implication.Consequent;
                 Formula a = reduceUsingRule(antecent, rule);
                 if (a != null)
                 {
-                    reducedFormula = Formula.createImplication(a, consequent);
+                    reducedFormula = Implication.newImplication(a, consequent);
                     return reducedFormula;
                 }
                 Formula c = reduceUsingRule(consequent, rule);
                 if (c != null)
                 {
-                    reducedFormula = Formula.createImplication(antecent, c);
+                    reducedFormula = Implication.newImplication(antecent, c);
                     return reducedFormula;
                 }
             }
 
 
             // check if given formula is a substitution instance of the reduction rules formula
-			var substitutionInstance
             InstanceRecognizer instanceRecognizer = new InstanceRecognizer();
-            instanceRecognizer.addFormula(rule.formula);
-            List<NodeInfo> matches = instanceRecognizer.findMatchingNodes(formula, 1);
+            instanceRecognizer.Add(rule.Formula);
+            var matches = instanceRecognizer.findGeneralizationNodes(formula, 1);
             if (matches == null)
                 return null;
 
             // if formula and rule formula match then create reduced formula
-            NodeInfo info = matches.get(0);
-            reducedFormula = Formula.createInstance(rule.reduction, info.substitutions);
+            var info = matches[0];
+            reducedFormula = Formula.createInstance(rule.Reduction, info.Substitutions);
             return reducedFormula;
         }
 

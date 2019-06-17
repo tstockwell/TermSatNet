@@ -62,7 +62,7 @@ namespace TermSAT.Formulas
      * 
      * @author Ted Stockwell <emorning@yahoo.com>
      */
-    abstract public partial class Formula : IEquatable<Formula>, IComparable<Formula>, IEnumerable<Formula>
+    abstract public partial class Formula : IEquatable<Formula>, IComparable<Formula>
     {
         private static readonly ConditionalWeakTable<Object, List<Variable>> __varListCache = new ConditionalWeakTable<Object, List<Variable>>();
 
@@ -74,6 +74,24 @@ namespace TermSAT.Formulas
             Length = length;
         }
 
+        /// <summary>
+        ///     Here's an important point to understand about formula ordering...
+        /// 
+        ///     ... In order to prove that TermSAT's set of reduction rules is 'complete' we 
+        ///         need to create an ordering of formulas in terms of 'simplicity'.
+        ///         That is, 'simpler' formulas must come before more 'complex' formulas 
+        ///         in the ordering.
+        /// 
+        ///     ... However, in order to use formulas in indexes we often want formulas ordered 
+        ///         lexically.
+        /// 
+        ///     The ordering implemented here does both (I hope).
+        /// 
+        ///     Also, note that the characters used to represent formulas as strings were 
+        ///     specifically chosen so that the string representations of a formula naturally 
+        ///     sort in the same order as formulas.  
+        /// 
+        /// </summary>
         public int CompareTo(Formula other)
         {
             if (other == this)
@@ -129,20 +147,20 @@ namespace TermSAT.Formulas
             }
 
             // at this point both formulas must be Implications
-            // implications with simpler consequences come first
+            // implications with simpler antecendents come first
             var impThis = this as Implication;
             var impOther = other as Implication;
-            var cThis = impThis.Consequent;
-            var cOther = impOther.Consequent;
-            var c = cThis.CompareTo(cOther);
-            if (c != 0)
             {
-                return c;
+                var aThis = impThis.Antecedent;
+                var aOther = impOther.Antecedent;
+                var c = aThis.CompareTo(aOther);
+                if (c != 0)
+                    return c;
             }
 
-            var aThis = impThis.Antecedent;
-            var aOther = impOther.Antecedent;
-            var i = aThis.CompareTo(aOther);
+            var cThis = impThis.Consequent;
+            var cOther = impOther.Consequent;
+            var i = cThis.CompareTo(cOther);
             return i;
         }
 
@@ -511,33 +529,6 @@ namespace TermSAT.Formulas
             }
 
             return new List<Formula>(criticalTerms);
-        }
-
-        /**
-         * Creates a list of variables from a given list of variables.
-         * The purpose of this method is to cache previously created lists so as to save memory.
-         */
-        public static List<Variable> createVariableList(IList<Variable> collection)
-        {
-            var set = new HashSet<Variable>(collection); // eliminate duplicates
-
-            // sort 
-            var list = new List<Variable>(set);
-            list.Sort();
-
-            // get previously cached list
-            List<Variable> vars;
-            lock (__varListCache)
-            {
-
-                if (!__varListCache.TryGetValue(list, out vars))
-                {
-                    __varListCache.Add(list, list);
-                    vars = list;
-                }
-            }
-
-            return vars;
         }
     }
 
