@@ -35,16 +35,11 @@ namespace TermSAT.Formulas
             return (Antecedent.evaluate(values) && !Consequent.evaluate(values)) ? false : true;
         }
 
-        public override ICollection<Formula> AllSubterms
+        public override void GetAllSubterms(ICollection<Formula> subterms)
         {
-            get
-            {
-                var subterms = new HashSet<Formula>();
-                subterms.UnionWith(Antecedent.AllSubterms);
-                subterms.UnionWith(Consequent.AllSubterms);
-                subterms.Add(this);
-                return subterms;
-            }
+            Antecedent.GetAllSubterms(subterms);
+            Consequent.GetAllSubterms(subterms);
+            subterms.Add(this);
         }
 
         public override IList<Variable> AllVariables

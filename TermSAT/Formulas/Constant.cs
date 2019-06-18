@@ -12,14 +12,10 @@ namespace TermSAT.Formulas
         public static readonly Formula FALSE= new Constant("F");
 
 	    readonly string _text;
-	    readonly IList<Formula> _subformulas;
 
         protected Constant(string text) : base(1)
         {
             _text = text;
-            var subterms = new List<Formula>();
-            subterms.Add(this);
-            _subformulas = subterms.AsReadOnly();
         }
 
         override public string ToString()
@@ -37,9 +33,9 @@ namespace TermSAT.Formulas
             return this == TRUE ? true : false;
         }
 
-        override public ICollection<Formula> AllSubterms
+        public override void GetAllSubterms(ICollection<Formula> subterms)
         {
-            get { return _subformulas; }
+            subterms.Add(this);
         }
 
         public override IList<Variable> AllVariables { get { return EMPTY_VARIABLE_LIST; } }

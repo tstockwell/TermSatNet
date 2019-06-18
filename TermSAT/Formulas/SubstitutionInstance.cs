@@ -17,6 +17,7 @@
  ******************************************************************************/
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 
 namespace TermSAT.Formulas
 {
@@ -50,5 +51,60 @@ namespace TermSAT.Formulas
                 substitutions = substitutions.ToImmutableDictionary();
         }
     }
+
+
+    public partial class Formula
+    {
+        /**
+         * Creates a new formula by making the given substitutions for the 
+         * variables in the given formula.  
+         */
+        abstract public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions);
+
+    }
+
+    public partial class Constant : Formula
+    {
+        override public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        {
+            return Task.FromResult<Formula>(this);
+        }
+    }
+
+    public partial class Variable
+    {
+        override public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        {
+            Formula f= this;
+            substitutions.TryGetValue(this, out f);
+            return Task.FromResult<Formula>(f);
+        }
+    }
+
+    public partial class Negation
+    {
+        async override public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        {
+            Formula child = this.Child;
+            Formula f = await child.CreateSubstitutionInstance(substitutions);
+            if (f == child)
+                return this;
+            return Negation.newNegation(f);
+        }
+    }
+
+    public partial class Implication
+    {
+        async override public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        {
+            var taskA = Task.Run(() => Antecedent.CreateSubstitutionInstance(substitutions));
+            var newConsequent = await Consequent.CreateSubstitutionInstance(substitutions);
+            var newAntecedent = await taskA;
+            if (newAntecedent != Antecedent || newConsequent != Consequent)
+                return Implication.newImplication(newAntecedent, newConsequent);
+            return this;
+        }
+    }
+
 
 }

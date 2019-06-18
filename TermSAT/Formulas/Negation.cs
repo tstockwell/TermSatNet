@@ -35,13 +35,10 @@ namespace TermSAT.Formulas
             return Child.containsVariable(variable);
         }
 
-        override public ICollection<Formula> AllSubterms {
-            get {
-                var subterms = new List<Formula>();
-                subterms.AddRange(Child.AllSubterms);
-                subterms.Add(this);
-                return subterms;
-            }
+        public override void GetAllSubterms(ICollection<Formula> subterms)
+        { 
+            Child.GetAllSubterms(subterms);
+            subterms.Add(this);
         }
         override public IList<Variable> AllVariables
         {

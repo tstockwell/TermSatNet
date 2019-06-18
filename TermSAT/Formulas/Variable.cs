@@ -55,9 +55,8 @@ namespace TermSAT.Formulas
             _text = "#" + number;
             Number = number;
 
-            var vars = new List<Variable>();
-            vars.Add(this);
-            _varlist = Formula.createVariableList(vars);
+            _varlist = new List<Variable>();
+            _varlist.Add(this);
         }
 
         override public bool evaluate(IDictionary<Variable, Boolean> valuation)
@@ -75,10 +74,9 @@ namespace TermSAT.Formulas
             return this.Equals(variable);
         }
 
-        override public ICollection<Formula> AllSubterms {
-            get {
-                return _varlist as ICollection<Formula>;
-            }
+        public override void GetAllSubterms(ICollection<Formula> subterms)
+        { 
+            subterms.Add(this);
         }
 
         override public IList<Variable> AllVariables

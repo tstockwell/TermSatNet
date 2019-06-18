@@ -19,6 +19,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace TermSAT.Formulas
 {
@@ -181,48 +182,11 @@ namespace TermSAT.Formulas
 
 
         /**
-         * Creates a new formula by making the given substitutions for the 
-         * variables in the given formula.  
-         */
-        static public Formula createInstance(Formula templateFormula, IDictionary<Variable, Formula> substitutions)
-        {
-
-            if (templateFormula is Constant)
-                return templateFormula;
-
-            if (templateFormula is Variable)
-            {
-                Formula f;
-                if (substitutions.TryGetValue((Variable)templateFormula, out f))
-                    return f;
-                return templateFormula;
-            }
-
-            if (templateFormula is Negation)
-            {
-                Formula child = ((Negation)templateFormula).Child;
-                Formula f = createInstance(child, substitutions);
-                if (f == child)
-                    return templateFormula;
-                return Negation.newNegation(f);
-            }
-
-            Implication implication = (Implication)templateFormula;
-            Formula ant = implication.Antecedent;
-            Formula con = implication.Consequent;
-            Formula a = createInstance(ant, substitutions);
-            Formula c = createInstance(con, substitutions);
-            if (a != ant || c != con)
-                return Implication.newImplication(a, c);
-            return templateFormula;
-        }
-
-        /**
          * Creates a new formula by replacing all the variables in this formula 
          * that also occur in the given formula with new variables that 
          * don't occur in the given formula
          */
-        public Formula createIndependentInstance(Formula formula)
+        async public Task<Formula> createIndependentInstance(Formula formula)
         {
             var substitutions = new Dictionary<Variable, Formula>();
             var variables = formula.AllVariables;
@@ -245,7 +209,7 @@ namespace TermSAT.Formulas
             }
             if (substitutions.Count <= 0)
                 return formula;
-            Formula independent = Formula.createInstance(this, substitutions);
+            Formula independent = await this.CreateSubstitutionInstance(substitutions);
             return independent;
         }
 
@@ -336,7 +300,7 @@ namespace TermSAT.Formulas
          * 		an empty map if the formulas are equal, 
          * 		else returns a map of substitutions for each formula.
          */
-        static public IDictionary<Variable, Formula> unify(Formula left, Formula right)
+        async static public Task<IDictionary<Variable, Formula>> unify(Formula left, Formula right)
         {
             if (left is Constant)
             {
@@ -371,7 +335,7 @@ namespace TermSAT.Formulas
             else if (left is Negation)
             {
                 if (right is Negation)
-                    return unify(((Negation)left).Child, ((Negation)right).Child);
+                    return await unify(((Negation)left).Child, ((Negation)right).Child);
                 return null;
             }
             else if (right is Negation)
@@ -389,8 +353,13 @@ namespace TermSAT.Formulas
                     return null;
                 Formula lc = ((Implication)left).Consequent;
                 Formula rc = ((Implication)right).Consequent;
-                Formula lu = Formula.createInstance(lc, ua);
-                Formula ru = Formula.createInstance(rc, ua);
+
+
+                var ltask = lc.CreateSubstitutionInstance(ua);
+                var rtask = rc.CreateSubstitutionInstance(ua);
+                Formula lu = await ltask;
+                Formula ru = await rtask;
+
                 var uc = unify(lu, ru);
                 if (uc == null)
                     return null;
@@ -401,7 +370,7 @@ namespace TermSAT.Formulas
                 {
                     // must create composition of substitutions
                     Formula f = ua[v];
-                    f = Formula.createInstance(f, uc);
+                    f = await f.CreateSubstitutionInstance(uc);
                     map[v] = f;
                 }
                 foreach (Variable v in uc.Keys)
@@ -452,7 +421,14 @@ namespace TermSAT.Formulas
         /**
          * @return a list of all subterms.  Includes this formula.
          */
-        abstract public ICollection<Formula> AllSubterms { get; }
+        virtual public ICollection<Formula> AllSubterms {
+            get {
+                var subterms = new HashSet<Formula>();
+                this.GetAllSubterms(subterms);
+                return subterms;
+            }
+        }
+        abstract public void GetAllSubterms(ICollection<Formula> subterms);
 
         /**
          * Returns an ordered list of the variable that occur in this formula.
@@ -465,12 +441,12 @@ namespace TermSAT.Formulas
          * Two rules are syntactically equal if they are identical except for variable names.
          * 
          */
-        public static bool syntacticallyEqual(Formula left, Formula right)
+        async public static Task<bool> syntacticallyEqual(Formula left, Formula right)
         {
             if (left == right)
                 return true;
 
-            var unification = Formula.unify(left, right);
+            var unification = await Formula.unify(left, right);
             if (unification == null)
                 return false;
             foreach (Formula f in unification.Values)
@@ -487,7 +463,7 @@ namespace TermSAT.Formulas
          * 
          * @return a list of formulas 
          */
-        public static List<Formula> findAllCriticalTerms(Formula left, Formula right)
+        async public static Task<List<Formula>> findAllCriticalTerms(Formula left, Formula right)
         {
 
             HashSet<Formula> criticalTerms = new HashSet<Formula>();
@@ -505,10 +481,10 @@ namespace TermSAT.Formulas
                 if (subTerm is Variable)
                     continue;
 
-                var unification = Formula.unify(subTerm, right);
+                var unification = await Formula.unify(subTerm, right);
                 if (unification != null)
                 {
-                    Formula criticalTerm = Formula.createInstance(left, unification);
+                    Formula criticalTerm = await left.CreateSubstitutionInstance(unification);
                     criticalTerms.Add(criticalTerm);
                 }
             }
@@ -520,10 +496,10 @@ namespace TermSAT.Formulas
                 if (subTerm is Variable)
                     continue;
 
-                var unification = Formula.unify(subTerm, left);
+                var unification = await Formula.unify(subTerm, left);
                 if (unification != null)
                 {
-                    Formula criticalTerm = Formula.createInstance(right, unification);
+                    Formula criticalTerm = await right.CreateSubstitutionInstance(unification);
                     criticalTerms.Add(criticalTerm);
                 }
             }
