@@ -96,7 +96,7 @@ namespace TermSAT.RuleDatabase
             _database = new RuleDatabase();
             _formulaGenerator = new FormulaGenerator(_database);
 
-            foreach (var formula in _database.getAllNonCanonicalFormulas())
+            foreach (var formula in _database.GetAllNonCanonicalFormulas())
             {
                 _recognizer.Add(formula);
             }
@@ -118,10 +118,10 @@ namespace TermSAT.RuleDatabase
                 else
                 {
                     _recognizer.Add(formula);
-                    reductionRule = new ReductionRule(formula, _database.findCanonicalFormula(formula));
+                    reductionRule = new ReductionRule(formula, _database.FindCanonicalFormula(formula));
                     Trace.WriteLine("Found a new reduction rule: " + reductionRule);
                 }
-                _database.addFormula(formula, isCanonical);
+                _database.AddFormula(formula, isCanonical);
             }
             else
             {
@@ -131,7 +131,7 @@ namespace TermSAT.RuleDatabase
 
         private Boolean isCanonicalFormula(Formula formula)
         {
-            int length = _database.getLengthOfCanonicalFormulas(TruthTable.newTruthTable(formula));
+            int length = _database.GetLengthOfCanonicalFormulas(TruthTable.newTruthTable(formula));
 
             // if there are no canonical formulas in the database then this is the first
             if (length <= 0) 
@@ -157,13 +157,13 @@ namespace TermSAT.RuleDatabase
             SubstitutionInstance match = _recognizer.findFirstGeneralization(formula);
             if (match == null)
                 return null;
-            Formula canonicalFormula = _database.findCanonicalFormula(match.Generalization);
+            Formula canonicalFormula = _database.FindCanonicalFormula(match.Generalization);
             return new ReductionRule(match.Generalization, canonicalFormula);
         }
 
         private void shutdown()
         {
-            _database.shutdown();
+            _database.Shutdown();
         }
 
 

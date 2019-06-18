@@ -168,7 +168,7 @@ namespace TermSAT.RuleDatabase
         {
             _database= database;
             _formulaLength = formulaLength;
-            _formulas = _database.findCanonicalFormulasByLength(_formulaLength - 1).GetEnumerator();
+            _formulas = _database.FindCanonicalFormulasByLength(_formulaLength - 1).GetEnumerator();
         }
 
         public bool MoveNext()
@@ -200,8 +200,8 @@ namespace TermSAT.RuleDatabase
         {
             _database= database;
             _formulaLength = formulaLength;
-            _rightIterator = _database.findCanonicalFormulasByLength(lengthOfRightSideFormulas).GetEnumerator();
-            _consequents = _database.findCanonicalFormulasByLength(_formulaLength - lengthOfRightSideFormulas - 1).GetEnumerator();
+            _rightIterator = _database.FindCanonicalFormulasByLength(lengthOfRightSideFormulas).GetEnumerator();
+            _consequents = _database.FindCanonicalFormulasByLength(_formulaLength - lengthOfRightSideFormulas - 1).GetEnumerator();
             if (!_rightIterator.MoveNext())
             {
                 Dispose();
@@ -238,7 +238,7 @@ namespace TermSAT.RuleDatabase
             }
             _antecedent = _rightIterator.Current;
             _consequents.Dispose();
-            _consequents = _database.findCanonicalFormulasByLength(_formulaLength - _antecedent.Length - 1).GetEnumerator();
+            _consequents = _database.FindCanonicalFormulasByLength(_formulaLength - _antecedent.Length - 1).GetEnumerator();
             return true;
         }
 

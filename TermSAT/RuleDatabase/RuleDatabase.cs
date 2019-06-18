@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 using TermSAT.Formulas;
+using TermSAT.RuleDatabase;
 
 public class FormulaRecord
 {
@@ -54,11 +55,11 @@ public class RuleDatabaseContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("Data Source=rules.db");
+        optionsBuilder.UseSqlite("Data Source=rules-" + TruthTable.VARIABLE_COUNT + ".db");
     }
 
     /// <summary>
-    /// I think that ef still tracks afetr an add/ssavechanges.
+    /// I think that ef still tracks after an add/ssavechanges.
     /// So, periodically detach any entries.
     /// </summary>
     public void DetachAllEntities()
@@ -99,15 +100,7 @@ namespace TermSAT.RuleDatabase
     public class RuleDatabase
     {
 
-        public const string LIST_FORMULA_LENGTHS = "-listFormulaLengths";
-
         RuleDatabaseContext ruleContext;
-
-        int lengthOfLongestCanonical = 0;
-        Dictionary<TruthTable, int> lengthOfCanonicalFormulas = null;
-        Dictionary<int, List<Formula>> canonicalFormulasByLength = new Dictionary<int, List<Formula>>();
-        //Dictionary<Integer, List<Formula>> _allNonCanonicalFormulasByLength= new Dictionary<Integer, List<Formula>>();
-
 
         public RuleDatabase()
         {
@@ -117,7 +110,7 @@ namespace TermSAT.RuleDatabase
             ruleContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
-        public Formula getLastGeneratedFormula()
+        public Formula GetLastGeneratedFormula()
         {
             var record = this.ruleContext.Formulas
                 .OrderByDescending(f => f.Id)
@@ -127,7 +120,7 @@ namespace TermSAT.RuleDatabase
             return formula;
         }
 
-        public List<Formula> getCanonicalFormulas(TruthTable truthTable)
+        public List<Formula> GetCanonicalFormulas(TruthTable truthTable)
         {
             var records = ruleContext.Formulas
                 .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == true)
@@ -138,12 +131,12 @@ namespace TermSAT.RuleDatabase
         }
 
 
-        public void shutdown()
+        public void Shutdown()
         {
             ruleContext.Dispose();
         }
 
-        public int getLengthOfLongestCanonicalFormula()
+        public int GetLengthOfLongestCanonicalFormula()
         {
             var formula = ruleContext.Formulas
                 .Where(f => f.IsCanonical == true)
@@ -161,16 +154,16 @@ namespace TermSAT.RuleDatabase
          * generated from previous formulas. 
          * Therefore processing can stop when formulas get this long.
          */
-        public int lengthOfLongestPossibleNonReducableFormula()
+        public int LengthOfLongestPossibleNonReducableFormula()
         {
-            int maxLength = getLengthOfLongestCanonicalFormula();
+            int maxLength = GetLengthOfLongestCanonicalFormula();
             if (maxLength <= 0) // we don't know the length of longest formula yet
                 return int.MaxValue;
             return maxLength * 2 + 1;
         }
 
 
-        public List<Formula> findCanonicalFormulasByLength(int size)
+        public List<Formula> FindCanonicalFormulasByLength(int size)
         {
             var records = ruleContext.Formulas
                 .Where(f => f.Length == size && f.IsCanonical == true)
@@ -180,7 +173,7 @@ namespace TermSAT.RuleDatabase
             return formulas;
         }
 
-        public void addFormula(Formula formula, bool isCanonical)
+        public void AddFormula(Formula formula, bool isCanonical)
         {
             var record = new FormulaRecord
             {
@@ -194,7 +187,7 @@ namespace TermSAT.RuleDatabase
             ruleContext.SaveChanges();
         }
 
-        public List<Formula> getAllNonCanonicalFormulas(int maxLength)
+        public List<Formula> GetAllNonCanonicalFormulas(int maxLength)
         {
             var records = ruleContext.Formulas
                 .Where(f => f.Length <= maxLength && f.IsCanonical == false)
@@ -202,7 +195,7 @@ namespace TermSAT.RuleDatabase
             var formulas = records.Select(r => Formula.CreateFormula(r.Text)).ToList();
             return formulas;
         }
-        public List<Formula> getAllNonCanonicalFormulas()
+        public List<Formula> GetAllNonCanonicalFormulas()
         {
             var records = ruleContext.Formulas
                 .Where(f => f.IsCanonical == false)
@@ -212,7 +205,7 @@ namespace TermSAT.RuleDatabase
             var formulas = records.Select(r => Formula.CreateFormula(r.Text)).ToList();
             return formulas;
         }
-        public List<Formula> getAllCanonicalFormulasInLexicalOrder()
+        public List<Formula> GetAllCanonicalFormulasInLexicalOrder()
         {
             var records = ruleContext.Formulas
                 .Where(f => f.IsCanonical == true)
@@ -221,8 +214,19 @@ namespace TermSAT.RuleDatabase
             var formulas = records.Select(r => Formula.CreateFormula(r.Text)).ToList();
             return formulas;
         }
+        public List<TruthTable> GetAllTruthTables()
+        {
+            var truthValues = ruleContext.Formulas
+                .Where(f => f.IsCanonical == true)
+                .OrderBy(f => f.Text)
+                .Select(f => f.TruthValue)
+                .Distinct()
+                .ToList();
+            var truthTables = truthValues.Select(v => TruthTable.newTruthTable(v)).ToList();
+            return truthTables;
+        }
 
-        public int getLengthOfCanonicalFormulas(TruthTable truthTable)
+        public int GetLengthOfCanonicalFormulas(TruthTable truthTable)
         {
             var formula = ruleContext.Formulas
                 .Where(f => f.IsCanonical == true && f.TruthValue == truthTable.ToString())
@@ -238,7 +242,7 @@ namespace TermSAT.RuleDatabase
         /**
          * Finds the canonical form of the given formula.
          */
-        public Formula findCanonicalFormula(Formula formula)
+        public Formula FindCanonicalFormula(Formula formula)
         {
             var truthTableText = TruthTable.newTruthTable(formula).ToString();
 
@@ -256,7 +260,7 @@ namespace TermSAT.RuleDatabase
             return canonicalFormula;
         }
 
-        public int countNonCanonicalFormulas()
+        public int CountNonCanonicalFormulas()
         {
             var count = ruleContext.Formulas
                 .Where(f => f.IsCanonical == false)
@@ -264,7 +268,7 @@ namespace TermSAT.RuleDatabase
             return count;
         }
 
-        public int countCanonicalFormulas()
+        public int CountCanonicalFormulas()
         {
             var count = ruleContext.Formulas
                 .Where(f => f.IsCanonical == true)
@@ -273,7 +277,7 @@ namespace TermSAT.RuleDatabase
         }
 
 
-        public long countCanonicalTruthTables()
+        public long CountCanonicalTruthTables()
         {
             var count = ruleContext.Formulas
                 .Where(f => f.IsCanonical == true)
@@ -283,7 +287,7 @@ namespace TermSAT.RuleDatabase
             return count;
         }
 
-        public List<Formula> getAllFormulas(TruthTable truthTable)
+        public List<Formula> GetAllFormulas(TruthTable truthTable)
         {
             var records = ruleContext.Formulas
                 .Where(f => f.TruthValue == truthTable.ToString())

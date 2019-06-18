@@ -63,7 +63,7 @@ namespace TermSAT.RuleDatabase
 
         public Formula getStartingFormula()
         {
-            Formula formula = _database.getLastGeneratedFormula();
+            Formula formula = _database.GetLastGeneratedFormula();
             if (formula == null)
             {
                 _currentLength = 1;
@@ -91,8 +91,8 @@ namespace TermSAT.RuleDatabase
                     _currentLength++;
                     Trace.WriteLine("The formulas lengths have been increased to " + _currentLength);
 
-                    if (TruthTable.MAX_TRUTH_TABLES <= _database.countCanonicalTruthTables())
-                        if (_database.lengthOfLongestPossibleNonReducableFormula() < _currentLength)
+                    if (TruthTable.MAX_TRUTH_TABLES <= _database.CountCanonicalTruthTables())
+                        if (_database.LengthOfLongestPossibleNonReducableFormula() < _currentLength)
                         {
                             Trace.WriteLine("!!!!!! The Rule Database is Complete !!!");
                             return null;

@@ -54,10 +54,7 @@ namespace TermSAT.Formulas
         {
             _text = "#" + number;
             Number = number;
-
-            var vars = new List<Variable>();
-            vars.Add(this);
-            _varlist = Formula.createVariableList(vars);
+            _varlist = new List<Variable>() { this };
         }
 
         override public bool evaluate(IDictionary<Variable, Boolean> valuation)

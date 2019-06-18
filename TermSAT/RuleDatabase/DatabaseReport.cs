@@ -46,35 +46,32 @@ namespace TermSAT.RuleDatabase
             /* 
              * Count # of rules
              */
-            Trace.WriteLine("Total number of canonical formulas is " + database.countCanonicalFormulas());
-            Trace.WriteLine("Total number of non-canonical formulas  is " + database.countNonCanonicalFormulas());
+            Trace.WriteLine("Total number of canonical formulas is " + database.CountCanonicalFormulas());
+            Trace.WriteLine("Total number of non-canonical formulas  is " + database.CountNonCanonicalFormulas());
 
             int tt = 0;
-            for (int truthValue = 0; truthValue < TruthTable.MAX_TRUTH_TABLES; truthValue++)
+            foreach (var truthTable in database.GetAllTruthTables())
             {
-                TruthTable truthTable = TruthTable.newTruthTable(truthValue);
-                if (0 < database.getLengthOfCanonicalFormulas(truthTable))
+                if (0 < database.GetLengthOfCanonicalFormulas(truthTable))
                     tt++;
             }
             Trace.WriteLine("Have found formlas for " + tt + " of " + TruthTable.MAX_TRUTH_TABLES + " truth tables");
-            Trace.WriteLine("The length of the longest canonical formula is " + database.getLengthOfLongestCanonicalFormula());
+            Trace.WriteLine("The length of the longest canonical formula is " + database.GetLengthOfLongestCanonicalFormula());
             Trace.WriteLine("");
 
 
             /*
              * List lengths and # of canonical formulas
              */
-            database.getLengthOfCanonicalFormulas(TruthTables.create(0));
             Trace.WriteLine("TRUTH VALUE     LENGTH    COUNT");
             Trace.WriteLine("                FORMULAS");
             Trace.WriteLine("-------------   ------   ------");
-            for (int truthValue = 0; truthValue < TruthTable.MAX_TRUTH_TABLES; truthValue++)
+            foreach (var truthTable in database.GetAllTruthTables())
             {
-                TruthTable truthTable = TruthTables.create(truthValue);
-                var canonicalFormulas = database.getCanonicalFormulas(truthTable);
+                var canonicalFormulas = database.GetCanonicalFormulas(truthTable);
 
-                var t = "" + truthValue + "(" + truthTable + ")                 ";
-                t = t.substring(0, 13);
+                var t = "(" + truthTable.ToString() + ")                 ";
+                t = t.Substring(0, 13);
 
                 if (canonicalFormulas.Count <= 0)
                 {
@@ -82,14 +79,14 @@ namespace TermSAT.RuleDatabase
                 }
                 else
                 {
-                    var l = "      " + canonicalFormulas.get(0).length();
-                    l = l.substring(l.length() - 6);
+                    var l = "      " + canonicalFormulas[0].Length;
+                    l = l.Substring(l.Length - 6);
                     var c = "      " + canonicalFormulas.Count;
-                    c = c.substring(c.length() - 6);
+                    c = c.Substring(c.Length - 6);
                     Trace.WriteLine(t + "   " + l + "   " + c);
                     foreach (var formula in canonicalFormulas)
                     {
-                        Trace.WriteLine("              " + formula.toString());
+                        Trace.WriteLine("              " + formula);
                     }
                 }
                 Trace.WriteLine("-------------   ------   ------");
@@ -98,7 +95,7 @@ namespace TermSAT.RuleDatabase
             Trace.WriteLine("");
             Trace.WriteLine("Canonical Formulas in Lexical Order");
             Trace.WriteLine("=====================================");
-            foreach (var formula in database.getAllCanonicalFormulasInLexicalOrder())
+            foreach (var formula in database.GetAllCanonicalFormulasInLexicalOrder())
             {
                 Trace.WriteLine(formula);
             }
@@ -109,9 +106,9 @@ namespace TermSAT.RuleDatabase
                 Trace.WriteLine("Reduction Rules");
                 Trace.WriteLine("=====================================");
                 long count = 0;
-                foreach (var formula in database.getAllNonCanonicalFormulas())
+                foreach (var formula in database.GetAllNonCanonicalFormulas())
                 {
-                    Trace.WriteLine(new ReductionRule(formula, database.findCanonicalFormula(formula)));
+                    Trace.WriteLine(new ReductionRule(formula, database.FindCanonicalFormula(formula)));
                     count++;
                 }
             }
