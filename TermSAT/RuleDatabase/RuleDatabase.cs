@@ -167,7 +167,7 @@ namespace TermSAT.RuleDatabase
                 .Where(f => f.Length == size && f.IsCanonical == true)
                 .OrderBy(f => f.Id)
                 .ToList();
-            var formulas = records.Select(r => Formula.CreateFormula(r.Text)).ToList();
+            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
             return formulas;
         }
 
@@ -190,7 +190,7 @@ namespace TermSAT.RuleDatabase
             var records = ruleContext.Formulas
                 .Where(f => f.Length <= maxLength && f.IsCanonical == false)
                 .ToList();
-            var formulas = records.Select(r => Formula.CreateFormula(r.Text)).ToList();
+            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
             return formulas;
         }
         public List<Formula> GetAllNonCanonicalFormulas()
@@ -200,7 +200,7 @@ namespace TermSAT.RuleDatabase
                 .OrderBy(f => f.Length)
                 .ThenBy(f => f.Text)
                 .ToList();
-            var formulas = records.Select(r => Formula.CreateFormula(r.Text)).ToList();
+            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
             return formulas;
         }
         public List<Formula> GetAllCanonicalFormulasInLexicalOrder()
@@ -209,7 +209,7 @@ namespace TermSAT.RuleDatabase
                 .Where(f => f.IsCanonical == true)
                 .OrderBy(f => f.Text)
                 .ToList();
-            var formulas = records.Select(r => Formula.CreateFormula(r.Text)).ToList();
+            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
             return formulas;
         }
         public List<TruthTable> GetAllTruthTables()
@@ -290,7 +290,7 @@ namespace TermSAT.RuleDatabase
             var records = ruleContext.Formulas
                 .Where(f => f.TruthValue == truthTable.ToString())
                 .ToList();
-            var formulas = records.Select(r => Formula.CreateFormula(r.Text)).ToList();
+            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
             return formulas;
         }
 

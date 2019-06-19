@@ -28,19 +28,19 @@ namespace TermSAT.Tests
         [TestMethod]
         async public void testUnification()
         {
-            Formula one = Formula.CreateFormula("*1.T");
-            Formula two = Formula.CreateFormula("*T2.");
+            Formula one = "*1.T".ToFormula();
+            Formula two = "*T2.".ToFormula();
             var unification = await Formula.Unify(one, two);
             Assert.IsNotNull(unification, "A unifying substitution should have been found");
-            Formula expectedFormula = Formula.CreateFormula("*TT");
+            Formula expectedFormula = "*TT".ToFormula();
             Formula unifyingInstance = await one.CreateSubstitutionInstance(unification);
             Assert.AreEqual(expectedFormula, unifyingInstance, "Incorrect unification");
             unifyingInstance = await two.CreateSubstitutionInstance(unification);
             Assert.AreEqual(expectedFormula, unifyingInstance, "Incorrect unification");
 
-            one = Formula.CreateFormula("*1.2.");
-            two = Formula.CreateFormula("*-3.3.");
-            expectedFormula = Formula.CreateFormula("*-3.3.");
+            one = "*1.2.".ToFormula();
+            two = "*-3.3.".ToFormula();
+            expectedFormula = "*-3.3.".ToFormula();
             unification = await Formula.Unify(one, two);
             Assert.IsNotNull(unification, "A unifying substitution should have been found");
             unifyingInstance = await one.CreateSubstitutionInstance(unification);
@@ -48,9 +48,9 @@ namespace TermSAT.Tests
             unifyingInstance = await two.CreateSubstitutionInstance(unification);
             Assert.AreEqual(expectedFormula, unifyingInstance, "Incorrect unification");
 
-            one = Formula.CreateFormula("**1.2.*1.3.");
-            two = Formula.CreateFormula("**4.*5.6.6.");
-            expectedFormula = Formula.CreateFormula("**4.*5.*4.3.*4.3.");
+            one = "**1.2.*1.3.".ToFormula();
+            two = "**4.*5.6.6.".ToFormula();
+            expectedFormula = "**4.*5.*4.3.*4.3.".ToFormula();
             unification = await Formula.Unify(one, two);
             Assert.IsNotNull(unification, "A unifying substitution should have been found");
                    
@@ -60,26 +60,26 @@ namespace TermSAT.Tests
             Assert.AreEqual(expectedFormula, unifyingInstance, "Incorrect unification");
 
             // this example used to cause Formula.createFormula to lock up
-            one = Formula.CreateFormula("*2.*1.2.");
-            two = Formula.CreateFormula("*-*-*2.*1.2.*1.-*2.*1.2.*1.-*2.*1.2.");
+            one = "*2.*1.2.".ToFormula();
+            two = "*-*-*2.*1.2.*1.-*2.*1.2.*1.-*2.*1.2.".ToFormula();
             unification = await Formula.Unify(one, two);
             Assert.IsNull(unification, "A unifying substitution should not have been found");
 
             // this example used to cause Formula.createFormula to lock up
-            one = Formula.CreateFormula("***1.2.-*2.1.3.");
-            two = Formula.CreateFormula("****1.2.-*2.1.3.-*-*3.1.2.");
+            one = "***1.2.-*2.1.3.".ToFormula();
+            two = "****1.2.-*2.1.3.-*-*3.1.2.".ToFormula();
             unification = await Formula.Unify(one, two);
             Assert.IsNull(unification, "A unifying substitution should not have been found");
 
-            one = Formula.CreateFormula("T");
-            two = Formula.CreateFormula("****1.2.-*2.1.3.-*-*3.1.2.");
+            one = "T".ToFormula();
+            two = "****1.2.-*2.1.3.-*-*3.1.2.".ToFormula();
             unification = await Formula.Unify(one, two);
             Assert.IsNull(unification, "A unifying substitution should not have been found");
 
             // this example is from Figure 10 in
             // http://comjnl.oxfordjournals.org/content/34/1/2.full.pdf
-            one = Formula.CreateFormula("**1.2.3.");
-            two = Formula.CreateFormula("*-1.1.");
+            one = "**1.2.3.".ToFormula();
+            two = "*-1.1.".ToFormula();
             unification = await Formula.Unify(one, two);
             Assert.IsNull(unification, "A unifying substitution should not have been found");
         }

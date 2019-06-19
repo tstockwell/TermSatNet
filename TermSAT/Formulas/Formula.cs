@@ -214,80 +214,11 @@ namespace TermSAT.Formulas
         }
 
         /**
-         * Create a formula from its textual representation in normal form
+         * Parses out the first formula from the beginning of the given string
          */
-        public static Formula CreateFormula(string path)
+        public static Formula Parse(string formulaText)
         {
-            return Parse(path);
-        }
-
-
-        /**
-         * Parses out the first formula from the beginning of the given sequence 
-         */
-        public static Formula Parse(string formula)
-        {
-            // find the end of the formula
-            int last = -1;
-            {
-                int count = 0;
-                int max = formula.Length - 1;
-                for (int i = 0; i <= max; i++)
-                {
-                    char c = formula[i];
-                    if (Symbol.isSymbol(c))
-                        count++;
-                    if (0 < count)
-                    {
-                        last = i + 1;
-                        break;
-                    }
-                }
-            }
-            if (last < 0)
-                throw new Exception("Not a valid formula:" + formula);
-
-
-            Stack<Formula> stack = new Stack<Formula>();
-            for (int i = last; 0 < i--;)
-            {
-                char c = formula[i];
-                if (Symbol.isVariable(c))
-                {
-                    Formula f = stack.Pop();
-                    stack.Push(Negation.newNegation(f));
-                }
-                else if (Symbol.isImplication(c))
-                {
-                    Formula antecendent = stack.Pop();
-                    Formula consequent = stack.Pop();
-                    stack.Push(Implication.newImplication(antecendent, consequent));
-                }
-                else if (Symbol.isTrue(c))
-                {
-                    stack.Push(Constant.TRUE);
-                }
-                else if (Symbol.isFalse('F'))
-                {
-                    stack.Push(Constant.FALSE);
-                }
-                else if (Symbol.isVariable(c))
-                {
-                    int end = i;
-                    while (0 < i && Char.IsDigit(formula[i - 1]))
-                        i--;
-                    var n = int.Parse(formula.Substring(i, end - i));
-                    stack.Push(Variable.newVariable(n));
-                }
-                else
-                    throw new Exception("Unknown symbol:" + c);
-            }
-
-            if (stack.Count != 1)
-                throw new Exception("Invalid postcondition after evaluating formula wellformedness: count < 1");
-
-            Formula formula2 = stack.Pop();
-            return formula2;
+            return formulaText.ToFormula();
         }
 
         /**
@@ -506,6 +437,9 @@ namespace TermSAT.Formulas
             return new List<Formula>(criticalTerms);
         }
     }
+
+
+
 
 
 }

@@ -24,6 +24,13 @@ namespace TermSAT.Formulas
      * A utility for converting 'pretty' formula text into this system's 
      * normal form, and vice versa.
      * 
+     * Example:  
+     * This formula in TermSAT normal form...
+     *      *.1*.1-.2
+     * ...is written like this in 'pretty' form...
+     *      (1 -> (1 -> ~2))
+     *  
+     * 
      * @author Ted Stockwell
      */
     static public class PrettyFormula
@@ -33,9 +40,9 @@ namespace TermSAT.Formulas
             return new PrettyParser(prettyText).getFormulaText();
         }
 
-        public static string ToPrettyString(this string formula)
+        public static string ToPrettyString(this string formulaText)
         {
-            return ToPrettyString(Formula.CreateFormula(formula));
+            return ToPrettyString(formulaText.ToFormula());
         }
 
         public static string ToPrettyString(this Formula formula)
@@ -43,7 +50,7 @@ namespace TermSAT.Formulas
             if (formula is Constant)
                 return formula.ToString();
             if (formula is Variable)
-                return formula.ToString().Replace("\\.", "");
+                return formula.ToString().Replace(".", "");
             if (formula is Negation)
                 return "~" + ToPrettyString((formula as Negation).Child);
             if (formula is Implication)
@@ -89,7 +96,7 @@ namespace TermSAT.Formulas
             {
                 int i = _position;
                 while (Char.IsDigit(_formula[++_position])) { }
-                return _formula.Substring(i, _position - i) + Symbol.Variable.ToString();
+                return Symbol.Variable.ToString() + _formula.Substring(i, _position - i);
             }
             else if (c == 'T')
             {

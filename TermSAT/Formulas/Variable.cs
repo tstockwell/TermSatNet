@@ -52,7 +52,7 @@ namespace TermSAT.Formulas
 
         private Variable(int number) : base(1)
         {
-            _text = "#" + number;
+            _text = "." + number;
             Number = number;
             _varlist = new List<Variable>() { this };
         }
