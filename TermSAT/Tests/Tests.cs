@@ -80,16 +80,16 @@ namespace TermSAT.Tests
                     var valuation = new Dictionary<Variable, Boolean>();
                     valuation.Add(one, (a == 1 ? true : false));
                     valuation.Add(two, (b == 1 ? true : false));
-                    var value1 = formula1.evaluate(valuation);
+                    var value1 = formula1.Evaluate(valuation);
                     Assert.AreEqual(a != 1 || b != 0, value1, "formula evaluation failed");
-                    var value2 = formula2.evaluate(valuation);
+                    var value2 = formula2.Evaluate(valuation);
                     Assert.AreEqual(!value1, value2, "formula evaluation failed");
                 }
             }
         }
 
         [TestMethod]
-        public void testSubstitutions()
+        async public void testSubstitutions()
         {
             String text = "***.1.2.3.4";
             Formula formula1 = Formula.CreateFormula(text);
@@ -99,7 +99,7 @@ namespace TermSAT.Tests
             substitutions.Add(Variable.newVariable(2), Variable.newVariable(6));
             substitutions.Add(Variable.newVariable(3), Variable.newVariable(7));
             substitutions.Add(Variable.newVariable(4), Variable.newVariable(8));
-            Formula instance = Formula.createInstance(formula1, substitutions);
+            Formula instance = await formula1.CreateSubstitutionInstance(substitutions);
 
             Assert.Equals("***.5.6.7.8", instance.ToString());
 

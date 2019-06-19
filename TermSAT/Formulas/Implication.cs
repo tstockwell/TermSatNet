@@ -30,21 +30,16 @@ namespace TermSAT.Formulas
             Consequent = consequent;
         }
 
-        override public bool evaluate(IDictionary<Variable, bool> values)
+        override public bool Evaluate(IDictionary<Variable, bool> values)
         {
-            return (Antecedent.evaluate(values) && !Consequent.evaluate(values)) ? false : true;
+            return (Antecedent.Evaluate(values) && !Consequent.Evaluate(values)) ? false : true;
         }
 
-        public override ICollection<Formula> AllSubterms
+        public override void GetAllSubterms(ICollection<Formula> subterms)
         {
-            get
-            {
-                var subterms = new HashSet<Formula>();
-                subterms.UnionWith(Antecedent.AllSubterms);
-                subterms.UnionWith(Consequent.AllSubterms);
-                subterms.Add(this);
-                return subterms;
-            }
+            Antecedent.GetAllSubterms(subterms);
+            Consequent.GetAllSubterms(subterms);
+            subterms.Add(this);
         }
 
         public override IList<Variable> AllVariables

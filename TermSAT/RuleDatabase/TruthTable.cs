@@ -89,7 +89,7 @@ namespace TermSAT.RuleDatabase
                     valuation.Add(variable, iVariableValue != 0);
                 }
 
-                var formulaValue= formula.evaluate(valuation);
+                var formulaValue= formula.Evaluate(valuation);
                 truthTable.Set(i, formulaValue);
             }
             return truthTable;

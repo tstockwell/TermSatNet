@@ -15,69 +15,67 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using TermSAT.Formulas;
-using TermSAT.RuleDatabase;
-
-public class FormulaRecord
-{
-    [Key]
-    public int Id { get; set; }
-    public string Text { get; set; }
-    public int Length { get; set; }
-    public string TruthValue { get; set; }
-    public bool IsCanonical { get; set; }
-}
-
-
-public class RuleDatabaseContext : DbContext
-{
-    public DbSet<FormulaRecord> Formulas { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.Text).IsRequired();
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.Length).IsRequired();
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.TruthValue).IsRequired();
-
-        modelBuilder.Entity<FormulaRecord>().HasKey(f => f.Id);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Text);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Length);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.TruthValue);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsCanonical);
-
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.IsCanonical).HasDefaultValue(false);
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlite("Data Source=rules-" + TruthTable.VARIABLE_COUNT + ".db");
-    }
-
-    /// <summary>
-    /// I think that ef still tracks after an add/ssavechanges.
-    /// So, periodically detach any entries.
-    /// </summary>
-    public void DetachAllEntities()
-    {
-        var changedEntriesCopy = this.ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Added ||
-                        e.State == EntityState.Modified ||
-                        e.State == EntityState.Deleted)
-            .ToList();
-
-        foreach (var entry in changedEntriesCopy)
-            entry.State = EntityState.Detached;
-    }
-}
-
 
 namespace TermSAT.RuleDatabase
 {
+
+    public class FormulaRecord
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Text { get; set; }
+        public int Length { get; set; }
+        public string TruthValue { get; set; }
+        public bool IsCanonical { get; set; }
+    }
+
+
+    public class RuleDatabaseContext : DbContext
+    {
+        public DbSet<FormulaRecord> Formulas { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FormulaRecord>().Property(f => f.Text).IsRequired();
+            modelBuilder.Entity<FormulaRecord>().Property(f => f.Length).IsRequired();
+            modelBuilder.Entity<FormulaRecord>().Property(f => f.TruthValue).IsRequired();
+
+            modelBuilder.Entity<FormulaRecord>().HasKey(f => f.Id);
+            modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Text);
+            modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Length);
+            modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.TruthValue);
+            modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsCanonical);
+
+            modelBuilder.Entity<FormulaRecord>().Property(f => f.IsCanonical).HasDefaultValue(false);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlite("Data Source=rules-" + TruthTable.VARIABLE_COUNT + ".db");
+        }
+
+        /// <summary>
+        /// I think that ef still tracks after an add/ssavechanges.
+        /// So, periodically detach any entries.
+        /// </summary>
+        public void DetachAllEntities()
+        {
+            var changedEntriesCopy = this.ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added ||
+                            e.State == EntityState.Modified ||
+                            e.State == EntityState.Deleted)
+                .ToList();
+
+            foreach (var entry in changedEntriesCopy)
+                entry.State = EntityState.Detached;
+        }
+    }
+
 
     /**
      * An API for accessing the rule database.

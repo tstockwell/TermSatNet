@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  * termsat SAT solver
  *     Copyright (C) 2010 Ted Stockwell <emorning@yahoo.com>
  * 
@@ -16,21 +16,20 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
 using System.Diagnostics;
 using TermSAT.RuleDatabase;
 
-namespace TermSAT.RuleDatabase
+namespace TermSAT.Scripts.FormulaDatabaseReport
 {
-
     /**
      * Spits out a bunch of information about the formulas in the Rule Database.
      *  
      * @author Ted Stockwell
      *
      */
-    public class DatabaseReport
+    public class FormulaDatabaseReport
     {
-
         private const string SHOW_REDUCTION_RULES = "-showReductionRules";
 
         public static void Main(string[] args)
@@ -41,7 +40,7 @@ namespace TermSAT.RuleDatabase
                 if (arg.Equals(SHOW_REDUCTION_RULES))
                     showReductionRules = true;
 
-            var database = new RuleDatabase();
+            var database = new TermSAT.RuleDatabase.RuleDatabase();
 
             /* 
              * Count # of rules
@@ -115,7 +114,5 @@ namespace TermSAT.RuleDatabase
 
 
         }
-
     }
-
 }

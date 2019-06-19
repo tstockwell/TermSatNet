@@ -25,9 +25,9 @@ namespace TermSAT.Formulas
             Child = subFormula;
         }
 
-        override public bool evaluate(IDictionary<Variable, bool> valuation)
+        override public bool Evaluate(IDictionary<Variable, bool> valuation)
         {
-            return Child.evaluate(valuation) ? false : true;
+            return Child.Evaluate(valuation) ? false : true;
         }
 
         override public bool containsVariable(Variable variable)
@@ -35,13 +35,10 @@ namespace TermSAT.Formulas
             return Child.containsVariable(variable);
         }
 
-        override public ICollection<Formula> AllSubterms {
-            get {
-                var subterms = new List<Formula>();
-                subterms.AddRange(Child.AllSubterms);
-                subterms.Add(this);
-                return subterms;
-            }
+        public override void GetAllSubterms(ICollection<Formula> subterms)
+        { 
+            Child.GetAllSubterms(subterms);
+            subterms.Add(this);
         }
         override public IList<Variable> AllVariables
         {

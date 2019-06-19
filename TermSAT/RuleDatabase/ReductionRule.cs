@@ -15,6 +15,7 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+using System.Threading.Tasks;
 using TermSAT.Formulas;
 
 namespace TermSAT.RuleDatabase
@@ -47,7 +48,7 @@ namespace TermSAT.RuleDatabase
          * possible.
          * @return A reduced formula.  Returns null if the given formula can't be reduced. 
          */
-        static public Formula reduceUsingRule(this Formula formula, ReductionRule rule)
+        async static public Task<Formula> reduceUsingRule(this Formula formula, ReductionRule rule)
         {
             Formula reducedFormula;
 
@@ -61,7 +62,7 @@ namespace TermSAT.RuleDatabase
             if (formula is Negation)
             {
                 Formula negated = ((Negation)formula).Child;
-                Formula n = reduceUsingRule(negated, rule);
+                Formula n = await reduceUsingRule(negated, rule);
                 if (n != null)
                 {
                     reducedFormula = Negation.newNegation(n);
@@ -73,13 +74,13 @@ namespace TermSAT.RuleDatabase
                 Implication implication = (Implication)formula;
                 Formula antecent = implication.Antecedent;
                 Formula consequent = implication.Consequent;
-                Formula a = reduceUsingRule(antecent, rule);
+                Formula a = await reduceUsingRule(antecent, rule);
                 if (a != null)
                 {
                     reducedFormula = Implication.newImplication(a, consequent);
                     return reducedFormula;
                 }
-                Formula c = reduceUsingRule(consequent, rule);
+                Formula c = await reduceUsingRule(consequent, rule);
                 if (c != null)
                 {
                     reducedFormula = Implication.newImplication(antecent, c);
@@ -97,7 +98,7 @@ namespace TermSAT.RuleDatabase
 
             // if formula and rule formula match then create reduced formula
             var info = matches[0];
-            reducedFormula = Formula.createInstance(rule.Reduction, info.Substitutions);
+            reducedFormula = await rule.Reduction.CreateSubstitutionInstance(info.Substitutions);
             return reducedFormula;
         }
 
