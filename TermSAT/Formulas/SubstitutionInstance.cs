@@ -101,7 +101,7 @@ namespace TermSAT.Formulas
             var newConsequent = await Consequent.CreateSubstitutionInstance(substitutions);
             var newAntecedent = await taskA;
             if (newAntecedent != Antecedent || newConsequent != Consequent)
-                return Implication.newImplication(newAntecedent, newConsequent);
+                return Implication.NewImplication(newAntecedent, newConsequent);
             return this;
         }
     }

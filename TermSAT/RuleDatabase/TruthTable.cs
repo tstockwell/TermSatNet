@@ -61,11 +61,11 @@ namespace TermSAT.RuleDatabase
         private TruthTable(string valueText) : this(valueText.ToBitArray()) {  }
         private TruthTable(Formula formula) : this(ToBitArray(formula)) { }
 
-        public static TruthTable newTruthTable(string valueText)
+        public static TruthTable NewTruthTable(string valueText)
         {
             return __cache.GetOrCreateValue(valueText, () => new TruthTable(valueText));
         }
-        public static TruthTable newTruthTable(Formula formula)
+        public static TruthTable NewTruthTable(Formula formula)
         {
             return __formulaCache.GetOrCreateValue(formula, () => new TruthTable(formula));
         }
@@ -83,7 +83,7 @@ namespace TermSAT.RuleDatabase
 
                 for (int b= 1; b <= VARIABLE_COUNT; b++)
                 {
-                    var variable = Variable.newVariable(b);
+                    var variable = Variable.NewVariable(b);
                     var mask = 1 << (b - 1);
                     var iVariableValue= i & ~(mask);
                     valuation.Add(variable, iVariableValue != 0);

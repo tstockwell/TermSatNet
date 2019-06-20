@@ -131,7 +131,7 @@ namespace TermSAT.RuleDatabase
 
         private Boolean isCanonicalFormula(Formula formula)
         {
-            int length = _database.GetLengthOfCanonicalFormulas(TruthTable.newTruthTable(formula));
+            int length = _database.GetLengthOfCanonicalFormulas(TruthTable.NewTruthTable(formula));
 
             // if there are no canonical formulas in the database then this is the first
             if (length <= 0) 
@@ -154,7 +154,7 @@ namespace TermSAT.RuleDatabase
          */
         private ReductionRule formulaCanBeReduced(Formula formula)
         {
-            SubstitutionInstance match = _recognizer.findFirstGeneralization(formula);
+            SubstitutionInstance match = _recognizer.FindFirstGeneralization(formula);
             if (match == null)
                 return null;
             Formula canonicalFormula = _database.FindCanonicalFormula(match.Generalization);

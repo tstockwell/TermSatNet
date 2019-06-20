@@ -54,11 +54,12 @@ namespace TermSAT.Common
 
             bool IsRoot();
             TValue FindValue(TKey key, int index);
-            TResult Accept<TResult>(Visitor<TResult> visitor);
+            TResult Accept<TResult>(IVisitor<TResult> visitor);
+            TValue Add(TKey key, TValue value);
             TValue Remove(TKey key);
         }
 
-        public interface Visitor<TResult>
+        public interface IVisitor<TResult>
         {
             /**
              * Visit a node
@@ -74,15 +75,12 @@ namespace TermSAT.Common
 
         public class NodeImpl : INode
         {
-
             public INode Parent { get; protected set; }
-
             private IDictionary<TItem, INode> _children;
             public IDictionary<TItem, INode> Children
             {
                 get
                 {
-                    ISequence<char> x= ((object)"   ") as ISequence<char>;
                     if (_children == null)
                         return EMPTY_DICTIONARY as IDictionary<TItem, INode>;
                     return _children;
@@ -101,7 +99,7 @@ namespace TermSAT.Common
                 Depth = depth;
                 System.Diagnostics.Trace.Assert(key != null || parent == null);
             }
-            public TResult Accept<TResult>(Visitor<TResult> visitor)
+            public TResult Accept<TResult>(IVisitor<TResult> visitor)
             {
                 bool visitChildren = !IsRoot() ? visitor.Visit(this) : true;
                 if (visitChildren)
@@ -122,9 +120,7 @@ namespace TermSAT.Common
 
             public TValue Add(TKey key, TValue value)
             {
-                System.Diagnostics.Debug.Assert(Key.Equals(key[Depth]));
-                System.Diagnostics.Debug.Assert(Depth < key.Length);
-
+                // if at end of key then return the value of this node
                 if (key.Length - 1 <= Depth)
                 {
                     var oldValue = Value;
@@ -132,15 +128,15 @@ namespace TermSAT.Common
                     return oldValue;
                 }
 
-                var symbol = key[Depth];
-                NodeImpl n = (NodeImpl)Children[symbol];
-                if (n == null)
-                {
+                var symbol = key[Depth+1];
+
+                if (_children == null)
+                    _children = new Dictionary<TItem, INode>();
+
+                if (!_children.TryGetValue(symbol, out INode n))
                     n = new NodeImpl(this, symbol, Depth + 1);
-                    if (_children == null)
-                        _children = new Dictionary<TItem, INode>();
-                    _children[symbol] = n;
-                }
+
+                _children[symbol] = n;
 
                 return n.Add(key, value);
             }
@@ -221,7 +217,7 @@ namespace TermSAT.Common
         /**
          * Visits all the nodes in the trie and gathers a list of all the values stored in the trie.
          */
-        class ValueCollectorVisitor : Visitor<HashSet<TValue>>
+        class ValueCollectorVisitor : IVisitor<HashSet<TValue>>
         {
             HashSet<TValue> keys = new HashSet<TValue>();
             public bool IsComplete { get { return false; } }
@@ -288,7 +284,7 @@ namespace TermSAT.Common
             _root.Children.Clear();
         }
 
-        public TResult Accept<TResult>(Visitor<TResult> visitor)
+        public TResult Accept<TResult>(IVisitor<TResult> visitor)
         {
             _root.Accept(visitor);
             return visitor.Result;

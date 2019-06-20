@@ -46,7 +46,7 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestFormulaConstruction()
         {
-            Assert.AreEqual(".1", Variable.newVariable(1).ToString());
+            Assert.AreEqual(".1", Variable.NewVariable(1).ToString());
 
             Assert.AreEqual("*.1.1", "*.1.1".ToFormula().ToString());
 
@@ -56,7 +56,7 @@ namespace TermSAT.Tests
             Assert.AreEqual(formula1.ToString(), text);
 
             text = "*" + text + text;
-            Formula formula2 = Implication.newImplication(formula1, formula1);
+            Formula formula2 = Implication.NewImplication(formula1, formula1);
             Assert.AreEqual(15, formula2.Length);
             Assert.AreEqual(formula2.ToString(), text);
 
@@ -65,7 +65,7 @@ namespace TermSAT.Tests
             Assert.AreEqual(16, formula3.Length);
             Assert.AreEqual(formula3.ToString(), text);
 
-            Formula formula4 = Variable.newVariable(23);
+            Formula formula4 = Variable.NewVariable(23);
             Assert.AreEqual(formula4.ToString(), ".23");
 
         }
@@ -73,17 +73,19 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestEvaluation()
         {
-            Variable one = Variable.newVariable(1);
-            Variable two = Variable.newVariable(2);
-            Formula formula1 = Implication.newImplication(one, two);
+            Variable one = Variable.NewVariable(1);
+            Variable two = Variable.NewVariable(2);
+            Formula formula1 = Implication.NewImplication(one, two);
             Formula formula2 = Negation.newNegation(formula1);
             for (int a = 0; a <= 1; a++)
             {
                 for (int b = 0; b <= 1; b++)
                 {
-                    var valuation = new Dictionary<Variable, Boolean>();
-                    valuation.Add(one, (a == 1 ? true : false));
-                    valuation.Add(two, (b == 1 ? true : false));
+                    var valuation = new Dictionary<Variable, bool>
+                    {
+                        { one, (a == 1 ? true : false) },
+                        { two, (b == 1 ? true : false) }
+                    };
                     var value1 = formula1.Evaluate(valuation);
                     Assert.AreEqual(a != 1 || b != 0, value1, "formula evaluation failed");
                     var value2 = formula2.Evaluate(valuation);
@@ -97,11 +99,13 @@ namespace TermSAT.Tests
         {
             Formula formula1 = "***.1.2.3.4".ToFormula();
 
-            var substitutions = new Dictionary<Variable, Formula>();
-            substitutions.Add(Variable.newVariable(1), Variable.newVariable(5));
-            substitutions.Add(Variable.newVariable(2), Variable.newVariable(6));
-            substitutions.Add(Variable.newVariable(3), Variable.newVariable(7));
-            substitutions.Add(Variable.newVariable(4), Variable.newVariable(8));
+            var substitutions = new Dictionary<Variable, Formula>
+            {
+                { Variable.NewVariable(1), Variable.NewVariable(5) },
+                { Variable.NewVariable(2), Variable.NewVariable(6) },
+                { Variable.NewVariable(3), Variable.NewVariable(7) },
+                { Variable.NewVariable(4), Variable.NewVariable(8) }
+            };
             Formula instance = await formula1.CreateSubstitutionInstance(substitutions);
 
             Assert.AreEqual("***.5.6.7.8", instance.ToString());
@@ -109,52 +113,56 @@ namespace TermSAT.Tests
         }
 
         [TestMethod]
-        public void testInstanceRecognizer()
+        public void TestInstanceRecognizer()
         {
             String text = "***.1.2.3.4";
             Formula formula1 = text.ToFormula();
-            Formula formula2 = Implication.newImplication(formula1, formula1);
+            Formula formula2 = Implication.NewImplication(formula1, formula1);
 
             InstanceRecognizer recognizer = new InstanceRecognizer();
             Formula rule1 = "*.1.2".ToFormula();
             recognizer.Add(rule1);
-            Assert.AreEqual(1, recognizer.findAllGeneralizations(rule1).Count);
-            Assert.AreEqual(1, recognizer.findAllGeneralizations(formula1).Count);
-            Assert.AreEqual(1, recognizer.findAllGeneralizations(formula2).Count);
+            Assert.AreEqual(1, recognizer.FindAllGeneralizations(rule1).Count);
+            Assert.AreEqual(1, recognizer.FindAllGeneralizations(formula1).Count);
+            Assert.AreEqual(1, recognizer.FindAllGeneralizations(formula2).Count);
 
-            SubstitutionInstance match = recognizer.findFirstGeneralization(formula2);
+            SubstitutionInstance match = recognizer.FindFirstGeneralization(formula2);
             Assert.IsNotNull(match.Substitutions);
             Assert.AreEqual(2, match.Substitutions.Count);
 
             recognizer.Add("*.1.1".ToFormula());
-            Assert.AreEqual(2, recognizer.findAllGeneralizations(formula2).Count);
+            Assert.AreEqual(2, recognizer.FindAllGeneralizations(formula2).Count);
 
-            InstanceRecognizer recognizer2 = new InstanceRecognizer();
-            recognizer2.Add("**.1.2*.3.4".ToFormula());
-            Assert.AreEqual(1, recognizer2.findAllGeneralizations(formula2).Count);
+            InstanceRecognizer recognizer2 = new InstanceRecognizer
+            {
+                "**.1.2*.3.4".ToFormula()
+            };
+            Assert.AreEqual(1, recognizer2.FindAllGeneralizations(formula2).Count);
 
             recognizer.Add("**.1.2*.3.4".ToFormula());
-            Assert.AreEqual(3, recognizer.findAllGeneralizations(formula2).Count);
+            Assert.AreEqual(3, recognizer.FindAllGeneralizations(formula2).Count);
             recognizer.Add("**.1.2*.3.2".ToFormula());
-            Assert.AreEqual(4, recognizer.findAllGeneralizations(formula2).Count);
+            Assert.AreEqual(4, recognizer.FindAllGeneralizations(formula2).Count);
             recognizer.Add("**.1.2*.1.4".ToFormula());
-            Assert.AreEqual(5, recognizer.findAllGeneralizations(formula2).Count);
+            Assert.AreEqual(5, recognizer.FindAllGeneralizations(formula2).Count);
             recognizer.Add("**.1.2*.1.2".ToFormula());
-            Assert.AreEqual(6, recognizer.findAllGeneralizations(formula2).Count);
+            Assert.AreEqual(6, recognizer.FindAllGeneralizations(formula2).Count);
 
             Formula formula3 = Negation.newNegation(formula2);
             recognizer.Add("-.1".ToFormula());
-            Assert.AreEqual(1, recognizer.findAllGeneralizations(formula3).Count);
+            Assert.AreEqual(1, recognizer.FindAllGeneralizations(formula3).Count);
 
-            recognizer = new InstanceRecognizer();
-            recognizer.Add("*.1T".ToFormula());
-            Assert.AreEqual(1, recognizer
-                    .findAllGeneralizations("*.1T".ToFormula()).Count);
+            recognizer = new InstanceRecognizer
+            {
+                "*.1T".ToFormula()
+            };
+            Assert.AreEqual(1, recognizer.FindAllGeneralizations("*.1T".ToFormula()).Count);
 
-            recognizer = new InstanceRecognizer();
-            recognizer.Add("*.1.1".ToFormula());
-            Assert.AreEqual(0,
-                    recognizer.findAllGeneralizations("*.1.2".ToFormula()).Count);
+            recognizer = new InstanceRecognizer
+            {
+                "*.1.1".ToFormula()
+            };
+            Assert.AreEqual(0, recognizer.FindAllGeneralizations("*.1.2".ToFormula()).Count);
         }
 
     }

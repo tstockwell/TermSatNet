@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,4 +17,25 @@ namespace TermSAT.Common
 
         int Length { get; }
     }
+
+    /// <summary>
+    /// ISequence adapter interface for strings.
+    /// </summary>
+    public class StringSequence : ISequence<char>
+    {
+        public readonly string Value;
+
+        public StringSequence(string value) { Value= value; }
+
+        public char this[int index] => Value[index];
+        public override string ToString() => Value;
+        public int Length => Value.Length;
+        public int CompareTo(ISequence<char> other) => Value.CompareTo(other.ToString());
+        public bool Equals(ISequence<char> other) => Value.Equals(other.ToString());
+        public IEnumerator<char> GetEnumerator() => Value.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Value.GetEnumerator();
+    }
+
+
+
 }

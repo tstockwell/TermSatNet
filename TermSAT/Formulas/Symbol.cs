@@ -49,64 +49,64 @@ namespace TermSAT.Formulas
         private Symbol(char c) : base(c) { }
 
 
-        public static bool isNegation(char c)
+        public static bool IsNegation(char c)
         {
             return c == Negation.Value;
         }
 
-        public static bool isImplication(char c)
+        public static bool IsImplication(char c)
         {
             return c == Implication.Value;
         }
 
-        public static bool isVariable(char c)
+        public static bool IsVariable(char c)
         {
             return c == Variable.Value;
         }
 
-        public static bool isFalse(char c)
+        public static bool IsFalse(char c)
         {
             return c == False.Value;
         }
 
-        public static bool isTrue(char c)
+        public static bool IsTrue(char c)
         {
             return c == True.Value;
         }
 
 
-        public static bool isNegation(string c)
+        public static bool IsNegation(string c)
         {
             return c.StartsWith(Negation.Value);
         }
 
-        public static bool isImplication(string c)
+        public static bool IsImplication(string c)
         {
             return c.StartsWith(Implication.Value);
         }
 
-        public static bool isVariable(string c)
+        public static bool IsVariable(string c)
         {
             return c.StartsWith(Variable.Value);
         }
 
-        public static bool isTrue(string c)
+        public static bool IsTrue(string c)
         {
             return c.StartsWith(True.Value);
         }
 
-        public static bool isFalse(string c)
+        public static bool IsFalse(string c)
         {
             return c.StartsWith(False.Value);
         }
-        public static bool isConstant(string c)
+        public static bool IsConstant(string c)
         {
-            return isTrue(c) || isFalse(c);
+            return IsTrue(c) || IsFalse(c);
         }
 
-        public static bool isSymbol(char c)
+        public static bool IsSymbol(char c)
         {
-            return isTrue(c) || isFalse(c) || isVariable(c) || isNegation(c) || isImplication(c);
+            return IsTrue(c) || IsFalse(c) || IsVariable(c) || IsNegation(c) || IsImplication(c);
         }
     }
 }

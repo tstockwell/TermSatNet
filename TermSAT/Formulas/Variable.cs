@@ -23,7 +23,7 @@ namespace TermSAT.Formulas
         /// </summary>
         class CacheKey
         {
-            private int key;
+            private readonly int key;
             public CacheKey(int k)
             {
                 this.key = k;
@@ -43,7 +43,7 @@ namespace TermSAT.Formulas
 
         public int Number { get; }
 
-        public static Variable newVariable(int variableId)
+        public static Variable NewVariable(int variableId)
         {
             if (variableId < 1)
                 throw new Exception("Variable numbers must be greater than 0");
@@ -67,7 +67,7 @@ namespace TermSAT.Formulas
             return _text;
         }
 
-        override public bool containsVariable(Variable variable)
+        override public bool ContainsVariable(Variable variable)
         {
             return this.Equals(variable);
         }

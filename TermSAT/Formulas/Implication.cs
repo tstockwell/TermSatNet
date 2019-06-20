@@ -11,10 +11,10 @@ namespace TermSAT.Formulas
 
         static readonly WeakCache<Formula, WeakCache<Formula, Implication>> formulaCache = new WeakCache<Formula, WeakCache<Formula, Implication>>();
 
-        public static Implication newImplication(Formula antecedent, Formula consequent)
+        public static Implication NewImplication(Formula antecedent, Formula consequent)
         {
             var implicationCache = formulaCache.GetOrCreateValue(antecedent, () => new WeakCache<Formula, Implication>());
-            return implicationCache.GetOrCreateValue(antecedent, () => new Implication(antecedent, consequent));
+            return implicationCache.GetOrCreateValue(consequent, () => new Implication(antecedent, consequent));
         }
 
         public Formula Antecedent { get; }
@@ -56,9 +56,9 @@ namespace TermSAT.Formulas
             }
         }
 
-        override public bool containsVariable(Variable variable)
+        override public bool ContainsVariable(Variable variable)
         {
-            return Antecedent.containsVariable(variable) || Consequent.containsVariable(variable);
+            return Antecedent.ContainsVariable(variable) || Consequent.ContainsVariable(variable);
         }
 
         public override string ToString()

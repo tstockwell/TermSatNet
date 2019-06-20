@@ -178,7 +178,7 @@ namespace TermSAT.RuleDatabase
                 Text = formula.ToString(),
                 IsCanonical = isCanonical,
                 Length = formula.Length,
-                TruthValue = TruthTable.newTruthTable(formula).ToString()
+                TruthValue = TruthTable.NewTruthTable(formula).ToString()
             };
 
             ruleContext.Formulas.Add(record);
@@ -220,7 +220,7 @@ namespace TermSAT.RuleDatabase
                 .Select(f => f.TruthValue)
                 .Distinct()
                 .ToList();
-            var truthTables = truthValues.Select(v => TruthTable.newTruthTable(v)).ToList();
+            var truthTables = truthValues.Select(v => TruthTable.NewTruthTable(v)).ToList();
             return truthTables;
         }
 
@@ -242,7 +242,7 @@ namespace TermSAT.RuleDatabase
          */
         public Formula FindCanonicalFormula(Formula formula)
         {
-            var truthTableText = TruthTable.newTruthTable(formula).ToString();
+            var truthTableText = TruthTable.NewTruthTable(formula).ToString();
 
             var record = ruleContext.Formulas
                 .AsNoTracking()

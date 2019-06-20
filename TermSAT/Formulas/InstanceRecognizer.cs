@@ -63,9 +63,9 @@ namespace TermSAT.Formulas
          * the given formula.
          * @param maxMatchCount maximum # of matches to find
          */
-        public IList<SubstitutionInstance> findGeneralizations(Formula formula, int maxMatchCount)
+        public IList<SubstitutionInstance> FindGeneralizations(Formula formula, int maxMatchCount)
         {
-            var matches = findGeneralizationNodes(formula, maxMatchCount);
+            var matches = FindGeneralizationNodes(formula, maxMatchCount);
             if (matches == null)
                 return new List<SubstitutionInstance>(0);
             var list = new List<SubstitutionInstance>(matches.Count);
@@ -78,25 +78,25 @@ namespace TermSAT.Formulas
          * Returns a list of all formulas in this InstanceRecogniser that are 
          * generalizations of the given formula.
          */
-        public IList<SubstitutionInstance> findAllGeneralizations(Formula formula)
+        public IList<SubstitutionInstance> FindAllGeneralizations(Formula formula)
         {
-            return findGeneralizations(formula, int.MaxValue);
+            return FindGeneralizations(formula, int.MaxValue);
         }
 
         /**
          * Returns the first formula found in this InstanceRecogniser that is a 
          * generalization of the given formula.
          */
-        public SubstitutionInstance findFirstGeneralization(Formula formula)
+        public SubstitutionInstance FindFirstGeneralization(Formula formula)
         {
-            var matches = findGeneralizations(formula, 1);
+            var matches = FindGeneralizations(formula, 1);
             if (matches.Count <= 0)
                 return null;
             return matches[0];
         }
 
 
-        public IList<SearchResult> findGeneralizationNodes(Formula formula, int maxMatchCount)
+        public IList<SearchResult> FindGeneralizationNodes(Formula formula, int maxMatchCount)
         {
             var visitor = new RecognizerVisitor(formula, maxMatchCount);
             var matches = Accept(visitor);
@@ -117,7 +117,7 @@ namespace TermSAT.Formulas
         /// <summary>
         /// This trie visitor finds all the formulas in a trie that are generalizations of the given formula.
         /// </summary>
-        public class RecognizerVisitor : Visitor<List<SearchResult>>
+        public class RecognizerVisitor : IVisitor<List<SearchResult>>
         {
             List<SearchResult> _matches = new List<SearchResult>();
             Stack<IDictionary<Variable, Formula>> _substitutions = new Stack<IDictionary<Variable, Formula>>();
@@ -157,8 +157,10 @@ namespace TermSAT.Formulas
                         Formula subtitute = currentSubstitutions[currentSubformula as Variable];
                         if (subtitute == null)
                         {
-                            currentSubstitutions = new Dictionary<Variable, Formula>(currentSubstitutions);
-                            currentSubstitutions.Add(currentSubformula as Variable, instanceSubformula);
+                            currentSubstitutions = new Dictionary<Variable, Formula>(currentSubstitutions)
+                            {
+                                { currentSubformula as Variable, instanceSubformula }
+                            };
                             currentPosition += instanceSubformula.Length;
                         }
                         else

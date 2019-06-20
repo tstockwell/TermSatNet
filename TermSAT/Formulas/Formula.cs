@@ -186,19 +186,19 @@ namespace TermSAT.Formulas
          * that also occur in the given formula with new variables that 
          * don't occur in the given formula
          */
-        async public Task<Formula> createIndependentInstance(Formula formula)
+        async public Task<Formula> CreateIndependentInstance(Formula formula)
         {
             var substitutions = new Dictionary<Variable, Formula>();
             var variables = formula.AllVariables;
             var newVariables = new List<Variable>();
             foreach (Variable variable in variables)
             {
-                if (containsVariable(variable))
+                if (ContainsVariable(variable))
                 {
                     for (int i = 1; ; i++)
                     {
-                        Variable v = Variable.newVariable(i);
-                        if (!containsVariable(v) && !variables.Contains(v) && !newVariables.Contains(v))
+                        Variable v = Variable.NewVariable(i);
+                        if (!ContainsVariable(v) && !variables.Contains(v) && !newVariables.Contains(v))
                         {
                             substitutions.Add(variable, v);
                             newVariables.Add(v);
@@ -253,13 +253,13 @@ namespace TermSAT.Formulas
             {
                 if (right.Equals(left))
                     return new Dictionary<Variable, Formula>();
-                if (right.containsVariable((Variable)left))
+                if (right.ContainsVariable((Variable)left))
                     return null;
                 return new Dictionary<Variable, Formula>() { [(Variable)left] = right };
             }
             else if (right is Variable)
             {
-                if (left.containsVariable((Variable)right))
+                if (left.ContainsVariable((Variable)right))
                     return null;
                 return new Dictionary<Variable, Formula>() { [(Variable)right] = left };
             }
@@ -346,7 +346,7 @@ namespace TermSAT.Formulas
             //	        end		
         }
 
-        abstract public bool containsVariable(Variable variable);
+        public abstract bool ContainsVariable(Variable variable);
 
         /**
          * @return a list of all subterms.  Includes this formula.
@@ -371,7 +371,7 @@ namespace TermSAT.Formulas
          * Two rules are syntactically equal if they are identical except for variable names.
          * 
          */
-        async public static Task<bool> syntacticallyEqual(Formula left, Formula right)
+        public static async Task<bool> SyntacticallyEqual(Formula left, Formula right)
         {
             if (left == right)
                 return true;
@@ -393,7 +393,7 @@ namespace TermSAT.Formulas
          * 
          * @return a list of formulas 
          */
-        async public static Task<List<Formula>> findAllCriticalTerms(Formula left, Formula right)
+        public static async Task<List<Formula>> FindAllCriticalTerms(Formula left, Formula right)
         {
 
             HashSet<Formula> criticalTerms = new HashSet<Formula>();

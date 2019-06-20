@@ -43,32 +43,32 @@ namespace TermSAT.Formulas
             for (int i = last; 0 < i--;)
             {
                 char c = formulaText[i];
-                if (Symbol.isNegation(c))
+                if (Symbol.IsNegation(c))
                 {
                     Formula f = stack.Pop();
                     stack.Push(Negation.newNegation(f));
                 }
-                else if (Symbol.isImplication(c))
+                else if (Symbol.IsImplication(c))
                 {
                     Formula antecendent = stack.Pop();
                     Formula consequent = stack.Pop();
-                    stack.Push(Implication.newImplication(antecendent, consequent));
+                    stack.Push(Implication.NewImplication(antecendent, consequent));
                 }
-                else if (Symbol.isTrue(c))
+                else if (Symbol.IsTrue(c))
                 {
                     stack.Push(Constant.TRUE);
                 }
-                else if (Symbol.isFalse(c))
+                else if (Symbol.IsFalse(c))
                 {
                     stack.Push(Constant.FALSE);
                 }
-                else if (Symbol.isVariable(c))
+                else if (Symbol.IsVariable(c))
                 {
                     int start = i + 1, end= i + 2;
                     while (end < formulaText.Length && Char.IsDigit(formulaText[end]))
                         end++;
                     var n = int.Parse(formulaText.Substring(start, end - start));
-                    stack.Push(Variable.newVariable(n));
+                    stack.Push(Variable.NewVariable(n));
                 }
                 else if (Char.IsDigit(c))
                 {

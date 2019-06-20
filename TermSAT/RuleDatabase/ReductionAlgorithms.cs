@@ -43,7 +43,7 @@ namespace TermSAT.RuleDatabase
         /// 
         /// </summary>
         /// <returns>A reduced formula, or the original formula if the orginal formula connot be reduced.</returns>
-        async static public Task<Formula> reduceUsingSingleReplacement(Formula formula)
+        public static async Task<Formula> ReduceUsingSingleReplacement(Formula formula)
         {
             if (formula is Constant)
                 return formula;
@@ -52,21 +52,21 @@ namespace TermSAT.RuleDatabase
             if (formula is Negation)
             {
                 var child = (formula as Negation).Child;
-                var reducedChild = await reduceUsingSingleReplacement(child);
+                var reducedChild = await ReduceUsingSingleReplacement(child);
                 if (reducedChild != child)
                     return Negation.newNegation(reducedChild);
                 return formula;
             }
 
             Implication i = formula as Implication;
-            var consequentTask = Task.Run(() => { return reduceUsingSingleReplacement(i.Consequent); });
-            var antecedentTask = Task.Run(() => { return reduceUsingSingleReplacement(i.Antecedent); });
+            var consequentTask = Task.Run(() => { return ReduceUsingSingleReplacement(i.Consequent); });
+            var antecedentTask = Task.Run(() => { return ReduceUsingSingleReplacement(i.Antecedent); });
 
             var consequent = await consequentTask;
             var antecedent = await consequentTask;
 
             if (consequent != i.Consequent || antecedent != i.Antecedent)
-                return Implication.newImplication(antecedent, consequent);
+                return Implication.NewImplication(antecedent, consequent);
 
             return formula;
         }

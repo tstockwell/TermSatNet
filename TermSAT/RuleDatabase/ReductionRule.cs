@@ -48,7 +48,7 @@ namespace TermSAT.RuleDatabase
          * possible.
          * @return A reduced formula.  Returns null if the given formula can't be reduced. 
          */
-        async static public Task<Formula> reduceUsingRule(this Formula formula, ReductionRule rule)
+        public static async Task<Formula> ReduceUsingRule(this Formula formula, ReductionRule rule)
         {
             Formula reducedFormula;
 
@@ -59,40 +59,38 @@ namespace TermSAT.RuleDatabase
             //
             // reduce subformulas before reducing this formula
             //
-            if (formula is Negation)
+            if (formula is Negation negation)
             {
-                Formula negated = ((Negation)formula).Child;
-                Formula n = await reduceUsingRule(negated, rule);
+                Formula negated = negation.Child;
+                Formula n = await ReduceUsingRule(negated, rule);
                 if (n != null)
                 {
                     reducedFormula = Negation.newNegation(n);
                     return reducedFormula;
                 }
             }
-            else if (formula is Implication)
+            else if (formula is Implication implication)
             {
-                Implication implication = (Implication)formula;
                 Formula antecent = implication.Antecedent;
                 Formula consequent = implication.Consequent;
-                Formula a = await reduceUsingRule(antecent, rule);
+                Formula a = await ReduceUsingRule(antecent, rule);
                 if (a != null)
                 {
-                    reducedFormula = Implication.newImplication(a, consequent);
+                    reducedFormula = Implication.NewImplication(a, consequent);
                     return reducedFormula;
                 }
-                Formula c = await reduceUsingRule(consequent, rule);
+                Formula c = await ReduceUsingRule(consequent, rule);
                 if (c != null)
                 {
-                    reducedFormula = Implication.newImplication(antecent, c);
+                    reducedFormula = Implication.NewImplication(antecent, c);
                     return reducedFormula;
                 }
             }
 
 
             // check if given formula is a substitution instance of the reduction rules formula
-            InstanceRecognizer instanceRecognizer = new InstanceRecognizer();
-            instanceRecognizer.Add(rule.Formula);
-            var matches = instanceRecognizer.findGeneralizationNodes(formula, 1);
+            InstanceRecognizer instanceRecognizer = new InstanceRecognizer { rule.Formula };
+            var matches = instanceRecognizer.FindGeneralizationNodes(formula, 1);
             if (matches == null)
                 return null;
 

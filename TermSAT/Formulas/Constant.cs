@@ -23,7 +23,7 @@ namespace TermSAT.Formulas
             return _text;
         }
 
-        override public bool containsVariable(Variable variable)
+        override public bool ContainsVariable(Variable variable)
         {
             return false;
         }

@@ -30,9 +30,9 @@ namespace TermSAT.Formulas
             return Child.Evaluate(valuation) ? false : true;
         }
 
-        override public bool containsVariable(Variable variable)
+        override public bool ContainsVariable(Variable variable)
         {
-            return Child.containsVariable(variable);
+            return Child.ContainsVariable(variable);
         }
 
         public override void GetAllSubterms(ICollection<Formula> subterms)

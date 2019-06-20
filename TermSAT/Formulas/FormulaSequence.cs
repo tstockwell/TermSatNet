@@ -141,7 +141,7 @@ namespace TermSAT.Formulas
     public class FormulaEnumerator : IEnumerator<Formula>
     {
         private Formula formula;
-        private int startingPosition;
+        private readonly int startingPosition;
         int position = 0;
 
         public Formula Current { get; private set; }

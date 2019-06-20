@@ -210,7 +210,7 @@ namespace TermSAT.RuleDatabase
                 _antecedent = _rightIterator.Current;
         }
 
-        public Formula Current { get { return Implication.newImplication(_antecedent, _consequents.Current); } }
+        public Formula Current { get { return Implication.NewImplication(_antecedent, _consequents.Current); } }
 
         object IEnumerator.Current { get { return Current; } }
 
