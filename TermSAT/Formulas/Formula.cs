@@ -67,6 +67,12 @@ namespace TermSAT.Formulas
     {
         private static readonly ConditionalWeakTable<Object, List<Variable>> __varListCache = new ConditionalWeakTable<Object, List<Variable>>();
 
+        public static implicit operator Formula(string formulaText)
+        {
+            return FormulaParser.ToFormula(formulaText);
+        }
+
+
         public int Length { get; }
 
         /// <param name="length">The number of symbols in this formula</param>

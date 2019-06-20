@@ -37,8 +37,6 @@ namespace TermSAT.Common
     {
 
         private static readonly Dictionary<object, object> EMPTY_DICTIONARY = new Dictionary<object, object>();
-        private static readonly object NO_VALUE = null;
-
 
         /// <summary>
         /// The root node has Depth == -1, Key == null, and Parent == null
@@ -53,7 +51,7 @@ namespace TermSAT.Common
             TItem Key { get; } 
 
             bool IsRoot();
-            TValue FindValue(TKey key, int index);
+            TValue FindValue(TKey key);
             TResult Accept<TResult>(IVisitor<TResult> visitor);
             TValue Add(TKey key, TValue value);
             TValue Remove(TKey key);
@@ -102,9 +100,9 @@ namespace TermSAT.Common
             public TResult Accept<TResult>(IVisitor<TResult> visitor)
             {
                 bool visitChildren = !IsRoot() ? visitor.Visit(this) : true;
-                if (visitChildren)
+                if (visitChildren && _children != null)
                 {
-                    foreach (var node in Children.Values)
+                    foreach (var node in _children.Values)
                     {
                         if (visitor.IsComplete)
                             break;
@@ -141,45 +139,34 @@ namespace TermSAT.Common
                 return n.Add(key, value);
             }
 
-            public TValue FindValue(TKey key, int index)
+            public TValue FindValue(TKey key)
             {
-                if (key.Length <= index)
-                    throw new IndexOutOfRangeException();
-                if (index < Depth)
-                    throw new IndexOutOfRangeException();
-                if (index == Depth)
+                if (key.Length - 1 <= Depth)
                     return Value;
-                var item = key[index];
-                var n = Children[item];
-                if (n == null)
+                var item = key[Depth + 1];
+                if (!Children.TryGetValue(item, out INode n))
                     return default(TValue);
-                return n.FindValue(key, index + 1);
+                return n.FindValue(key);
             }
 
             public TValue Remove(TKey key)
             {
-                var symbol = key[Depth];
-                var oldValue = Value;
-
                 if (key.Length - 1 <= Depth)
                 {
+                    var oldValue = Value;
                     Value = default(TValue);
 
-                    if (Children.Count <= 0 && Parent != null)
-                        Parent.Children.Remove(symbol);
+                    if (_children.Count <= 0)
+                        Parent.Children.Remove(Key);
 
                     return oldValue;
                 }
 
+                var symbol = key[Depth + 1];
                 var childNode = Children[symbol];
                 if (childNode == null)
                     return default(TValue);
-                childNode.Remove(key);
-
-                if (Value.Equals(default(TValue)) && Children.Count <= 0 && Parent != null)
-                    Parent.Children.Remove(symbol);
-
-                return oldValue;
+                return childNode.Remove(key);
             }
 
             void Clear()
@@ -237,8 +224,13 @@ namespace TermSAT.Common
 
         public bool IsReadOnly { get; set; }
 
+        /// <summary>
+        /// Unlike the standard .NET IDictionary interface, this method doesn't throw an exception 
+        /// if the ley is not found, because I think that's stupid.
+        /// It's normal to look for items that are not necessarily in the container, it's is NOT an error.
+        /// </summary>
         public TValue this[TKey key] {
-            get { return _root.FindValue(key, -1); }
+            get { return _root.FindValue(key); }
             set
             {
                 if (!IsReadOnly)
@@ -252,7 +244,10 @@ namespace TermSAT.Common
         {
             if (IsReadOnly)
                 return false;
-            return !_root.Remove(key).Equals(default(TValue));
+            bool valueWasRemoved = !_root.Remove(key).Equals(default(TValue));
+            if (valueWasRemoved)
+                Count--;
+            return valueWasRemoved;
         }
 
         public void Add(TKey key, TValue value)
@@ -276,12 +271,14 @@ namespace TermSAT.Common
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            throw new System.NotImplementedException();
+            value = _root.FindValue(key);
+            return value != null;
         }
 
         public void Clear()
         {
             _root.Children.Clear();
+            Count = 0;
         }
 
         public TResult Accept<TResult>(IVisitor<TResult> visitor)
