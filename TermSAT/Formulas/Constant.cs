@@ -1,16 +1,13 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace TermSAT.Formulas
 {
     public partial class Constant : Formula
     {
 
-        static internal List<Variable> EMPTY_VARIABLE_LIST= new List<Variable>();
-
-        public static implicit operator Constant(string formulaText)
-        {
-            return FormulaParser.ToFormula(formulaText) as Constant;
-        }
+        public static implicit operator Constant(string formulaText) =>
+            FormulaParser.ToFormula(formulaText) as Constant;
 
         // constants
         public static readonly Formula TRUE = new Constant("T");
@@ -18,32 +15,20 @@ namespace TermSAT.Formulas
 
 	    readonly string _text;
 
-        protected Constant(string text) : base(1)
+        protected Constant(string text) : base(length:1)
         {
             _text = text;
         }
 
-        override public string ToString()
-        {
-            return _text;
-        }
+        override public string ToString() => _text;
 
-        override public bool ContainsVariable(Variable variable)
-        {
-            return false;
-        }
+        override public bool ContainsVariable(Variable variable) => false;
 
-        public override bool Evaluate(IDictionary<Variable, bool> valuation)
-        {
-            return this == TRUE ? true : false;
-        }
+        public override bool Evaluate(IDictionary<Variable, bool> valuation) => this == TRUE ? true : false;
 
-        public override void GetAllSubterms(ICollection<Formula> subterms)
-        {
-            subterms.Add(this);
-        }
+        public override void GetAllSubterms(ICollection<Formula> subterms) => subterms.Add(this);
 
-        public override IList<Variable> AllVariables { get { return EMPTY_VARIABLE_LIST; } }
+        public override IList<Variable> AllVariables { get => ImmutableList<Variable>.Empty; }
     }
 
 

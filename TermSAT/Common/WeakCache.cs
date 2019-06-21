@@ -6,25 +6,76 @@ using System.Text;
 namespace TermSAT.Common
 {
     /// <summary>
-    ///    A convenince class for weakly caching item of type T.
-    ///    A weak cache automatically removes items from the cache when there are no
-    ///    other external object referencing the item in the cache.
+    ///    A convenince class for weakly caching items.
+    ///    
+    ///    IMPORTANT...
+    ///    The WeakReference implementation in .NET is pretty weak (get it ;-)).
+    ///    Unlike in Java, there is no way in .NET, AFAIK, to clean up WeakReferences whose targets 
+    ///    have been garbage collected.
+    ///    That means that even though the values saved in a cache may be garbage collected the key will not.
+    ///    
+    ///    It's recommended that, if possible, the values stored in a cache have finalizers 
+    ///    that will remove themselves from any cache during finalization 
+    /// 
     /// </summary>
-    /// <typeparam name="K">key Type</typeparam>
-    /// <typeparam name="V">value type</typeparam>
-    public class WeakCache<K, V> 
-        where K : class
-        where V : class
+    public class WeakCache<TKey, TValue> where TValue : class
     {
 
-        private ConditionalWeakTable<K, V> cache= new ConditionalWeakTable<K, V>();
+        private Dictionary<TKey, WeakReference<TValue>> cache= new Dictionary<TKey, WeakReference<TValue>>();
 
         public WeakCache() { }
 
-        public V GetOrCreateValue(K key, Func<V> createValue)
+        public TValue GetOrCreateValue(TKey key, Func<TValue> createValue)
         {
-            return cache.GetValue(key, _=> createValue());
+            WeakReference<TValue> reference;
+            TValue value;
+
+            // first try to get the value without locking anything
+            if (cache.TryGetValue(key, out reference))
+                if (reference.TryGetTarget(out value))
+                    return value;
+
+
+            // try again, with locking
+            lock (cache)
+            {
+                if (!cache.TryGetValue(key, out reference))
+                {
+                    value = createValue();
+                    reference = new WeakReference<TValue>(value);
+                    cache.Add(key, reference);
+                }
+                else
+                {
+                    if (!reference.TryGetTarget(out value))
+                    {
+                        value = createValue();
+                        reference.SetTarget(value);
+                    }
+                }
+            }
+
+            return value;
+        }
+        public void Remove(TKey key)
+        {
+            lock (cache)
+            {
+                cache.Remove(key);
+            }
+        }
+        
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            WeakReference<TValue> reference;
+
+            if (cache.TryGetValue(key, out reference))
+                if (reference.TryGetTarget(out value))
+                    return true;
+            value = default(TValue);
+            return false;
         }
 
+        public int Count => cache.Count;
     }
 }

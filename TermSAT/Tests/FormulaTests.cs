@@ -19,6 +19,7 @@ using TermSAT.Formulas;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
 
 namespace TermSAT.Tests
 {
@@ -46,10 +47,7 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestFormulaConstruction()
         {
-            Assert.AreEqual(Variable.NewVariable(1).GetHashCode(), Variable.NewVariable(1).GetHashCode());
             Assert.AreEqual(".1", Variable.NewVariable(1).ToString());
-            Assert.AreEqual(".1".ToFormula().GetHashCode(), Variable.NewVariable(1).GetHashCode());
-
             Assert.AreEqual("*.1.1", "*.1.1".ToFormula().ToString());
 
             var text = "***.1.2.3.4";
@@ -63,13 +61,23 @@ namespace TermSAT.Tests
             Assert.AreEqual(formula2.ToString(), text);
 
             text = "-" + text;
-            Formula formula3 = Negation.newNegation(formula2);
+            Formula formula3 = Negation.NewNegation(formula2);
             Assert.AreEqual(16, formula3.Length);
             Assert.AreEqual(formula3.ToString(), text);
 
             Formula formula4 = Variable.NewVariable(23);
             Assert.AreEqual(formula4.ToString(), ".23");
 
+        }
+
+        [TestMethod]
+        public void TestFormulaCaching()
+        {
+            // gotta test all formulas types, sine each has thier own cache
+            Assert.AreEqual("T".ToFormula().GetHashCode(), "T".ToFormula().GetHashCode());
+            Assert.AreEqual(".1".ToFormula().GetHashCode(), ".1".ToFormula().GetHashCode());
+            Assert.AreEqual("-.1".ToFormula().GetHashCode(), "-.1".ToFormula().GetHashCode());
+            Assert.AreEqual("*.1.1".ToFormula().GetHashCode(), "*.1.1".ToFormula().GetHashCode());
         }
 
         [TestMethod]
@@ -97,8 +105,9 @@ namespace TermSAT.Tests
         }
 
         [TestMethod]
-        public void TestSubstitutions()
+        public async Task TestSubstitutions()
         {
+
             Formula formula1 = "***.1.2.3.4";
 
             var substitutions = new Dictionary<Variable, Formula>
@@ -108,7 +117,7 @@ namespace TermSAT.Tests
                 { ".3", ".7" },
                 { ".4", ".8" }
             };
-            Formula instance = formula1.CreateSubstitutionInstance(substitutions).Result;
+            Formula instance = await formula1.CreateSubstitutionInstance(substitutions);
 
             Assert.AreEqual("***.5.6.7.8", instance);
 
@@ -117,16 +126,26 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestInstanceRecognizer()
         {
+            SubstitutionInstance match;
+            ICollection<SubstitutionInstance> matches;
+
             Formula formula1 = "***.1.2.3.4";
             Formula formula2 = Implication.NewImplication(formula1, formula1);
 
             Formula rule1 = "*.1.2";
             InstanceRecognizer recognizer = new InstanceRecognizer() { rule1 };
-            Assert.AreEqual(1, recognizer.FindAllGeneralizations(rule1).Count);
+
+
             Assert.AreEqual(1, recognizer.FindAllGeneralizations(formula1).Count);
             Assert.AreEqual(1, recognizer.FindAllGeneralizations(formula2).Count);
 
-            SubstitutionInstance match = recognizer.FindFirstGeneralization(formula2);
+            match = recognizer.FindFirstGeneralization(formula2);
+            Assert.IsNotNull(match.Substitutions);
+            Assert.AreEqual(2, match.Substitutions.Count);
+            Assert.AreEqual(formula2, rule1.CreateSubstitutionInstance(match.Substitutions));
+
+
+            match = recognizer.FindFirstGeneralization(formula2);
             Assert.IsNotNull(match.Substitutions);
             Assert.AreEqual(2, match.Substitutions.Count);
 
@@ -143,9 +162,15 @@ namespace TermSAT.Tests
             recognizer.Add("**.1.2*.1.4");
             Assert.AreEqual(5, recognizer.FindAllGeneralizations(formula2).Count);
             recognizer.Add("**.1.2*.1.2");
-            Assert.AreEqual(6, recognizer.FindAllGeneralizations(formula2).Count);
+            matches = recognizer.FindAllGeneralizations(formula2);
+            Assert.AreEqual(6, matches.Count);
+            foreach (var m in matches)
+            {
+                Assert.AreEqual(formula2, m.Generalization.CreateSubstitutionInstance(m.Substitutions));
+            }
 
-            Formula formula3 = Negation.newNegation(formula2);
+
+            Formula formula3 = Negation.NewNegation(formula2);
             recognizer.Add("-.1");
             Assert.AreEqual(1, recognizer.FindAllGeneralizations(formula3).Count);
 

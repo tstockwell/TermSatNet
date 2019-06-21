@@ -7,20 +7,19 @@ namespace TermSAT.Formulas
 {
     public partial class Implication : Formula
     {
-
-
         static readonly WeakCache<Formula, WeakCache<Formula, Implication>> formulaCache = new WeakCache<Formula, WeakCache<Formula, Implication>>();
 
         public static Implication NewImplication(Formula antecedent, Formula consequent)
         {
-            var implicationCache = formulaCache.GetOrCreateValue(antecedent, () => new WeakCache<Formula, Implication>());
-            return implicationCache.GetOrCreateValue(consequent, () => new Implication(antecedent, consequent));
+            lock(formulaCache)
+            {
+                var implicationCache = formulaCache.GetOrCreateValue(antecedent, () => new WeakCache<Formula, Implication>());
+                return implicationCache.GetOrCreateValue(consequent, () => new Implication(antecedent, consequent));
+            }
         }
 
-        public static implicit operator Implication(string formulaText)
-        {
-            return FormulaParser.ToFormula(formulaText) as Implication;
-        }
+        public static implicit operator Implication(string formulaText) =>
+            FormulaParser.ToFormula(formulaText) as Implication;
 
         public Formula Antecedent { get; }
         public Formula Consequent { get; }
@@ -32,10 +31,22 @@ namespace TermSAT.Formulas
             Consequent = consequent;
         }
 
-        override public bool Evaluate(IDictionary<Variable, bool> values)
+        ~Implication()
         {
-            return (Antecedent.Evaluate(values) && !Consequent.Evaluate(values)) ? false : true;
+            // clean up cache
+            lock (formulaCache)
+            {
+                if (formulaCache.TryGetValue(Antecedent, out WeakCache<Formula, Implication> implicationCache))
+                {
+                    implicationCache.Remove(Consequent);
+                    if (implicationCache.Count <= 0)
+                        formulaCache.Remove(Antecedent);
+                }
+            }
         }
+
+        override public bool Evaluate(IDictionary<Variable, bool> values) => 
+            (Antecedent.Evaluate(values) && !Consequent.Evaluate(values)) ? false : true;
 
         public override void GetAllSubterms(ICollection<Formula> subterms)
         {
@@ -58,15 +69,11 @@ namespace TermSAT.Formulas
             }
         }
 
-        override public bool ContainsVariable(Variable variable)
-        {
-            return Antecedent.ContainsVariable(variable) || Consequent.ContainsVariable(variable);
-        }
+        override public bool ContainsVariable(Variable variable) => 
+            Antecedent.ContainsVariable(variable) || Consequent.ContainsVariable(variable);
 
-        public override string ToString()
-        {
-            return "*" + Antecedent.ToString() + Consequent.ToString();
-        }
+        public override string ToString() =>
+            "*" + Antecedent.ToString() + Consequent.ToString();
     }
 
 }

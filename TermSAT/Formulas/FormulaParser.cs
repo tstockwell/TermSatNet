@@ -46,7 +46,7 @@ namespace TermSAT.Formulas
                 if (Symbol.IsNegation(c))
                 {
                     Formula f = stack.Pop();
-                    stack.Push(Negation.newNegation(f));
+                    stack.Push(Negation.NewNegation(f));
                 }
                 else if (Symbol.IsImplication(c))
                 {

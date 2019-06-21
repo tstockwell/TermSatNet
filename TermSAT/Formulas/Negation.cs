@@ -11,52 +11,37 @@ namespace TermSAT.Formulas
 
         public Formula Child { get; }
 
-        public static Negation newNegation(Formula f)
-        {
-            return __cache.GetOrCreateValue(f, () => new Negation(f));
-        }
+        public static Negation NewNegation(Formula child) =>
+            __cache.GetOrCreateValue(child, () => new Negation(child));
 
-        public static implicit operator Negation(string formulaText)
-        {
-            return FormulaParser.ToFormula(formulaText) as Negation;
-        }
+        public static implicit operator Negation(string formulaText) =>
+            FormulaParser.ToFormula(formulaText) as Negation;
 
 
         /// <summary>
         /// Creates a new formula by negating the given formula
         /// </summary>
-        private Negation(Formula subFormula) : base(subFormula.Length + 1)
+        private Negation(Formula subFormula) : base(length: subFormula.Length + 1)
         {
             Child = subFormula;
         }
+        ~Negation() => __cache.Remove(Child); 
 
-        override public bool Evaluate(IDictionary<Variable, bool> valuation)
-        {
-            return Child.Evaluate(valuation) ? false : true;
-        }
+        public override bool Evaluate(IDictionary<Variable, bool> valuation) =>
+            Child.Evaluate(valuation) ? false : true;
 
-        override public bool ContainsVariable(Variable variable)
-        {
-            return Child.ContainsVariable(variable);
-        }
+        public override bool ContainsVariable(Variable variable) => 
+            Child.ContainsVariable(variable);
 
         public override void GetAllSubterms(ICollection<Formula> subterms)
         { 
             Child.GetAllSubterms(subterms);
             subterms.Add(this);
         }
-        override public IList<Variable> AllVariables
-        {
-            get
-            {
-                return Child.AllVariables;
-            }
-        }
 
-        public override string ToString()
-        {
-            return "-" + Child.ToString();
-        }
+        public override IList<Variable> AllVariables { get => Child.AllVariables; }
+
+        public override string ToString() => "-" + Child.ToString();
     }
 
 

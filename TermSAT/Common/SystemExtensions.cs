@@ -2,11 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace TermSAT.Common
 {
     public static class SystemExtensions
     {
+
+        public static Task ForEachAsync<TValue>(this ICollection<TValue> collection, Func<TValue, Task> asyncAction)
+        {
+            var tasks = new List<Task>(collection.Count);
+            foreach (var v in collection)
+            {
+                var task= Task.Run(() => asyncAction(v));
+                tasks.Add(task);
+            }
+            return Task.WhenAll();
+        }
+
         public static string ToHexadecimalString(this BitArray bits)
         {
             StringBuilder sb = new StringBuilder(bits.Length / 4);

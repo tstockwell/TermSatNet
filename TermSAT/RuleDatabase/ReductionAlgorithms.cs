@@ -47,14 +47,16 @@ namespace TermSAT.RuleDatabase
         {
             if (formula is Constant)
                 return formula;
+
             if (formula is Variable)
                 return formula;
+
             if (formula is Negation)
             {
                 var child = (formula as Negation).Child;
                 var reducedChild = await ReduceUsingSingleReplacement(child);
                 if (reducedChild != child)
-                    return Negation.newNegation(reducedChild);
+                    return Negation.NewNegation(reducedChild);
                 return formula;
             }
 

@@ -172,7 +172,7 @@ namespace TermSAT.Formulas
                             currentPosition++;
                         }
                     }
-                    else
+                    else if (currentSubformula != null)
                     {
                         // if the formula doesn't start with the symbol associated with 
                         // this node then the formula is not a match

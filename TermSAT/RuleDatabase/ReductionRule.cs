@@ -65,7 +65,7 @@ namespace TermSAT.RuleDatabase
                 Formula n = await ReduceUsingRule(negated, rule);
                 if (n != null)
                 {
-                    reducedFormula = Negation.newNegation(n);
+                    reducedFormula = Negation.NewNegation(n);
                     return reducedFormula;
                 }
             }
