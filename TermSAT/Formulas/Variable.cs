@@ -52,7 +52,10 @@ namespace TermSAT.Formulas
         {
             if (variableId < 1)
                 throw new Exception("Variable numbers must be greater than 0");
-            return __cache.GetOrCreateValue(new CacheKey(variableId), () => new Variable(variableId));
+            var f= __cache.GetOrCreateValue(new CacheKey(variableId), () => {
+                return new Variable(variableId);
+            });
+            return f;
         }
 
         private Variable(int number) : base(1)

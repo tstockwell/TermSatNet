@@ -46,7 +46,9 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestFormulaConstruction()
         {
+            Assert.AreEqual(Variable.NewVariable(1).GetHashCode(), Variable.NewVariable(1).GetHashCode());
             Assert.AreEqual(".1", Variable.NewVariable(1).ToString());
+            Assert.AreEqual(".1".ToFormula().GetHashCode(), Variable.NewVariable(1).GetHashCode());
 
             Assert.AreEqual("*.1.1", "*.1.1".ToFormula().ToString());
 
@@ -73,10 +75,10 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestEvaluation()
         {
-            Variable one = Variable.NewVariable(1);
-            Variable two = Variable.NewVariable(2);
-            Formula formula1 = Implication.NewImplication(one, two);
-            Formula formula2 = Negation.newNegation(formula1);
+            Variable one = ".1";
+            Variable two = ".2";
+            Formula formula1 = "*.1.2";
+            Formula formula2 = "-*.1.2";
             for (int a = 0; a <= 1; a++)
             {
                 for (int b = 0; b <= 1; b++)
