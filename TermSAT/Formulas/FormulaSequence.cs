@@ -148,8 +148,9 @@ namespace TermSAT.Formulas
 
         object IEnumerator.Current { get { return Current; } }
 
-        public FormulaEnumerator(Formula f, int startingPosition = 0)
+        public FormulaEnumerator(Formula formula, int startingPosition = 0)
         {
+            this.formula= formula;
             this.position = this.startingPosition = startingPosition;
         }
 

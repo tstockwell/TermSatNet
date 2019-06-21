@@ -7,6 +7,11 @@ namespace TermSAT.Formulas
 
         static internal List<Variable> EMPTY_VARIABLE_LIST= new List<Variable>();
 
+        public static implicit operator Constant(string formulaText)
+        {
+            return FormulaParser.ToFormula(formulaText) as Constant;
+        }
+
         // constants
         public static readonly Formula TRUE = new Constant("T");
         public static readonly Formula FALSE= new Constant("F");

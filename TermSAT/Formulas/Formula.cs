@@ -67,6 +67,13 @@ namespace TermSAT.Formulas
     {
         private static readonly ConditionalWeakTable<Object, List<Variable>> __varListCache = new ConditionalWeakTable<Object, List<Variable>>();
 
+        /// <summary>
+        /// Provide implicit cast from strings to Formulas.
+        /// I'm on the fence about whether this is a good idea of not.
+        /// All formula classes have these implicit casts defined, they make writing tests 
+        /// *very* readable.
+        /// So, I'm going to leave them in until and unless I figure out the downside.
+        /// </summary>
         public static implicit operator Formula(string formulaText)
         {
             return FormulaParser.ToFormula(formulaText);

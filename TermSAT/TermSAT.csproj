@@ -15,10 +15,10 @@
   <ItemGroup>
     <Compile Remove="Common\ServerCommandLineInterface.cs" />
     <Compile Remove="RuleDatabase\TruthTables.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include=".\Solver\" />
+    <Compile Remove="Solver\RuleRepository.cs" />
+    <Compile Remove="Tests\CompletionTests.cs" />
+    <Compile Remove="Tests\RuleReductionTests.cs" />
+    <Compile Remove="Tests\RuleRepositoryTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

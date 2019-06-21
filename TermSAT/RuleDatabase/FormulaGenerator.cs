@@ -43,7 +43,7 @@ namespace TermSAT.RuleDatabase
     public class FormulaGenerator
     {
 
-        readonly RuleDatabase _database;
+        readonly FormulaDatabase _database;
         int _startingLength = 0;
         int _currentLength = 0;
         IEnumerator<Formula> _currentIterator;
@@ -51,7 +51,7 @@ namespace TermSAT.RuleDatabase
         List<Formula> _startingFormulas = new List<Formula>();
 
 
-        public FormulaGenerator(RuleDatabase database)
+        public FormulaGenerator(FormulaDatabase database)
         {
             _database = database;
 
@@ -61,7 +61,7 @@ namespace TermSAT.RuleDatabase
                 _startingFormulas.Add(Variable.NewVariable(i));
         }
 
-        public Formula getStartingFormula()
+        public Formula GetStartingFormula()
         {
             Formula formula = _database.GetLastGeneratedFormula();
             if (formula == null)
@@ -78,7 +78,7 @@ namespace TermSAT.RuleDatabase
             return _currentIterator.Current;
         }
 
-        public Formula getNextWellFormedFormula()
+        public Formula GetNextWellFormedFormula()
         {
             if (!_currentIterator.MoveNext())
             {

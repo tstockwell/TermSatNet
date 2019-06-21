@@ -51,7 +51,7 @@ namespace TermSAT.RuleDatabase
     public class FormulaConstructor : IEnumerator<Formula>
     {
 
-        RuleDatabase _database;
+        FormulaDatabase _database;
         int _formulaLength;
 
         NegationFormulaConstructor _negationConstructor = null;
@@ -68,17 +68,17 @@ namespace TermSAT.RuleDatabase
          * until after if finds the given starting formula.
          * @param startingFormula
          */
-        public FormulaConstructor(RuleDatabase database, Formula startingFormula)
+        public FormulaConstructor(FormulaDatabase database, Formula startingFormula)
             : this(database, startingFormula, startingFormula.Length)
         {
         }
 
-        public FormulaConstructor(RuleDatabase database, int formulaLength)
+        public FormulaConstructor(FormulaDatabase database, int formulaLength)
             : this(database, null, formulaLength)
         {
         }
 
-        private FormulaConstructor(RuleDatabase database, Formula startingFormula, int formulaLength)
+        private FormulaConstructor(FormulaDatabase database, Formula startingFormula, int formulaLength)
         {
 
             _database = database;
@@ -158,13 +158,13 @@ namespace TermSAT.RuleDatabase
 
         IEnumerator<Formula> _formulas;
         int _formulaLength;
-        RuleDatabase _database;
+        FormulaDatabase _database;
 
         public Formula Current { get { return _formulas.Current; } }
 
         object IEnumerator.Current { get { return Current; } }
 
-        public NegationFormulaConstructor(RuleDatabase database, int formulaLength)
+        public NegationFormulaConstructor(FormulaDatabase database, int formulaLength)
         {
             _database= database;
             _formulaLength = formulaLength;
@@ -195,8 +195,8 @@ namespace TermSAT.RuleDatabase
         IEnumerator<Formula> _consequents;
         Formula _antecedent = null;
         int _formulaLength;
-        RuleDatabase _database;
-        public IfThenFormulaConstructor(RuleDatabase database, int formulaLength, int lengthOfRightSideFormulas)
+        FormulaDatabase _database;
+        public IfThenFormulaConstructor(FormulaDatabase database, int formulaLength, int lengthOfRightSideFormulas)
         {
             _database= database;
             _formulaLength = formulaLength;

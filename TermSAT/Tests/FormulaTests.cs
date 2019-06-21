@@ -95,20 +95,20 @@ namespace TermSAT.Tests
         }
 
         [TestMethod]
-        public async void TestSubstitutions()
+        public void TestSubstitutions()
         {
             Formula formula1 = "***.1.2.3.4";
 
             var substitutions = new Dictionary<Variable, Formula>
             {
-                { Variable.NewVariable(1), Variable.NewVariable(5) },
-                { Variable.NewVariable(2), Variable.NewVariable(6) },
-                { Variable.NewVariable(3), Variable.NewVariable(7) },
-                { Variable.NewVariable(4), Variable.NewVariable(8) }
+                { ".1", ".5" },
+                { ".2", ".6" },
+                { ".3", ".7" },
+                { ".4", ".8" }
             };
-            Formula instance = await formula1.CreateSubstitutionInstance(substitutions);
+            Formula instance = formula1.CreateSubstitutionInstance(substitutions).Result;
 
-            Assert.AreEqual("***.5.6.7.8", instance.ToString());
+            Assert.AreEqual("***.5.6.7.8", instance);
 
         }
 

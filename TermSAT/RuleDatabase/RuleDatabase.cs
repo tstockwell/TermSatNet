@@ -95,12 +95,12 @@ namespace TermSAT.RuleDatabase
      * @author Ted Stockwell
      *
      */
-    public class RuleDatabase
+    public class FormulaDatabase
     {
 
         RuleDatabaseContext ruleContext;
 
-        public RuleDatabase()
+        public FormulaDatabase()
         {
             ruleContext = new RuleDatabaseContext();
 

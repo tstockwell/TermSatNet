@@ -17,11 +17,13 @@ namespace TermSAT.Formulas
             return implicationCache.GetOrCreateValue(consequent, () => new Implication(antecedent, consequent));
         }
 
+        public static implicit operator Implication(string formulaText)
+        {
+            return FormulaParser.ToFormula(formulaText) as Implication;
+        }
+
         public Formula Antecedent { get; }
         public Formula Consequent { get; }
-
-
-        private List<Variable> _varlist = null;
 
         private Implication(Formula antecedent, Formula consequent)
             : base(antecedent.Length + consequent.Length + 1)

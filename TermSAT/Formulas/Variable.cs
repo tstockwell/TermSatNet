@@ -36,6 +36,11 @@ namespace TermSAT.Formulas
         }
 
 
+        public static implicit operator Variable(string formulaText)
+        {
+            return FormulaParser.ToFormula(formulaText) as Variable;
+        }
+
         static private readonly WeakCache<CacheKey, Variable> __cache = new WeakCache<CacheKey, Variable>();
 
         string _text;

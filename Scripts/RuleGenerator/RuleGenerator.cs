@@ -59,7 +59,7 @@ namespace TermSAT.RuleDatabase
         }
 
         private FormulaGenerator _formulaGenerator;
-        private RuleDatabase _database;
+        private FormulaDatabase _database;
         private InstanceRecognizer _recognizer = new InstanceRecognizer();
 
 
@@ -70,13 +70,13 @@ namespace TermSAT.RuleDatabase
             {
                 setup();
 
-                Formula formula = _formulaGenerator.getStartingFormula();
+                Formula formula = _formulaGenerator.GetStartingFormula();
 
                 while (formula != null)
                 {
 
                     processFormula(formula);
-                    formula = _formulaGenerator.getNextWellFormedFormula();
+                    formula = _formulaGenerator.GetNextWellFormedFormula();
                 }
 
             }
@@ -93,7 +93,7 @@ namespace TermSAT.RuleDatabase
 
         private void setup()
         {
-            _database = new RuleDatabase();
+            _database = new FormulaDatabase();
             _formulaGenerator = new FormulaGenerator(_database);
 
             foreach (var formula in _database.GetAllNonCanonicalFormulas())

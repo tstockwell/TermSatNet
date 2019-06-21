@@ -75,8 +75,8 @@ namespace TermSAT.Formulas
     {
         override public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
         {
-            Formula f= this;
-            substitutions.TryGetValue(this, out f);
+            if (!substitutions.TryGetValue(this, out Formula f))
+                f= this;
             return Task.FromResult<Formula>(f);
         }
     }

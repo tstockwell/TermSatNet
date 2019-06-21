@@ -40,7 +40,7 @@ namespace TermSAT.Scripts.FormulaDatabaseReport
                 if (arg.Equals(SHOW_REDUCTION_RULES))
                     showReductionRules = true;
 
-            var database = new TermSAT.RuleDatabase.RuleDatabase();
+            var database = new TermSAT.RuleDatabase.FormulaDatabase();
 
             /* 
              * Count # of rules

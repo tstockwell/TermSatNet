@@ -16,6 +16,11 @@ namespace TermSAT.Formulas
             return __cache.GetOrCreateValue(f, () => new Negation(f));
         }
 
+        public static implicit operator Negation(string formulaText)
+        {
+            return FormulaParser.ToFormula(formulaText) as Negation;
+        }
+
 
         /// <summary>
         /// Creates a new formula by negating the given formula

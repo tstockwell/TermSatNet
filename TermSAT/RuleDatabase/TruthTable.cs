@@ -95,18 +95,6 @@ namespace TermSAT.RuleDatabase
             return truthTable;
         }
 
-
-        override public bool Equals(Object obj)
-        {
-            if (obj is TruthTable)
-                return ((TruthTable)obj).values == this.values;
-            if (obj is Formula)
-                return ToBitArray(obj as Formula) == this.values;
-            if (obj is string)
-                return this.ToString() == (obj as string);
-            return false;
-        }
-
         public override string ToString()
         {
             return values.ToHexadecimalString();
