@@ -20,6 +20,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using TermSAT.Common;
 
 namespace TermSAT.Formulas
 {
@@ -298,7 +299,7 @@ namespace TermSAT.Formulas
 
                 Formula lc = ((Implication)left).Consequent;
                 Formula rc = ((Implication)right).Consequent;
-                var ltask = lc.CreateSubstitutionInstance(ua);
+                var ltask = Task.Run(() => lc.CreateSubstitutionInstance(ua));
                 var rtask = rc.CreateSubstitutionInstance(ua);
                 Formula lu = await ltask;
                 Formula ru = await rtask;
@@ -309,13 +310,13 @@ namespace TermSAT.Formulas
 
                 var map = new Dictionary<Variable, Formula>();
 
-                foreach (Variable v in ua.Keys)
+                await ua.Keys.ForEachAsync(async v =>
                 {
                     // must create composition of substitutions
                     Formula f = ua[v];
                     f = await f.CreateSubstitutionInstance(uc);
                     map[v] = f;
-                }
+                });
                 foreach (Variable v in uc.Keys)
                 {
                     map[v] = uc[v];
@@ -406,7 +407,7 @@ namespace TermSAT.Formulas
          * 
          * @return a list of formulas 
          */
-        public static async Task<List<Formula>> FindAllCriticalTerms(Formula left, Formula right)
+        public static async Task<ICollection<Formula>> FindAllCriticalTerms(Formula left, Formula right)
         {
 
             HashSet<Formula> criticalTerms = new HashSet<Formula>();
@@ -414,40 +415,48 @@ namespace TermSAT.Formulas
 
             // First, go through all the subterms of the left formula and unify with the right formula.
             // Then, go through all the subterms of the right formula and unify with the left formula.
-            foreach (Formula subTerm in leftSubterms)
+            var leftTask= leftSubterms.ForEachAsync(async subTerm =>
             {
                 // according to the paper cited above we can skip variables 
                 // and constants since they will not produce critical terms 
                 // of any value
                 if (subTerm is Constant)
-                    continue;
+                    return;
                 if (subTerm is Variable)
-                    continue;
+                    return;
 
                 var unification = await Formula.Unify(subTerm, right);
-                if (unification != null)
+                if (unification != null && 0 < unification.Count)
                 {
                     Formula criticalTerm = await left.CreateSubstitutionInstance(unification);
-                    criticalTerms.Add(criticalTerm);
+                    lock (criticalTerms)
+                    {
+                        criticalTerms.Add(criticalTerm);
+                    }
                 }
-            }
+            });
+
             var rightSubterms = right.AllSubterms;
-            foreach (Formula subTerm in rightSubterms)
+            var rightTask= rightSubterms.ForEachAsync(async subTerm =>
             {
                 if (subTerm is Constant)
-                    continue;
+                    return;
                 if (subTerm is Variable)
-                    continue;
+                    return;
 
                 var unification = await Formula.Unify(subTerm, left);
-                if (unification != null)
+                if (unification != null && 0 < unification.Count)
                 {
                     Formula criticalTerm = await right.CreateSubstitutionInstance(unification);
-                    criticalTerms.Add(criticalTerm);
+                    lock (criticalTerms)
+                    {
+                        criticalTerms.Add(criticalTerm);
+                    }
                 }
-            }
+            });
+            await Task.WhenAll(leftTask, rightTask);
 
-            return new List<Formula>(criticalTerms);
+            return criticalTerms;
         }
     }
 

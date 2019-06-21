@@ -21,20 +21,6 @@ using TermSAT.Common;
 
 namespace TermSAT.Formulas
 {
-    /// <summary>
-    /// 
-    /// Note that the characters used to represent formulas as strings were 
-    /// specifically chosen so that the string representations of a formula naturally 
-    /// sort in the same order as formulas themselves.  
-    /// That is, formulas that are just a constant come before variables, and variables 
-    /// before negations, and so on.
-    /// So the characters chosen to represent these naturally sort in the same order.
-    /// Also, since implications with simpler antecents are simpler than other implications 
-    /// of the same length, polish notation is used since it will causes formula strings 
-    /// to naturally sort in the same order as the formulas. 
-    /// 
-    /// 
-    /// </summary>
     public class Symbol : EnumType<Symbol, char>
     {
         public static Symbol Variable = new Symbol('.');
@@ -48,66 +34,21 @@ namespace TermSAT.Formulas
 
         private Symbol(char c) : base(c) { }
 
-
-        public static bool IsNegation(char c)
-        {
-            return c == Negation.Value;
-        }
-
-        public static bool IsImplication(char c)
-        {
-            return c == Implication.Value;
-        }
-
-        public static bool IsVariable(char c)
-        {
-            return c == Variable.Value;
-        }
-
-        public static bool IsFalse(char c)
-        {
-            return c == False.Value;
-        }
-
-        public static bool IsTrue(char c)
-        {
-            return c == True.Value;
-        }
+        public static bool IsNegation(char c) => c == Negation.Value;
+        public static bool IsImplication(char c) => c == Implication.Value;
+        public static bool IsVariable(char c) => c == Variable.Value;
+        public static bool IsFalse(char c) => c == False.Value;
+        public static bool IsTrue(char c) => c == True.Value;
 
 
-        public static bool IsNegation(string c)
-        {
-            return c.StartsWith(Negation.Value);
-        }
+        public static bool IsNegation(string c) => c.StartsWith(Negation.Value);
+        public static bool IsImplication(string c) => c.StartsWith(Implication.Value);
+        public static bool IsVariable(string c) => c.StartsWith(Variable.Value);
+        public static bool IsTrue(string c) => c.StartsWith(True.Value);
+        public static bool IsFalse(string c) => c.StartsWith(False.Value);
+        public static bool IsConstant(string c) => IsTrue(c) || IsFalse(c);
 
-        public static bool IsImplication(string c)
-        {
-            return c.StartsWith(Implication.Value);
-        }
-
-        public static bool IsVariable(string c)
-        {
-            return c.StartsWith(Variable.Value);
-        }
-
-        public static bool IsTrue(string c)
-        {
-            return c.StartsWith(True.Value);
-        }
-
-        public static bool IsFalse(string c)
-        {
-            return c.StartsWith(False.Value);
-        }
-        public static bool IsConstant(string c)
-        {
-            return IsTrue(c) || IsFalse(c);
-        }
-
-        public static bool IsSymbol(char c)
-        {
-            return IsTrue(c) || IsFalse(c) || IsVariable(c) || IsNegation(c) || IsImplication(c);
-        }
+        public static bool IsSymbol(char c) => IsTrue(c) || IsFalse(c) || IsVariable(c) || IsNegation(c) || IsImplication(c);
     }
 }
 

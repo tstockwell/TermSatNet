@@ -19,6 +19,7 @@ using TermSAT.Formulas;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
 
 namespace TermSAT.Tests
 {
@@ -26,7 +27,7 @@ namespace TermSAT.Tests
     public class UnificationTests
     {
         [TestMethod]
-        async public void testUnification()
+        public async Task TestUnification()
         {
             Formula one = "*1.T";
             Formula two = "*T2.";

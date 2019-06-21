@@ -58,17 +58,15 @@ namespace TermSAT.RuleDatabase
         {
             this.values = values;
         }
+
         private TruthTable(string valueText) : this(valueText.ToBitArray()) {  }
         private TruthTable(Formula formula) : this(ToBitArray(formula)) { }
 
-        public static TruthTable NewTruthTable(string valueText)
-        {
-            return __cache.GetOrCreateValue(valueText, () => new TruthTable(valueText));
-        }
-        public static TruthTable NewTruthTable(Formula formula)
-        {
-            return __formulaCache.GetOrCreateValue(formula, () => new TruthTable(formula));
-        }
+        public static TruthTable NewTruthTable(string valueText) => 
+            __cache.GetOrCreateValue(valueText, () => new TruthTable(valueText));
+
+        public static TruthTable NewTruthTable(Formula formula) =>
+            __formulaCache.GetOrCreateValue(formula, () => new TruthTable(formula));
 
         /// <summary>
         /// Create a bit array that represents a formula's truth table
@@ -95,10 +93,7 @@ namespace TermSAT.RuleDatabase
             return truthTable;
         }
 
-        public override string ToString()
-        {
-            return values.ToHexadecimalString();
-        }
+        public override string ToString() => values.ToHexadecimalString();
 
     }
 

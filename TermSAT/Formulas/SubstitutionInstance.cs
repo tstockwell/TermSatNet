@@ -89,7 +89,7 @@ namespace TermSAT.Formulas
             Formula f = await child.CreateSubstitutionInstance(substitutions);
             if (f == child)
                 return this;
-            return Negation.newNegation(f);
+            return Negation.NewNegation(f);
         }
     }
 
