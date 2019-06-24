@@ -192,6 +192,9 @@ namespace TermSAT.Tests
 
             recognizer = new InstanceRecognizer { "*.1.1" };
             Assert.AreEqual(0, recognizer.FindAllGeneralizations("*.1.2").Count);
+
+            recognizer = new InstanceRecognizer { "-T" };
+            Assert.AreEqual(0, recognizer.FindAllGeneralizations("-F").Count);
         }
 
     }

@@ -52,12 +52,6 @@ namespace TermSAT.RuleDatabase
      */
     public class RuleGenerator
     {
-
-        public static void Main(string[] args)
-        {
-            new RuleGenerator().Run();
-        }
-
         private FormulaGenerator _formulaGenerator;
         private FormulaDatabase _database;
         private InstanceRecognizer _recognizer = new InstanceRecognizer();

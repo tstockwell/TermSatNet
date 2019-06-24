@@ -137,11 +137,17 @@ namespace TermSAT.Formulas
 
                 try
                 {
+                    if (currentSubformula is Constant)
+                    {
+                        if (!currentSubformula.Equals(instanceSubformula))
+                            return false;
+                        currentPosition++;
+                    }
 
                     // if this node is variable then get the substitution associated 
                     // with the variable.
                     // If there is no substitution then create one 
-                    if (currentSubformula is Variable)
+                    else if (currentSubformula is Variable)
                     {
                         if (currentSubstitutions.TryGetValue(currentSubformula as Variable, out Formula subtitute)) {
                             // A substitution already exists, if current subformula does not match previous 
