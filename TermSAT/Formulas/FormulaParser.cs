@@ -6,6 +6,10 @@ namespace TermSAT.Formulas
 {
     public static class FormulaParser
     {
+        public static Constant ToConstant(this string formulaText) => ToFormula(formulaText) as Constant;
+        public static Variable ToVariable(this string formulaText) => ToFormula(formulaText) as Variable;
+        public static Negation ToNegation(this string formulaText) => ToFormula(formulaText) as Negation;
+        public static Implication ToImplication(this string formulaText) => ToFormula(formulaText) as Implication;
 
         /**
          * Parses out the first formula from the beginning of the given string

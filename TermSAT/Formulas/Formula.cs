@@ -70,15 +70,12 @@ namespace TermSAT.Formulas
 
         /// <summary>
         /// Provide implicit cast from strings to Formulas.
-        /// I'm on the fence about whether this is a good idea of not.
-        /// All formula classes have these implicit casts defined, they make writing tests 
-        /// *very* readable.
+        /// I'm on the fence about whether this is a good idea or not.
+        /// All formula classes have these implicit casts defined, they make writing tests *very* readable.
+        /// OTOH, I wonder if an implicit cast will be a source of hidden problems.
         /// So, I'm going to leave them in until and unless I figure out the downside.
         /// </summary>
-        public static implicit operator Formula(string formulaText)
-        {
-            return FormulaParser.ToFormula(formulaText);
-        }
+        public static implicit operator Formula(string formulaText) => FormulaParser.ToFormula(formulaText);
 
 
         public int Length { get; }
@@ -200,7 +197,7 @@ namespace TermSAT.Formulas
          * that also occur in the given formula with new variables that 
          * don't occur in the given formula
          */
-        async public Task<Formula> CreateIndependentInstance(Formula formula)
+        public Formula CreateIndependentInstance(Formula formula)
         {
             var substitutions = new Dictionary<Variable, Formula>();
             var variables = formula.AllVariables;
@@ -223,7 +220,7 @@ namespace TermSAT.Formulas
             }
             if (substitutions.Count <= 0)
                 return formula;
-            Formula independent = await this.CreateSubstitutionInstance(substitutions);
+            Formula independent = CreateSubstitutionInstance(substitutions);
             return independent;
         }
 
@@ -245,7 +242,7 @@ namespace TermSAT.Formulas
          * 		an empty map if the formulas are equal, 
          * 		else returns a map of substitutions for each formula.
          */
-        public static async Task<IDictionary<Variable, Formula>> Unify(Formula left, Formula right)
+        public static IDictionary<Variable, Formula> Unify(Formula left, Formula right)
         {
             if (left is Constant)
             {
@@ -280,7 +277,7 @@ namespace TermSAT.Formulas
             else if (left is Negation)
             {
                 if (right is Negation)
-                    return await Unify(((Negation)left).Child, ((Negation)right).Child);
+                    return Unify(((Negation)left).Child, ((Negation)right).Child);
                 return null;
             }
             else if (right is Negation)
@@ -293,30 +290,28 @@ namespace TermSAT.Formulas
                     return null;
                 Formula la = ((Implication)left).Antecedent;
                 Formula ra = ((Implication)right).Antecedent;
-                var ua = await Unify(la, ra);
+                var ua = Unify(la, ra);
                 if (ua == null)
                     return null;
 
                 Formula lc = ((Implication)left).Consequent;
                 Formula rc = ((Implication)right).Consequent;
-                var ltask = Task.Run(() => lc.CreateSubstitutionInstance(ua));
-                var rtask = rc.CreateSubstitutionInstance(ua);
-                Formula lu = await ltask;
-                Formula ru = await rtask;
+                Formula lu = lc.CreateSubstitutionInstance(ua);
+                Formula ru = rc.CreateSubstitutionInstance(ua);
 
-                var uc = await Unify(lu, ru);
+                var uc = Unify(lu, ru);
                 if (uc == null)
                     return null;
 
                 var map = new Dictionary<Variable, Formula>();
 
-                await ua.Keys.ForEachAsync(async v =>
+                foreach (var v in ua.Keys)
                 {
                     // must create composition of substitutions
                     Formula f = ua[v];
-                    f = await f.CreateSubstitutionInstance(uc);
+                    f = f.CreateSubstitutionInstance(uc);
                     map[v] = f;
-                });
+                }
                 foreach (Variable v in uc.Keys)
                 {
                     map[v] = uc[v];
@@ -365,8 +360,10 @@ namespace TermSAT.Formulas
         /**
          * @return a list of all subterms.  Includes this formula.
          */
-        virtual public ICollection<Formula> AllSubterms {
-            get {
+        virtual public ICollection<Formula> AllSubterms
+        {
+            get
+            {
                 var subterms = new HashSet<Formula>();
                 this.GetAllSubterms(subterms);
                 return subterms;
@@ -385,12 +382,12 @@ namespace TermSAT.Formulas
          * Two rules are syntactically equal if they are identical except for variable names.
          * 
          */
-        public static async Task<bool> SyntacticallyEqual(Formula left, Formula right)
+        public static bool SyntacticallyEqual(Formula left, Formula right)
         {
             if (left == right)
                 return true;
 
-            var unification = await Formula.Unify(left, right);
+            var unification = Formula.Unify(left, right);
             if (unification == null)
                 return false;
             foreach (Formula f in unification.Values)
@@ -407,54 +404,54 @@ namespace TermSAT.Formulas
          * 
          * @return a list of formulas 
          */
-        public static async Task<ICollection<Formula>> FindAllCriticalTerms(Formula left, Formula right)
+        public static ICollection<Formula> FindAllCriticalTerms(Formula left, Formula right)
         {
 
             HashSet<Formula> criticalTerms = new HashSet<Formula>();
-            var leftSubterms = left.AllSubterms;
 
-            // First, go through all the subterms of the left formula and unify with the right formula.
-            // Then, go through all the subterms of the right formula and unify with the left formula.
-            var leftTask= leftSubterms.ForEachAsync(async subTerm =>
-            {
-                // according to the paper cited above we can skip variables 
-                // and constants since they will not produce critical terms 
-                // of any value
-                if (subTerm is Constant)
-                    return;
-                if (subTerm is Variable)
-                    return;
-
-                var unification = await Formula.Unify(subTerm, right);
-                if (unification != null && 0 < unification.Count)
+            Parallel.Invoke(
+                () =>
                 {
-                    Formula criticalTerm = await left.CreateSubstitutionInstance(unification);
-                    lock (criticalTerms)
+                    // Go through all the subterms of the left formula and unify with the right formula.
+                    var leftSubterms = left.AllSubterms;
+                    foreach (var subTerm in leftSubterms)
                     {
-                        criticalTerms.Add(criticalTerm);
+                        // according to the paper cited above we can skip variables 
+                        // and constants since they will not produce critical terms 
+                        // of any value
+                        if (subTerm is Constant)
+                            return;
+                        if (subTerm is Variable)
+                            return;
+
+                        var unification = Formula.Unify(subTerm, right);
+                        if (unification != null && 0 < unification.Count)
+                        {
+                            Formula criticalTerm = left.CreateSubstitutionInstance(unification);
+                            lock (criticalTerms) { criticalTerms.Add(criticalTerm); }
+                        }
+                    }
+                },
+                () =>
+                {
+                    // go through all the subterms of the right formula and unify with the left formula.
+                    var rightSubterms = right.AllSubterms;
+                    foreach(var subTerm in rightSubterms)
+                    {
+                        if (subTerm is Constant)
+                            return;
+                        if (subTerm is Variable)
+                            return;
+
+                        var unification = Formula.Unify(subTerm, left);
+                        if (unification != null && 0 < unification.Count)
+                        {
+                            Formula criticalTerm = right.CreateSubstitutionInstance(unification);
+                            lock (criticalTerms) { criticalTerms.Add(criticalTerm); }
+                        }
                     }
                 }
-            });
-
-            var rightSubterms = right.AllSubterms;
-            var rightTask= rightSubterms.ForEachAsync(async subTerm =>
-            {
-                if (subTerm is Constant)
-                    return;
-                if (subTerm is Variable)
-                    return;
-
-                var unification = await Formula.Unify(subTerm, left);
-                if (unification != null && 0 < unification.Count)
-                {
-                    Formula criticalTerm = await right.CreateSubstitutionInstance(unification);
-                    lock (criticalTerms)
-                    {
-                        criticalTerms.Add(criticalTerm);
-                    }
-                }
-            });
-            await Task.WhenAll(leftTask, rightTask);
+            );
 
             return criticalTerms;
         }

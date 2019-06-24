@@ -42,13 +42,9 @@ namespace TermSAT.Formulas
         public SubstitutionInstance(Formula generalization, IDictionary<Variable, Formula> substitutions)
         {
             Generalization = generalization;
-
-            if (substitutions == null)
-            {
-                substitutions = new Dictionary<Variable, Formula>(0).ToImmutableDictionary();
-            }
-            else
-                substitutions = substitutions.ToImmutableDictionary();
+            Substitutions = (substitutions == null) ? 
+                ImmutableDictionary<Variable, Formula>.Empty : 
+                substitutions.ToImmutableDictionary();
         }
     }
 
@@ -59,34 +55,31 @@ namespace TermSAT.Formulas
          * Creates a new formula by making the given substitutions for the 
          * variables in the given formula.  
          */
-        abstract public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions);
+        abstract public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions);
 
     }
 
     public partial class Constant : Formula
     {
-        override public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
-        {
-            return Task.FromResult<Formula>(this);
-        }
+        override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions) => this;
     }
 
     public partial class Variable
     {
-        override public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
         {
             if (!substitutions.TryGetValue(this, out Formula f))
                 f= this;
-            return Task.FromResult<Formula>(f);
+            return f;
         }
     }
 
     public partial class Negation
     {
-        async override public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
         {
             Formula child = this.Child;
-            Formula f = await child.CreateSubstitutionInstance(substitutions);
+            Formula f = child.CreateSubstitutionInstance(substitutions);
             if (f == child)
                 return this;
             return Negation.NewNegation(f);
@@ -95,11 +88,10 @@ namespace TermSAT.Formulas
 
     public partial class Implication
     {
-        async override public Task<Formula> CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
         {
-            var taskA = Task.Run(() => Antecedent.CreateSubstitutionInstance(substitutions));
-            var newConsequent = await Consequent.CreateSubstitutionInstance(substitutions);
-            var newAntecedent = await taskA;
+            var newAntecedent = Antecedent.CreateSubstitutionInstance(substitutions);
+            var newConsequent = Consequent.CreateSubstitutionInstance(substitutions);
             if (newAntecedent != Antecedent || newConsequent != Consequent)
                 return Implication.NewImplication(newAntecedent, newConsequent);
             return this;

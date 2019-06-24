@@ -15,6 +15,7 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -37,7 +38,19 @@ namespace TermSAT.RuleDatabase
 
     public class RuleDatabaseContext : DbContext
     {
-        public DbSet<FormulaRecord> Formulas { get; set; }
+        //
+        // Summary:
+        //     Initializes a new instance of the Microsoft.EntityFrameworkCore.DbContext class
+        //     using the specified options. The Microsoft.EntityFrameworkCore.DbContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)
+        //     method will still be called to allow further configuration of the options.
+        //
+        // Parameters:
+        //   options:
+        //     The options for this context.
+        public RuleDatabaseContext(DbContextOptions options) : base(options)
+        {
+        }
+        public DbSet<FormulaRecord> FormulaRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,11 +65,8 @@ namespace TermSAT.RuleDatabase
             modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsCanonical);
 
             modelBuilder.Entity<FormulaRecord>().Property(f => f.IsCanonical).HasDefaultValue(false);
-        }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Data Source=rules-" + TruthTable.VARIABLE_COUNT + ".db");
+            modelBuilder.Entity<FormulaRecord>(f => f.ToTable("FormulaRecords"));
         }
 
         /// <summary>
@@ -98,21 +108,35 @@ namespace TermSAT.RuleDatabase
     public class FormulaDatabase
     {
 
-        RuleDatabaseContext ruleContext;
+        RuleDatabaseContext RuleContext { get; set; }
+
+        protected SqliteConnection Connection { get; set; }
 
         public FormulaDatabase()
         {
-            ruleContext = new RuleDatabaseContext();
+            Connection = new SqliteConnection("DataSource=:memory:");
+            Connection.Open();
 
-            // no tracking
-            ruleContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            var options = new DbContextOptionsBuilder()
+                .UseSqlite(Connection)
+                //.UseSqlite("Data Source=rules-" + TruthTable.VARIABLE_COUNT + ".db")
+                .Options;
+
+            RuleContext = new RuleDatabaseContext(options);
+            RuleContext.Database.EnsureCreated();
+        }
+
+        public void Clear()
+        {
+            this.RuleContext.Database.ExecuteSqlCommand("DELETE FROM FormulaRecords");
         }
 
         public Formula GetLastGeneratedFormula()
         {
-            var record = this.ruleContext.Formulas
+            var record = this.RuleContext.FormulaRecords.AsNoTracking()
                 .OrderByDescending(f => f.Id)
-                .First();
+                
+                .FirstOrDefault();
 
             var formula = record != null ? Formula.Parse(record.Text) : null;
             return formula;
@@ -120,7 +144,7 @@ namespace TermSAT.RuleDatabase
 
         public List<Formula> GetCanonicalFormulas(TruthTable truthTable)
         {
-            var records = ruleContext.Formulas
+            var records = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == true)
                 .OrderBy(f => f.Id)
                 .ToList();
@@ -131,15 +155,16 @@ namespace TermSAT.RuleDatabase
 
         public void Shutdown()
         {
-            ruleContext.Dispose();
+            try { RuleContext.Dispose(); } catch { } finally { RuleContext= null; }
+            try { Connection.Dispose(); } catch { } finally { Connection= null; }
         }
 
         public int GetLengthOfLongestCanonicalFormula()
         {
-            var formula = ruleContext.Formulas
+            var formula = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.IsCanonical == true)
                 .OrderByDescending(f => f.Length)
-                .First();
+                .FirstOrDefault();
 
             if (formula == null)
                 return 0;
@@ -163,7 +188,7 @@ namespace TermSAT.RuleDatabase
 
         public List<Formula> FindCanonicalFormulasByLength(int size)
         {
-            var records = ruleContext.Formulas
+            var records = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.Length == size && f.IsCanonical == true)
                 .OrderBy(f => f.Id)
                 .ToList();
@@ -181,13 +206,14 @@ namespace TermSAT.RuleDatabase
                 TruthValue = TruthTable.NewTruthTable(formula).ToString()
             };
 
-            ruleContext.Formulas.Add(record);
-            ruleContext.SaveChanges();
+            RuleContext.FormulaRecords.Add(record);
+            RuleContext.SaveChanges();
+            RuleContext.DetachAllEntities();
         }
 
         public List<Formula> GetAllNonCanonicalFormulas(int maxLength)
         {
-            var records = ruleContext.Formulas
+            var records = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.Length <= maxLength && f.IsCanonical == false)
                 .ToList();
             var formulas = records.Select(r => r.Text.ToFormula()).ToList();
@@ -195,8 +221,18 @@ namespace TermSAT.RuleDatabase
         }
         public List<Formula> GetAllNonCanonicalFormulas()
         {
-            var records = ruleContext.Formulas
+            var records = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.IsCanonical == false)
+                .OrderBy(f => f.Length)
+                .ThenBy(f => f.Text)
+                .ToList();
+            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
+            return formulas;
+        }
+        public List<Formula> GetAllCanonicalFormulas()
+        {
+            var records = RuleContext.FormulaRecords.AsNoTracking()
+                .Where(f => f.IsCanonical == true)
                 .OrderBy(f => f.Length)
                 .ThenBy(f => f.Text)
                 .ToList();
@@ -205,7 +241,7 @@ namespace TermSAT.RuleDatabase
         }
         public List<Formula> GetAllCanonicalFormulasInLexicalOrder()
         {
-            var records = ruleContext.Formulas
+            var records = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.IsCanonical == true)
                 .OrderBy(f => f.Text)
                 .ToList();
@@ -214,7 +250,7 @@ namespace TermSAT.RuleDatabase
         }
         public List<TruthTable> GetAllTruthTables()
         {
-            var truthValues = ruleContext.Formulas
+            var truthValues = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.IsCanonical == true)
                 .OrderBy(f => f.Text)
                 .Select(f => f.TruthValue)
@@ -226,10 +262,10 @@ namespace TermSAT.RuleDatabase
 
         public int GetLengthOfCanonicalFormulas(TruthTable truthTable)
         {
-            var formula = ruleContext.Formulas
+            var formula = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.IsCanonical == true && f.TruthValue == truthTable.ToString())
                 .OrderBy(f => f.Id)
-                .First();
+                .FirstOrDefault();
 
             if (formula == null)
                 return 0;
@@ -244,11 +280,11 @@ namespace TermSAT.RuleDatabase
         {
             var truthTableText = TruthTable.NewTruthTable(formula).ToString();
 
-            var record = ruleContext.Formulas
+            var record = RuleContext.FormulaRecords.AsNoTracking()
                 .AsNoTracking()
                 .Where(f => f.IsCanonical == true && f.TruthValue == truthTableText)
                 .OrderBy(f => f.Id)
-                .First();
+                .FirstOrDefault();
 
             if (record == null)
                 return null;
@@ -260,7 +296,7 @@ namespace TermSAT.RuleDatabase
 
         public int CountNonCanonicalFormulas()
         {
-            var count = ruleContext.Formulas
+            var count = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.IsCanonical == false)
                 .Count();
             return count;
@@ -268,7 +304,7 @@ namespace TermSAT.RuleDatabase
 
         public int CountCanonicalFormulas()
         {
-            var count = ruleContext.Formulas
+            var count = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.IsCanonical == true)
                 .Count();
             return count;
@@ -277,7 +313,7 @@ namespace TermSAT.RuleDatabase
 
         public long CountCanonicalTruthTables()
         {
-            var count = ruleContext.Formulas
+            var count = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.IsCanonical == true)
                 .Select(f => f.TruthValue)
                 .Distinct()
@@ -287,7 +323,7 @@ namespace TermSAT.RuleDatabase
 
         public List<Formula> GetAllFormulas(TruthTable truthTable)
         {
-            var records = ruleContext.Formulas
+            var records = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.TruthValue == truthTable.ToString())
                 .ToList();
             var formulas = records.Select(r => r.Text.ToFormula()).ToList();

@@ -55,7 +55,7 @@ namespace TermSAT.RuleDatabase
 
         public static void Main(string[] args)
         {
-            new RuleGenerator().run();
+            new RuleGenerator().Run();
         }
 
         private FormulaGenerator _formulaGenerator;
@@ -63,19 +63,19 @@ namespace TermSAT.RuleDatabase
         private InstanceRecognizer _recognizer = new InstanceRecognizer();
 
 
-        public void run()
+        public void Run()
         {
 
             try
             {
-                setup();
+                Setup();
 
                 Formula formula = _formulaGenerator.GetStartingFormula();
 
                 while (formula != null)
                 {
 
-                    processFormula(formula);
+                    ProcessFormula(formula);
                     formula = _formulaGenerator.GetNextWellFormedFormula();
                 }
 
@@ -86,14 +86,15 @@ namespace TermSAT.RuleDatabase
             }
             finally
             {
-                shutdown();
+                Shutdown();
             }
 
         }
 
-        private void setup()
+        private void Setup()
         {
             _database = new FormulaDatabase();
+            _database.Clear();
             _formulaGenerator = new FormulaGenerator(_database);
 
             foreach (var formula in _database.GetAllNonCanonicalFormulas())
@@ -102,14 +103,14 @@ namespace TermSAT.RuleDatabase
             }
         }
 
-        private void processFormula(Formula formula)
+        private void ProcessFormula(Formula formula)
         {
 
-            ReductionRule reductionRule = formulaCanBeReduced(formula);
+            ReductionRule reductionRule = FormulaCanBeReduced(formula);
             if (reductionRule == null)
             {
 
-                var isCanonical = isCanonicalFormula(formula);
+                var isCanonical = IsCanonicalFormula(formula);
 
                 if (isCanonical)
                 {
@@ -129,7 +130,7 @@ namespace TermSAT.RuleDatabase
             }
         }
 
-        private Boolean isCanonicalFormula(Formula formula)
+        private bool IsCanonicalFormula(Formula formula)
         {
             int length = _database.GetLengthOfCanonicalFormulas(TruthTable.NewTruthTable(formula));
 
@@ -152,7 +153,7 @@ namespace TermSAT.RuleDatabase
          * formulas then all subformulas of the given formula are guaranteed
          * to be non-reducible.   
          */
-        private ReductionRule formulaCanBeReduced(Formula formula)
+        private ReductionRule FormulaCanBeReduced(Formula formula)
         {
             SubstitutionInstance match = _recognizer.FindFirstGeneralization(formula);
             if (match == null)
@@ -161,7 +162,7 @@ namespace TermSAT.RuleDatabase
             return new ReductionRule(match.Generalization, canonicalFormula);
         }
 
-        private void shutdown()
+        private void Shutdown()
         {
             _database.Shutdown();
         }

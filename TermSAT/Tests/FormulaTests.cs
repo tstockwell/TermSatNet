@@ -73,11 +73,22 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestFormulaCaching()
         {
-            // gotta test all formulas types, sine each has thier own cache
+            // gotta test all formulas types, since each has thier own cache
             Assert.AreEqual("T".ToFormula().GetHashCode(), "T".ToFormula().GetHashCode());
             Assert.AreEqual(".1".ToFormula().GetHashCode(), ".1".ToFormula().GetHashCode());
             Assert.AreEqual("-.1".ToFormula().GetHashCode(), "-.1".ToFormula().GetHashCode());
             Assert.AreEqual("*.1.1".ToFormula().GetHashCode(), "*.1.1".ToFormula().GetHashCode());
+
+            Implication formula1 = "***.1.2.3.4";
+            Implication rule1 = "*.1.2";
+            Assert.AreEqual(rule1.GetHashCode(), ((Implication)formula1.Antecedent).Antecedent.GetHashCode());
+            Implication formula2 = Implication.NewImplication(formula1, formula1);
+            Negation formula3 = Negation.NewNegation(formula1);
+
+            var substitutions = new Dictionary<Variable, Formula> { { ".1", formula1 }, { ".2", formula1 } };
+            Formula substitutionI= rule1.CreateSubstitutionInstance(substitutions);
+            Assert.AreEqual(formula2.GetHashCode(), substitutionI.GetHashCode());  
+
         }
 
         [TestMethod]
@@ -105,9 +116,8 @@ namespace TermSAT.Tests
         }
 
         [TestMethod]
-        public async Task TestSubstitutions()
+        public void TestSubstitutions()
         {
-
             Formula formula1 = "***.1.2.3.4";
 
             var substitutions = new Dictionary<Variable, Formula>
@@ -117,10 +127,9 @@ namespace TermSAT.Tests
                 { ".3", ".7" },
                 { ".4", ".8" }
             };
-            Formula instance = await formula1.CreateSubstitutionInstance(substitutions);
+            Formula instance = formula1.CreateSubstitutionInstance(substitutions);
 
             Assert.AreEqual("***.5.6.7.8", instance);
-
         }
 
         [TestMethod]
@@ -128,6 +137,7 @@ namespace TermSAT.Tests
         {
             SubstitutionInstance match;
             ICollection<SubstitutionInstance> matches;
+            Formula substitution;
 
             Formula formula1 = "***.1.2.3.4";
             Formula formula2 = Implication.NewImplication(formula1, formula1);
@@ -142,7 +152,10 @@ namespace TermSAT.Tests
             match = recognizer.FindFirstGeneralization(formula2);
             Assert.IsNotNull(match.Substitutions);
             Assert.AreEqual(2, match.Substitutions.Count);
-            Assert.AreEqual(formula2, rule1.CreateSubstitutionInstance(match.Substitutions));
+            
+            substitution= rule1.CreateSubstitutionInstance(match.Substitutions);
+            Assert.AreEqual(formula2.GetHashCode(), substitution.GetHashCode(), "We have two different instances of the same formuals, formulas have not been properly cached");  
+            Assert.AreEqual(formula2, substitution);
 
 
             match = recognizer.FindFirstGeneralization(formula2);

@@ -96,7 +96,7 @@ namespace TermSAT.RuleDatabase
 
             // if formula and rule formula match then create reduced formula
             var info = matches[0];
-            reducedFormula = await rule.Reduction.CreateSubstitutionInstance(info.Substitutions);
+            reducedFormula = rule.Reduction.CreateSubstitutionInstance(info.Substitutions);
             return reducedFormula;
         }
 

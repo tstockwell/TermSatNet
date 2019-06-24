@@ -55,7 +55,7 @@ namespace TermSAT.RuleDatabase
         int _formulaLength;
 
         NegationFormulaConstructor _negationConstructor = null;
-        IfThenFormulaConstructor _ifthenConstructor = null;
+        ImplicationFormulaConstructor _ifthenConstructor = null;
         int _rightLength;
 
         public Formula Current { get; private set; }
@@ -84,7 +84,7 @@ namespace TermSAT.RuleDatabase
             _database = database;
             _formulaLength = formulaLength;
             _negationConstructor = new NegationFormulaConstructor(_database, _formulaLength);
-            _rightLength = formulaLength - 2;
+            _rightLength = formulaLength - 1;
 
 
             // skip formulas until we're at the starting formula
@@ -113,7 +113,7 @@ namespace TermSAT.RuleDatabase
                     _negationConstructor = null;
                     if (_rightLength < 1)
                         return false;
-                    _ifthenConstructor = new IfThenFormulaConstructor(_database, _formulaLength, _rightLength);
+                    _ifthenConstructor = new ImplicationFormulaConstructor(_database, _formulaLength, _rightLength);
                 }
                 else
                 {
@@ -127,7 +127,7 @@ namespace TermSAT.RuleDatabase
                     _ifthenConstructor.Dispose();
                     _ifthenConstructor = null;
                     if (0 < --_rightLength)
-                        _ifthenConstructor = new IfThenFormulaConstructor(_database, _formulaLength, _rightLength);
+                        _ifthenConstructor = new ImplicationFormulaConstructor(_database, _formulaLength, _rightLength);
                 }
             }
         }
@@ -155,40 +155,33 @@ namespace TermSAT.RuleDatabase
 
     class NegationFormulaConstructor : IEnumerator<Formula>
     {
-
         IEnumerator<Formula> _formulas;
-        int _formulaLength;
         FormulaDatabase _database;
+        public int FormulaLength {  get; private set; }
 
-        public Formula Current { get { return _formulas.Current; } }
+        public Formula Current { get { return Negation.NewNegation(_formulas.Current); } }
 
         object IEnumerator.Current { get { return Current; } }
 
         public NegationFormulaConstructor(FormulaDatabase database, int formulaLength)
         {
+            FormulaLength = formulaLength;
             _database= database;
-            _formulaLength = formulaLength;
-            _formulas = _database.FindCanonicalFormulasByLength(_formulaLength - 1).GetEnumerator();
+            _formulas = _database.FindCanonicalFormulasByLength(FormulaLength - 1).GetEnumerator();
         }
 
-        public bool MoveNext()
-        {
-            return _formulas.MoveNext();
-        }
-
-        public void Reset()
-        {
-            throw new NotSupportedException();
-        }
+        public bool MoveNext() => _formulas.MoveNext();
 
         public void Dispose()
         {
             _formulas.Dispose();
             _formulas = null;
         }
+
+        public void Reset() => throw new NotSupportedException();
     }
 
-    class IfThenFormulaConstructor : IEnumerator<Formula>
+    class ImplicationFormulaConstructor : IEnumerator<Formula>
     {
 
         IEnumerator<Formula> _rightIterator;
@@ -196,18 +189,12 @@ namespace TermSAT.RuleDatabase
         Formula _antecedent = null;
         int _formulaLength;
         FormulaDatabase _database;
-        public IfThenFormulaConstructor(FormulaDatabase database, int formulaLength, int lengthOfRightSideFormulas)
+
+        public ImplicationFormulaConstructor(FormulaDatabase database, int formulaLength, int lengthOfRightSideFormulas)
         {
             _database= database;
             _formulaLength = formulaLength;
             _rightIterator = _database.FindCanonicalFormulasByLength(lengthOfRightSideFormulas).GetEnumerator();
-            _consequents = _database.FindCanonicalFormulasByLength(_formulaLength - lengthOfRightSideFormulas - 1).GetEnumerator();
-            if (!_rightIterator.MoveNext())
-            {
-                Dispose();
-            }
-            else
-                _antecedent = _rightIterator.Current;
         }
 
         public Formula Current { get { return Implication.NewImplication(_antecedent, _consequents.Current); } }
@@ -227,25 +214,54 @@ namespace TermSAT.RuleDatabase
 
         public bool MoveNext()
         {
-            if (_antecedent == null)
-                return false;
-            if (_consequents.MoveNext())
-                return true;
-            if (!_rightIterator.MoveNext())
+            bool StartNewConsequentsEnumerator()
             {
-                Dispose();
-                return false;
+                _consequents?.Dispose();
+                _consequents= null;
+                var consequentLength= _formulaLength - _antecedent.Length - 1;
+                if (0 < consequentLength) {
+                    var consequents= _database.FindCanonicalFormulasByLength(consequentLength);
+                    if (consequents.Count <= 0)
+                        return false;    
+                    _consequents = consequents.GetEnumerator();
+                    if (!_consequents.MoveNext())
+                        return false;
+                }
+                else
+                    return false;
+                return true;
             }
-            _antecedent = _rightIterator.Current;
-            _consequents.Dispose();
-            _consequents = _database.FindCanonicalFormulasByLength(_formulaLength - _antecedent.Length - 1).GetEnumerator();
+
+            if (_antecedent == null) // start enumerating next antecent
+            {
+                if (!_rightIterator.MoveNext()) // no more antecedents
+                {
+                    Dispose();
+                    return false;
+                }
+                _antecedent= _rightIterator.Current;
+                _consequents?.Dispose();
+                _consequents= null;
+
+                if (!StartNewConsequentsEnumerator())
+                {
+                    Dispose();
+                    return false;
+                }
+
+                return true;
+            }
+
+            else if (!_consequents.MoveNext()) { 
+                // go to next antecedent
+                _antecedent= null;
+                return MoveNext();
+            }
+
             return true;
         }
 
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
+        public void Reset() => throw new NotSupportedException();
     }
 
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace TermSAT.Common
 {
@@ -35,9 +36,6 @@ namespace TermSAT.Common
         where TKey : ISequence<TItem> 
         where TItem : IComparable<TItem>, IEquatable<TItem> 
     {
-
-        private static readonly Dictionary<object, object> EMPTY_DICTIONARY = new Dictionary<object, object>();
-
         /// <summary>
         /// The root node has Depth == -1, Key == null, and Parent == null
         /// Non-root nodes have Depth== position within original key
@@ -80,7 +78,7 @@ namespace TermSAT.Common
                 get
                 {
                     if (_children == null)
-                        return EMPTY_DICTIONARY as IDictionary<TItem, INode>;
+                        return ImmutableDictionary<TItem, INode>.Empty;
                     return _children;
                 }
                 protected set { _children = value; }

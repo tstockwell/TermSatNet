@@ -55,8 +55,8 @@ namespace TermSAT.RuleDatabase
         {
             _database = database;
 
-            _startingFormulas.Add(Constant.FALSE);
             _startingFormulas.Add(Constant.TRUE);
+            _startingFormulas.Add(Constant.FALSE);
             for (int i = 1; i <= TruthTable.VARIABLE_COUNT; i++)
                 _startingFormulas.Add(Variable.NewVariable(i));
         }

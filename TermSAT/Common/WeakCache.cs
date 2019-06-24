@@ -27,11 +27,10 @@ namespace TermSAT.Common
 
         public TValue GetOrCreateValue(TKey key, Func<TValue> createValue)
         {
-            WeakReference<TValue> reference;
             TValue value;
 
             // first try to get the value without locking anything
-            if (cache.TryGetValue(key, out reference))
+            if (cache.TryGetValue(key, out WeakReference<TValue> reference))
                 if (reference.TryGetTarget(out value))
                     return value;
 
@@ -67,9 +66,7 @@ namespace TermSAT.Common
         
         public bool TryGetValue(TKey key, out TValue value)
         {
-            WeakReference<TValue> reference;
-
-            if (cache.TryGetValue(key, out reference))
+            if (cache.TryGetValue(key, out WeakReference<TValue> reference))
                 if (reference.TryGetTarget(out value))
                     return true;
             value = default(TValue);

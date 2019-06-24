@@ -52,7 +52,7 @@ namespace TermSAT.RuleDatabase
         static WeakCache<string, TruthTable> __cache = new WeakCache<string, TruthTable>();
         static WeakCache<Formula, TruthTable> __formulaCache = new WeakCache<Formula, TruthTable>();
 
-        private BitArray values = new BitArray(2 ^ (2 ^ VARIABLE_COUNT));
+        private BitArray values = new BitArray(MAX_TRUTH_VALUES);
 
         private TruthTable(BitArray values)
         {
@@ -73,7 +73,7 @@ namespace TermSAT.RuleDatabase
         /// </summary>
         public static BitArray ToBitArray(Formula formula)
         {
-            var truthTable = new BitArray(2 ^ (2 ^ VARIABLE_COUNT));
+            var truthTable = new BitArray(MAX_TRUTH_VALUES);
 
             for (int i= 0; i < truthTable.Length; i++)
             {

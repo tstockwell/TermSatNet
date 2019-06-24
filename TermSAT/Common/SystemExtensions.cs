@@ -15,7 +15,18 @@ namespace TermSAT.Common
             var tasks = new List<Task>(collection.Count);
             foreach (var v in collection)
             {
-                var task= Task.Run(() => asyncAction(v));
+                var task= Task.Run(async () => await asyncAction(v));
+                tasks.Add(task);
+            }
+            return Task.WhenAll();
+        }
+
+        public static Task ForEachAsync<TValue>(this ICollection<TValue> collection, Action<TValue> action)
+        {
+            var tasks = new List<Task>(collection.Count);
+            foreach (var v in collection)
+            {
+                var task= Task.Run(() => action(v));
                 tasks.Add(task);
             }
             return Task.WhenAll();
@@ -32,7 +43,7 @@ namespace TermSAT.Common
                         (bits[i + 2] ? 2 : 0) |
                         (bits[i + 3] ? 1 : 0);
 
-                sb.Append(v.ToString("x1")); // Or "X1"
+                sb.Append(v.ToString("X1")); 
             }
 
             return sb.ToString(); 
@@ -42,12 +53,13 @@ namespace TermSAT.Common
         {
             var bits = new BitArray(hexArray.Length*4);
             int i = 0;
-            Action<bool, bool, bool, bool> setBits = (bool a, bool b, bool c, bool d) => {
+            void setBits(bool a, bool b, bool c, bool d)
+            {
                 bits[i++] = a;
                 bits[i++] = b;
                 bits[i++] = c;
                 bits[i++] = d;
-            };
+            }
             foreach (var c in hexArray.ToLower())
             {
                 switch (c)

@@ -37,7 +37,7 @@ namespace TermSAT.Formulas
     {
         public static string ToFormulaString(this string prettyText)
         {
-            return new PrettyParser(prettyText).getFormulaText();
+            return new PrettyParser(prettyText).GetFormulaText();
         }
 
         public static string ToPrettyString(this string formulaText)
@@ -73,23 +73,23 @@ namespace TermSAT.Formulas
             _formula = formula.Replace(" ", "");
         }
 
-        public string getFormulaText()
+        public string GetFormulaText()
         {
             char c = _formula[_position];
             if (c == '(')
             {
                 _position++;
-                string antecedent = getFormulaText();
+                string antecedent = GetFormulaText();
                 if (!_formula.Substring(_position).StartsWith("->"))
                     throw new TermSatException("Expected -> at position " + _position);
                 _position += 2;
-                string consequent = getFormulaText();
+                string consequent = GetFormulaText();
                 return Symbol.Implication.ToString() + antecedent + consequent;
             }
             else if (c == '~')
             {
                 _position++;
-                string antecedent = getFormulaText();
+                string antecedent = GetFormulaText();
                 return Symbol.Negation.ToString() + antecedent;
             }
             else if (Char.IsDigit(c))

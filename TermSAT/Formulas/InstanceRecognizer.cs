@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using TermSAT.Common;
-using TermSAT.Formulas;
-using static TermSAT.Formulas.InstanceRecognizer.RecognizerVisitor;
+using System.Linq;
 
 namespace TermSAT.Formulas
 {
@@ -35,11 +35,10 @@ namespace TermSAT.Formulas
      * 
      * Terminology used in TermSAT... 
      * ...the result of applying a substitution to a formula, F, is called a substitution instance of formula F.
-     * ...if T is the formula that is the result of applying a substitution to formula F then F is called a 
-     *  generalization of formula T
+     * ...if S is the formula that is the result of applying a substitution to formula F then F is called a 
+     *  generalization of formula S
      * 
-     * InstanceRecognizer implements an efficient method for recognizing 
-     * substitution instances.
+     * InstanceRecognizer implements an efficient method for recognizing substitution instances.
      * A InstanceRecognizer builds an internal trie structure for representing all 
      * the given formulas that enables it to avoid many comparisons, thus making it 
      * much more efficient than testing all formulas individually.      
@@ -52,11 +51,7 @@ namespace TermSAT.Formulas
     {
         public InstanceRecognizer() { }
 
-        public void Add(Formula formula)
-        {
-            // formulas are thier own key
-            Add(formula, formula);
-        }
+        public void Add(Formula formula) => Add(formula /* formulas are thier own key */, formula);
 
         /**
          * Returns a list of formulas in this InstanceRecogniser that are generalizations of 
@@ -67,21 +62,16 @@ namespace TermSAT.Formulas
         {
             var matches = FindGeneralizationNodes(formula, maxMatchCount);
             if (matches == null)
-                return new List<SubstitutionInstance>(0);
-            var list = new List<SubstitutionInstance>(matches.Count);
-            foreach (SearchResult p in matches)
-                list.Add(new SubstitutionInstance(p.Node.Value, p.Substitutions));
-            return list;
+                return ImmutableList<SubstitutionInstance>.Empty;
+            return matches.Select<SearchResult, SubstitutionInstance>(match => 
+                new SubstitutionInstance(match.Node.Value, match.Substitutions)).ToList();
         }
 
         /**
          * Returns a list of all formulas in this InstanceRecogniser that are 
          * generalizations of the given formula.
          */
-        public IList<SubstitutionInstance> FindAllGeneralizations(Formula formula)
-        {
-            return FindGeneralizations(formula, int.MaxValue);
-        }
+        public IList<SubstitutionInstance> FindAllGeneralizations(Formula formula) => FindGeneralizations(formula, int.MaxValue);
 
         /**
          * Returns the first formula found in this InstanceRecogniser that is a 
@@ -90,7 +80,7 @@ namespace TermSAT.Formulas
         public SubstitutionInstance FindFirstGeneralization(Formula formula)
         {
             var matches = FindGeneralizations(formula, 1);
-            if (matches.Count <= 0)
+            if (matches == null || matches.Count <= 0)
                 return null;
             return matches[0];
         }
@@ -109,8 +99,8 @@ namespace TermSAT.Formulas
             public IDictionary<Variable, Formula> Substitutions { get; private set; }
             public SearchResult(INode node, IDictionary<Variable, Formula> substitutions)
             {
-                this.Node = node;
-                this.Substitutions = substitutions;
+                Node = node;
+                Substitutions = substitutions;
             }
         }
 
@@ -119,7 +109,6 @@ namespace TermSAT.Formulas
         /// </summary>
         public class RecognizerVisitor : IVisitor<List<SearchResult>>
         {
-            List<SearchResult> _matches = new List<SearchResult>();
             Stack<IDictionary<Variable, Formula>> _substitutions = new Stack<IDictionary<Variable, Formula>>();
             Stack<int> _position = new Stack<int>();
 
@@ -134,17 +123,17 @@ namespace TermSAT.Formulas
                 _position.Push(0);
             }
 
-            public bool IsComplete { get { return _matches != null && MaxMatchCount <= _matches.Count; } }
+            public bool IsComplete { get { return Result != null && MaxMatchCount <= Result.Count; } }
 
-            public List<SearchResult> Result { get { return _matches; } }
+            public List<SearchResult> Result { get; private set; } = new List<SearchResult>();
 
             public bool Visit(TrieMap<IFormulaSequence, Formula, Formula>.INode node)
             {
                 int currentPosition = _position.Peek(); // current position within the formula to match
                 var currentSubstitutions = _substitutions.Peek();
-                var currentSubformula = node.Value;
+                var currentSubformula = node.Key;
 
-                Formula instanceSubformula = FormulaToMatch[node.Depth];
+                Formula instanceSubformula = FormulaToMatch[currentPosition];
 
                 try
                 {
@@ -154,23 +143,20 @@ namespace TermSAT.Formulas
                     // If there is no substitution then create one 
                     if (currentSubformula is Variable)
                     {
-                        Formula subtitute = currentSubstitutions[currentSubformula as Variable];
-                        if (subtitute == null)
+                        if (currentSubstitutions.TryGetValue(currentSubformula as Variable, out Formula subtitute)) {
+                            // A substitution already exists, if current subformula does not match previous 
+                            // substitution then not a match 
+                            if (!subtitute.Equals(instanceSubformula))
+                                return false;
+                        }
+                        else
                         {
                             currentSubstitutions = new Dictionary<Variable, Formula>(currentSubstitutions)
                             {
                                 { currentSubformula as Variable, instanceSubformula }
                             };
-                            currentPosition += instanceSubformula.Length;
                         }
-                        else
-                        {
-                            // if current subformula does not match previous 
-                            // substitution then not a match 
-                            if (!subtitute.Equals(instanceSubformula))
-                                return false;
-                            currentPosition++;
-                        }
+                        currentPosition+= instanceSubformula.Length;
                     }
                     else if (currentSubformula != null)
                     {
@@ -185,19 +171,19 @@ namespace TermSAT.Formulas
                     if (node.Children.Count <= 0)
                     {
                         // this node is a leaf but there is still formula left, so not a match
-                        if (currentPosition < FormulaToMatch.Length - 1)
+                        if (currentPosition < FormulaToMatch.Length)
                             return false;
 
                         // this node is a leaf and we have matched the entire 
                         // formula so we have found a match
-                        if (_matches == null)
-                            _matches = new List<SearchResult>();
-                        _matches.Add(new SearchResult(node, currentSubstitutions));
+                        if (Result == null)
+                            Result = new List<SearchResult>();
+                        Result.Add(new SearchResult(node, currentSubstitutions));
                         return false;
                     }
 
                     // this node is not a leaf but we're out of formula, so not a match
-                    if (FormulaToMatch.Length - 1 <= currentPosition)
+                    if (FormulaToMatch.Length <= currentPosition)
                         return false;
 
                     // keep searching

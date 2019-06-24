@@ -16,15 +16,15 @@ namespace TermSAT.Formulas
      * For instance, ".1".
      *
      */
-    public partial class Variable : Formula {
+    public partial class Variable : Formula
+    {
+        static private readonly WeakCache<int, Variable> __cache = new WeakCache<int, Variable>();
 
         public static readonly Variable ONE = NewVariable(1);
         public static readonly Variable TWO = NewVariable(2);
         public static readonly Variable THREE = NewVariable(3);
 
         public static implicit operator Variable(string formulaText) => FormulaParser.ToFormula(formulaText) as Variable;
-
-        static private readonly WeakCache<int, Variable> __cache = new WeakCache<int, Variable>();
 
         string _text;
         readonly List<Variable> _varlist;
@@ -57,5 +57,4 @@ namespace TermSAT.Formulas
 
         override public IList<Variable> AllVariables { get => _varlist; }
     }
-
 }

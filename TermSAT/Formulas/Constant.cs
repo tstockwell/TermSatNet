@@ -5,9 +5,7 @@ namespace TermSAT.Formulas
 {
     public partial class Constant : Formula
     {
-
-        public static implicit operator Constant(string formulaText) =>
-            FormulaParser.ToFormula(formulaText) as Constant;
+        public static implicit operator Constant(string formulaText) => FormulaParser.ToFormula(formulaText) as Constant;
 
         // constants
         public static readonly Formula TRUE = new Constant("T");
@@ -15,10 +13,7 @@ namespace TermSAT.Formulas
 
 	    readonly string _text;
 
-        protected Constant(string text) : base(length:1)
-        {
-            _text = text;
-        }
+        protected Constant(string text) : base(length:1) => _text = text;
 
         override public string ToString() => _text;
 
@@ -30,8 +25,6 @@ namespace TermSAT.Formulas
 
         public override IList<Variable> AllVariables { get => ImmutableList<Variable>.Empty; }
     }
-
-
 }
 
 
