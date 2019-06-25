@@ -33,7 +33,7 @@ namespace TermSAT.Tests
         [TestInitialize]
         public void Initialize()
         {
-            database = new FormulaDatabase();
+            database = new FormulaDatabase(":memory:");
             database.Clear();
         }
 

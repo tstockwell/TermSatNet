@@ -29,16 +29,24 @@ namespace TermSAT.RuleDatabase
      */
     public class DatabaseReport
     {
-        public FormulaDatabase Database {  get; private set; }
-        public bool ShowReductionRules {  get; private set; }
-
-        public DatabaseReport(FormulaDatabase database, bool showReductionRules= false)
+        public class DatabaseReportOptions
         {
-            Database= database;
-            ShowReductionRules= showReductionRules;
+            public bool ShowReductionRules { get; set; } = false;
+            public bool ShowNonCanonicalFormulas { get; set; } = false;
+            public bool ShowCanonicalFormulasInLexicalOrder { get; set; } = true;
         }
 
-        public void Run(bool showReductionRules= false)
+
+        public FormulaDatabase Database { get; private set; }
+        public DatabaseReportOptions Options { get; private set; }
+
+        public DatabaseReport(FormulaDatabase database, DatabaseReportOptions options= null)
+        {
+            Database= database;
+            Options = (options == null) ? new DatabaseReportOptions() : options;
+        }
+
+        public void Run()
         {
             /* 
              * Count # of rules
@@ -75,21 +83,48 @@ namespace TermSAT.RuleDatabase
 
                     foreach (var formula in canonicalFormulas)
                     {
-                        Trace.WriteLine("              " + formula.ToString());
+                        Trace.WriteLine("          " + formula.ToString());
                     }
                 }
                 Trace.WriteLine("-------------   ------   ------");
             }
 
-            Trace.WriteLine("");
-            Trace.WriteLine("Canonical Formulas in Lexical Order");
-            Trace.WriteLine("=====================================");
-            Database.GetAllCanonicalFormulasInLexicalOrder().ForEach(f => 
-            { 
-                Trace.WriteLine(f); 
-            });
+            if (Options.ShowNonCanonicalFormulas)
+            {
+                /*
+                 * List lengths and # of canonical formulas
+                 */
+                Trace.WriteLine("TRUTH VALUE     COUNT");
+                Trace.WriteLine("                ");
+                Trace.WriteLine("-------------   ------");
+                foreach (var truthTable in allTruthTables)
+                {
+                    var nonCanonicalFormulas = Database.GetNonCanonicalFormulas(truthTable);
 
-            if (showReductionRules)
+                    Trace.WriteLine(
+                        truthTable.ToString().PadRight(16) +
+                        nonCanonicalFormulas.Count.ToString());
+
+                    foreach (var formula in nonCanonicalFormulas)
+                    {
+                        Trace.WriteLine("          " + formula.ToString());
+                    }
+                    Trace.WriteLine("-------------   ------   ------");
+                }
+            }
+
+            if (Options.ShowCanonicalFormulasInLexicalOrder)
+            {
+                Trace.WriteLine("");
+                Trace.WriteLine("Canonical Formulas in Lexical Order");
+                Trace.WriteLine("=====================================");
+                Database.GetAllCanonicalFormulasInLexicalOrder().ForEach(f =>
+                {
+                    Trace.WriteLine(f);
+                });
+            }
+
+            if (Options.ShowReductionRules)
             {
                 Trace.WriteLine("");
                 Trace.WriteLine("Reduction Rules");

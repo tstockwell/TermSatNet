@@ -56,6 +56,11 @@ namespace TermSAT.RuleDatabase
         private FormulaDatabase _database;
         private InstanceRecognizer _recognizer = new InstanceRecognizer();
 
+        public RuleGenerator(FormulaDatabase database)
+        {
+            _database = database;
+        }
+
 
         public void Run()
         {
@@ -87,8 +92,6 @@ namespace TermSAT.RuleDatabase
 
         private void Setup()
         {
-            _database = new FormulaDatabase();
-            _database.Clear();
             _formulaGenerator = new FormulaGenerator(_database);
 
             foreach (var formula in _database.GetAllNonCanonicalFormulas())
@@ -116,6 +119,7 @@ namespace TermSAT.RuleDatabase
                     reductionRule = new ReductionRule(formula, _database.FindCanonicalFormula(formula));
                     Trace.WriteLine("Found a new reduction rule: " + reductionRule);
                 }
+
                 _database.AddFormula(formula, isCanonical);
             }
             else

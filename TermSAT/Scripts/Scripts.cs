@@ -13,24 +13,35 @@ namespace TermSAT.Scripts
     [TestClass, TestCategory("Scripts")]
     public class Scripts
     {
-        const string DATABASE_PATH= "\temp\rules-"+TruthTable.VARIABLE_COUNT+".db";
+        readonly string DATABASE_PATH= "rules-"+TruthTable.VARIABLE_COUNT+".db";
 
+        // do this to create memory-based db
+        //readonly string DATABASE_PATH = ":memory:"; 
 
         [TestMethod]
         public void RunRuleGenerator()
         {
-            new RuleGenerator().Run();
+            var database = new FormulaDatabase(DATABASE_PATH);
+            database.Clear();
+            new RuleGenerator(database).Run();
         }
+
         [TestMethod]
         public void RunRuleReport()
         {
-            var database = FormulaDatabase 
-            new DatabaseReport().Run();
+            var database = new FormulaDatabase(DATABASE_PATH);
+            var options = new DatabaseReport.DatabaseReportOptions();
+            if (TruthTable.VARIABLE_COUNT <= 2)
+                options.ShowNonCanonicalFormulas = true;
+            new DatabaseReport(database, options).Run();
         }
+
         [TestMethod]
         public void RunRuleReport_ShowReductionRules()
         {
-            new DatabaseReport().Run(showReductionRules:true);
+            var database = new FormulaDatabase(DATABASE_PATH);
+            var options = new DatabaseReport.DatabaseReportOptions() { ShowReductionRules = true };
+            new DatabaseReport(database, options).Run();
         }
     }
 }

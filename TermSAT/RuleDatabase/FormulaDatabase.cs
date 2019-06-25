@@ -112,28 +112,10 @@ namespace TermSAT.RuleDatabase
 
         protected SqliteConnection Connection { get; set; }
 
-        /// <summary>
-        /// Creates a database in memory
-        /// </summary>
-        public FormulaDatabase()
+        /// <param name="datasource">path to a file, or ':memory:' to create a memory-based db</param>
+        public FormulaDatabase(string datasource)
         {
-            Connection = new SqliteConnection("DataSource=:memory:");
-            Connection.Open();
-
-            var options = new DbContextOptionsBuilder()
-                .UseSqlite(Connection)
-                .Options;
-
-            RuleContext = new RuleDatabaseContext(options);
-            RuleContext.Database.EnsureCreated();
-        }
-
-        /// <summary>
-        /// Creates a file based database
-        /// </summary>
-        public FormulaDatabase(string filePath)
-        {
-            Connection = new SqliteConnection("DataSource="+filePath);
+            Connection = new SqliteConnection("DataSource="+datasource);
             Connection.Open();
 
             var options = new DbContextOptionsBuilder()
@@ -164,6 +146,16 @@ namespace TermSAT.RuleDatabase
         {
             var records = RuleContext.FormulaRecords.AsNoTracking()
                 .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == true)
+                .OrderBy(f => f.Id)
+                .ToList();
+            var formulas = records.Select(r => Formula.Parse(r.Text)).ToList();
+            return formulas;
+        }
+
+        public List<Formula> GetNonCanonicalFormulas(TruthTable truthTable)
+        {
+            var records = RuleContext.FormulaRecords.AsNoTracking()
+                .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == false)
                 .OrderBy(f => f.Id)
                 .ToList();
             var formulas = records.Select(r => Formula.Parse(r.Text)).ToList();
@@ -269,8 +261,7 @@ namespace TermSAT.RuleDatabase
         public List<TruthTable> GetAllTruthTables()
         {
             var truthValues = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true)
-                .OrderBy(f => f.Text)
+                .OrderBy(f => f.TruthValue)
                 .Select(f => f.TruthValue)
                 .Distinct()
                 .ToList();
