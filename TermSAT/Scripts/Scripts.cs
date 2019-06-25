@@ -13,10 +13,24 @@ namespace TermSAT.Scripts
     [TestClass, TestCategory("Scripts")]
     public class Scripts
     {
+        const string DATABASE_PATH= "\temp\rules-"+TruthTable.VARIABLE_COUNT+".db";
+
+
         [TestMethod]
         public void RunRuleGenerator()
         {
             new RuleGenerator().Run();
+        }
+        [TestMethod]
+        public void RunRuleReport()
+        {
+            var database = FormulaDatabase 
+            new DatabaseReport().Run();
+        }
+        [TestMethod]
+        public void RunRuleReport_ShowReductionRules()
+        {
+            new DatabaseReport().Run(showReductionRules:true);
         }
     }
 }

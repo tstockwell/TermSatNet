@@ -112,6 +112,9 @@ namespace TermSAT.RuleDatabase
 
         protected SqliteConnection Connection { get; set; }
 
+        /// <summary>
+        /// Creates a database in memory
+        /// </summary>
         public FormulaDatabase()
         {
             Connection = new SqliteConnection("DataSource=:memory:");
@@ -119,7 +122,22 @@ namespace TermSAT.RuleDatabase
 
             var options = new DbContextOptionsBuilder()
                 .UseSqlite(Connection)
-                //.UseSqlite("Data Source=rules-" + TruthTable.VARIABLE_COUNT + ".db")
+                .Options;
+
+            RuleContext = new RuleDatabaseContext(options);
+            RuleContext.Database.EnsureCreated();
+        }
+
+        /// <summary>
+        /// Creates a file based database
+        /// </summary>
+        public FormulaDatabase(string filePath)
+        {
+            Connection = new SqliteConnection("DataSource="+filePath);
+            Connection.Open();
+
+            var options = new DbContextOptionsBuilder()
+                .UseSqlite(Connection)
                 .Options;
 
             RuleContext = new RuleDatabaseContext(options);

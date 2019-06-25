@@ -1,0 +1,535 @@
+Test Name:	RunRuleGenerator
+Test Outcome:	Passed
+Result StandardOutput:	
+Debug Trace:
+T is canonical.
+F is canonical.
+.1 is canonical.
+.2 is canonical.
+The formulas lengths have been increased to 2
+Found a new reduction rule: ~T ==> F
+Found a new reduction rule: ~F ==> T
+-.1 is canonical.
+-.2 is canonical.
+The formulas lengths have been increased to 3
+Found a new reduction rule: ~~1 ==> 1
+--.2 can be reduced using rule ~~1 ==> 1
+Found a new reduction rule: (T->T) ==> T
+Found a new reduction rule: (T->F) ==> F
+Found a new reduction rule: (T->1) ==> 1
+*T.2 can be reduced using rule (T->1) ==> 1
+Found a new reduction rule: (F->T) ==> T
+Found a new reduction rule: (F->F) ==> T
+Found a new reduction rule: (F->1) ==> T
+*F.2 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->T) ==> T
+Found a new reduction rule: (1->F) ==> ~1
+Found a new reduction rule: (1->1) ==> T
+*.1.2 is canonical.
+*.2T can be reduced using rule (1->T) ==> T
+*.2F can be reduced using rule (1->F) ==> ~1
+*.2.1 is canonical.
+*.2.2 can be reduced using rule (1->1) ==> T
+The formulas lengths have been increased to 4
+-*.1.2 is canonical.
+-*.2.1 is canonical.
+*-.1T can be reduced using rule (1->T) ==> T
+*-.1F can be reduced using rule (1->F) ==> ~1
+Found a new reduction rule: (~1->1) ==> 1
+*-.1.2 is canonical.
+*-.2T can be reduced using rule (1->T) ==> T
+*-.2F can be reduced using rule (1->F) ==> ~1
+*-.2.1 is canonical.
+*-.2.2 can be reduced using rule (~1->1) ==> 1
+*T-.1 can be reduced using rule (T->1) ==> 1
+*T-.2 can be reduced using rule (T->1) ==> 1
+*F-.1 can be reduced using rule (F->1) ==> T
+*F-.2 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->~1) ==> ~1
+*.1-.2 is canonical.
+*.2-.1 is canonical.
+*.2-.2 can be reduced using rule (1->~1) ==> ~1
+The formulas lengths have been increased to 5
+--*.1.2 can be reduced using rule ~~1 ==> 1
+--*.2.1 can be reduced using rule ~~1 ==> 1
+-*-.1.2 is canonical.
+-*-.2.1 is canonical.
+-*.1-.2 is canonical.
+-*.2-.1 is canonical.
+**.1.2T can be reduced using rule (1->T) ==> T
+**.1.2F can be reduced using rule (1->F) ==> ~1
+Found a new reduction rule: ((1->2)->1) ==> 1
+Found a new reduction rule: ((1->2)->2) ==> (~1->2)
+**.2.1T can be reduced using rule (1->T) ==> T
+**.2.1F can be reduced using rule (1->F) ==> ~1
+**.2.1.1 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.2.1.2 can be reduced using rule ((1->2)->1) ==> 1
+*-.1-.1 can be reduced using rule (1->1) ==> T
+Found a new reduction rule: (~1->~2) ==> (2->1)
+*-.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-.2 can be reduced using rule (1->1) ==> T
+*T*.1.2 can be reduced using rule (T->1) ==> 1
+*T*.2.1 can be reduced using rule (T->1) ==> 1
+*F*.1.2 can be reduced using rule (F->1) ==> T
+*F*.2.1 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->(1->2)) ==> (1->2)
+Found a new reduction rule: (1->(2->1)) ==> T
+*.2*.1.2 can be reduced using rule (1->(2->1)) ==> T
+*.2*.2.1 can be reduced using rule (1->(1->2)) ==> (1->2)
+The formulas lengths have been increased to 6
+--*-.1.2 can be reduced using rule ~~1 ==> 1
+--*-.2.1 can be reduced using rule ~~1 ==> 1
+--*.1-.2 can be reduced using rule ~~1 ==> 1
+--*.2-.1 can be reduced using rule ~~1 ==> 1
+*-*.1.2T can be reduced using rule (1->T) ==> T
+*-*.1.2F can be reduced using rule (1->F) ==> ~1
+Found a new reduction rule: (~(1->2)->1) ==> T
+Found a new reduction rule: (~(1->2)->2) ==> (1->2)
+*-*.2.1T can be reduced using rule (1->T) ==> T
+*-*.2.1F can be reduced using rule (1->F) ==> ~1
+*-*.2.1.1 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*.2.1.2 can be reduced using rule (~(1->2)->1) ==> T
+**-.1.2T can be reduced using rule (1->T) ==> T
+**-.1.2F can be reduced using rule (1->F) ==> ~1
+Found a new reduction rule: ((~1->2)->1) ==> (2->1)
+**-.1.2.2 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**-.2.1T can be reduced using rule (1->T) ==> T
+**-.2.1F can be reduced using rule (1->F) ==> ~1
+**-.2.1.1 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**-.2.1.2 can be reduced using rule ((~1->2)->1) ==> (2->1)
+**.1-.2T can be reduced using rule (1->T) ==> T
+**.1-.2F can be reduced using rule (1->F) ==> ~1
+**.1-.2.1 can be reduced using rule ((1->2)->1) ==> 1
+Found a new reduction rule: ((1->~2)->2) ==> 2
+**.2-.1T can be reduced using rule (1->T) ==> T
+**.2-.1F can be reduced using rule (1->F) ==> ~1
+**.2-.1.1 can be reduced using rule ((1->~2)->2) ==> 2
+**.2-.1.2 can be reduced using rule ((1->2)->1) ==> 1
+Found a new reduction rule: ((1->2)->~1) ==> (1->~2)
+Found a new reduction rule: ((1->2)->~2) ==> ~2
+**.2.1-.1 can be reduced using rule ((1->2)->~2) ==> ~2
+**.2.1-.2 can be reduced using rule ((1->2)->~1) ==> (1->~2)
+Found a new reduction rule: (~1->(1->2)) ==> T
+Found a new reduction rule: (~1->(2->1)) ==> (2->1)
+*-.2*.1.2 can be reduced using rule (~1->(2->1)) ==> (2->1)
+*-.2*.2.1 can be reduced using rule (~1->(1->2)) ==> T
+*T-*.1.2 can be reduced using rule (T->1) ==> 1
+*T-*.2.1 can be reduced using rule (T->1) ==> 1
+*T*-.1.2 can be reduced using rule (T->1) ==> 1
+*T*-.2.1 can be reduced using rule (T->1) ==> 1
+*T*.1-.2 can be reduced using rule (T->1) ==> 1
+*T*.2-.1 can be reduced using rule (T->1) ==> 1
+*F-*.1.2 can be reduced using rule (F->1) ==> T
+*F-*.2.1 can be reduced using rule (F->1) ==> T
+*F*-.1.2 can be reduced using rule (F->1) ==> T
+*F*-.2.1 can be reduced using rule (F->1) ==> T
+*F*.1-.2 can be reduced using rule (F->1) ==> T
+*F*.2-.1 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->~(1->2)) ==> (1->~2)
+Found a new reduction rule: (1->~(2->1)) ==> ~1
+Found a new reduction rule: (1->(~1->2)) ==> T
+*.1*-.2.1 can be reduced using rule (1->(2->1)) ==> T
+*.1*.1-.2 can be reduced using rule (1->(1->2)) ==> (1->2)
+Found a new reduction rule: (1->(2->~1)) ==> (1->~2)
+*.2-*.1.2 can be reduced using rule (1->~(2->1)) ==> ~1
+*.2-*.2.1 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+*.2*-.1.2 can be reduced using rule (1->(2->1)) ==> T
+*.2*-.2.1 can be reduced using rule (1->(~1->2)) ==> T
+*.2*.1-.2 can be reduced using rule (1->(2->~1)) ==> (1->~2)
+*.2*.2-.1 can be reduced using rule (1->(1->2)) ==> (1->2)
+The formulas lengths have been increased to 7
+*-*-.1.2T can be reduced using rule (1->T) ==> T
+*-*-.1.2F can be reduced using rule (1->F) ==> ~1
+Found a new reduction rule: (~(~1->2)->1) ==> (~1->2)
+*-*-.1.2.2 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*-.2.1T can be reduced using rule (1->T) ==> T
+*-*-.2.1F can be reduced using rule (1->F) ==> ~1
+*-*-.2.1.1 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*-.2.1.2 can be reduced using rule (~(~1->2)->1) ==> (~1->2)
+*-*.1-.2T can be reduced using rule (1->T) ==> T
+*-*.1-.2F can be reduced using rule (1->F) ==> ~1
+*-*.1-.2.1 can be reduced using rule (~(1->2)->1) ==> T
+Found a new reduction rule: (~(1->~2)->2) ==> T
+*-*.2-.1T can be reduced using rule (1->T) ==> T
+*-*.2-.1F can be reduced using rule (1->F) ==> ~1
+*-*.2-.1.1 can be reduced using rule (~(1->~2)->2) ==> T
+*-*.2-.1.2 can be reduced using rule (~(1->2)->1) ==> T
+*-*.1.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+**-.1.2-.1 can be reduced using rule ((1->2)->1) ==> 1
+**-.1.2-.2 can be reduced using rule ((1->2)->~2) ==> ~2
+**-.2.1-.1 can be reduced using rule ((1->2)->~2) ==> ~2
+**-.2.1-.2 can be reduced using rule ((1->2)->1) ==> 1
+**.1-.2-.1 can be reduced using rule ((1->2)->~1) ==> (1->~2)
+**.1-.2-.2 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.2-.1-.1 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.2-.1-.2 can be reduced using rule ((1->2)->~1) ==> (1->~2)
+**.1.2*.1.2 can be reduced using rule (1->1) ==> T
+Found a new reduction rule: ((1->2)->(2->1)) ==> (2->1)
+**.2.1*.1.2 can be reduced using rule ((1->2)->(2->1)) ==> (2->1)
+**.2.1*.2.1 can be reduced using rule (1->1) ==> T
+*-.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1*-.1.2 can be reduced using rule (1->(1->2)) ==> (1->2)
+*-.1*-.2.1 can be reduced using rule (~1->(2->1)) ==> (2->1)
+*-.1*.1-.2 can be reduced using rule (~1->(1->2)) ==> T
+*-.1*.2-.1 can be reduced using rule (1->(2->1)) ==> T
+*-.2-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2*-.1.2 can be reduced using rule (~1->(2->1)) ==> (2->1)
+*-.2*-.2.1 can be reduced using rule (1->(1->2)) ==> (1->2)
+*-.2*.1-.2 can be reduced using rule (1->(2->1)) ==> T
+*-.2*.2-.1 can be reduced using rule (~1->(1->2)) ==> T
+*T-*-.1.2 can be reduced using rule (T->1) ==> 1
+*T-*-.2.1 can be reduced using rule (T->1) ==> 1
+*T-*.1-.2 can be reduced using rule (T->1) ==> 1
+*T-*.2-.1 can be reduced using rule (T->1) ==> 1
+*F-*-.1.2 can be reduced using rule (F->1) ==> T
+*F-*-.2.1 can be reduced using rule (F->1) ==> T
+*F-*.1-.2 can be reduced using rule (F->1) ==> T
+*F-*.2-.1 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->~(~1->2)) ==> ~1
+*.1-*-.2.1 can be reduced using rule (1->~(2->1)) ==> ~1
+*.1-*.1-.2 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+Found a new reduction rule: (1->~(2->~1)) ==> (1->2)
+*.2-*-.1.2 can be reduced using rule (1->~(2->1)) ==> ~1
+*.2-*-.2.1 can be reduced using rule (1->~(~1->2)) ==> ~1
+*.2-*.1-.2 can be reduced using rule (1->~(2->~1)) ==> (1->2)
+*.2-*.2-.1 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+The formulas lengths have been increased to 8
+*-*-.1.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2*.1.2 can be reduced using rule (~1->1) ==> 1
+Found a new reduction rule: (~(1->2)->(2->1)) ==> T
+*-*.2.1*.1.2 can be reduced using rule (~(1->2)->(2->1)) ==> T
+*-*.2.1*.2.1 can be reduced using rule (~1->1) ==> 1
+Found a new reduction rule: ((~1->2)->(1->2)) ==> (1->2)
+Found a new reduction rule: ((~1->2)->(2->1)) ==> (2->1)
+**-.2.1*.1.2 can be reduced using rule ((~1->2)->(2->1)) ==> (2->1)
+**-.2.1*.2.1 can be reduced using rule ((~1->2)->(1->2)) ==> (1->2)
+Found a new reduction rule: ((1->~2)->(1->2)) ==> (1->2)
+Found a new reduction rule: ((1->~2)->(2->1)) ==> (2->1)
+**.2-.1*.1.2 can be reduced using rule ((1->~2)->(2->1)) ==> (2->1)
+**.2-.1*.2.1 can be reduced using rule ((1->~2)->(1->2)) ==> (1->2)
+**.1.2-*.1.2 can be reduced using rule (1->~1) ==> ~1
+**.1.2-*.2.1 is canonical.
+Found a new reduction rule: ((1->2)->(~1->2)) ==> (~1->2)
+Found a new reduction rule: ((1->2)->(~2->1)) ==> (~1->2)
+Found a new reduction rule: ((1->2)->(1->~2)) ==> (1->~2)
+Found a new reduction rule: ((1->2)->(2->~1)) ==> (1->~2)
+**.2.1-*.1.2 is canonical.
+Found a new reduction rule: ((2->1)->~(2->1)) ==> ~(2->1)
+**.2.1*-.1.2 can be reduced using rule ((1->2)->(~2->1)) ==> (~1->2)
+**.2.1*-.2.1 can be reduced using rule ((1->2)->(~1->2)) ==> (~1->2)
+**.2.1*.1-.2 can be reduced using rule ((1->2)->(2->~1)) ==> (1->~2)
+**.2.1*.2-.1 can be reduced using rule ((1->2)->(1->~2)) ==> (1->~2)
+*-.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+The formulas lengths have been increased to 9
+-**.1.2-*.2.1 is canonical.
+-**.2.1-*.1.2 is canonical.
+Found a new reduction rule: (~(~1->2)->(1->2)) ==> T
+Found a new reduction rule: (~(~1->2)->(2->1)) ==> T
+*-*-.2.1*.1.2 can be reduced using rule (~(~1->2)->(2->1)) ==> T
+*-*-.2.1*.2.1 can be reduced using rule (~(~1->2)->(1->2)) ==> T
+Found a new reduction rule: (~(1->~2)->(1->2)) ==> T
+Found a new reduction rule: (~(1->~2)->(2->1)) ==> T
+*-*.2-.1*.1.2 can be reduced using rule (~(1->~2)->(2->1)) ==> T
+*-*.2-.1*.2.1 can be reduced using rule (~(1->~2)->(1->2)) ==> T
+*-*.1.2-*.1.2 can be reduced using rule (1->1) ==> T
+*-*.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+Found a new reduction rule: (~(1->2)->(~1->2)) ==> T
+Found a new reduction rule: (~(1->2)->(~2->1)) ==> T
+Found a new reduction rule: (~(1->2)->(1->~2)) ==> T
+Found a new reduction rule: (~(1->2)->(2->~1)) ==> T
+*-*.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.2.1 can be reduced using rule (1->1) ==> T
+*-*.2.1*-.1.2 can be reduced using rule (~(1->2)->(~2->1)) ==> T
+*-*.2.1*-.2.1 can be reduced using rule (~(1->2)->(~1->2)) ==> T
+*-*.2.1*.1-.2 can be reduced using rule (~(1->2)->(2->~1)) ==> T
+*-*.2.1*.2-.1 can be reduced using rule (~(1->2)->(1->~2)) ==> T
+Found a new reduction rule: ((~1->2)->~(1->2)) ==> ~2
+Found a new reduction rule: ((~1->2)->~(2->1)) ==> ~1
+**-.1.2*-.1.2 can be reduced using rule (1->1) ==> T
+Found a new reduction rule: ((~1->2)->(~2->1)) ==> T
+Found a new reduction rule: ((~1->2)->(1->~2)) ==> (1->~2)
+**-.1.2*.2-.1 can be reduced using rule ((1->2)->(2->1)) ==> (2->1)
+**-.2.1-*.1.2 can be reduced using rule ((~1->2)->~(2->1)) ==> ~1
+**-.2.1-*.2.1 can be reduced using rule ((~1->2)->~(1->2)) ==> ~2
+**-.2.1*-.1.2 can be reduced using rule ((~1->2)->(~2->1)) ==> T
+Found a new reduction rule: ((~2->1)->(~2->1)) ==> T
+**-.2.1*.1-.2 can be reduced using rule ((1->2)->(2->1)) ==> (2->1)
+**-.2.1*.2-.1 can be reduced using rule ((~1->2)->(1->~2)) ==> (1->~2)
+Found a new reduction rule: ((1->~2)->~(1->2)) ==> 1
+Found a new reduction rule: ((1->~2)->~(2->1)) ==> 2
+Found a new reduction rule: ((1->~2)->(~1->2)) ==> (~1->2)
+**.1-.2*-.2.1 can be reduced using rule ((1->2)->(2->1)) ==> (2->1)
+Found a new reduction rule: ((1->~2)->(1->~2)) ==> T
+Found a new reduction rule: ((1->~2)->(2->~1)) ==> T
+**.2-.1-*.1.2 can be reduced using rule ((1->~2)->~(2->1)) ==> 2
+**.2-.1-*.2.1 can be reduced using rule ((1->~2)->~(1->2)) ==> 1
+**.2-.1*-.1.2 can be reduced using rule ((1->2)->(2->1)) ==> (2->1)
+**.2-.1*-.2.1 can be reduced using rule ((1->~2)->(~1->2)) ==> (~1->2)
+**.2-.1*.1-.2 can be reduced using rule ((1->~2)->(2->~1)) ==> T
+**.2-.1*.2-.1 can be reduced using rule ((1->~2)->(1->~2)) ==> T
+Found a new reduction rule: ((1->2)->~(~1->2)) ==> ~2
+Found a new reduction rule: ((1->2)->~(~2->1)) ==> ~2
+Found a new reduction rule: ((1->2)->~(1->~2)) ==> 1
+Found a new reduction rule: ((1->2)->~(2->~1)) ==> 1
+**.2.1-*-.1.2 can be reduced using rule ((1->2)->~(~2->1)) ==> ~2
+**.2.1-*-.2.1 can be reduced using rule ((1->2)->~(~1->2)) ==> ~2
+**.2.1-*.1-.2 can be reduced using rule ((1->2)->~(2->~1)) ==> 1
+**.2.1-*.2-.1 can be reduced using rule ((1->2)->~(1->~2)) ==> 1
+The formulas lengths have been increased to 10
+--**.1.2-*.2.1 can be reduced using rule ~~1 ==> 1
+--**.2.1-*.1.2 can be reduced using rule ~~1 ==> 1
+***.1.2-*.2.1T can be reduced using rule (1->T) ==> T
+***.1.2-*.2.1F can be reduced using rule (1->F) ==> ~1
+Found a new reduction rule: (((1->2)->~(2->1))->1) ==> (2->1)
+Found a new reduction rule: (((1->2)->~(2->1))->2) ==> (1->2)
+***.2.1-*.1.2T can be reduced using rule (1->T) ==> T
+***.2.1-*.1.2F can be reduced using rule (1->F) ==> ~1
+***.2.1-*.1.2.1 can be reduced using rule (((1->2)->~(2->1))->2) ==> (1->2)
+***.2.1-*.1.2.2 can be reduced using rule (((1->2)->~(2->1))->1) ==> (2->1)
+*-*-.1.2-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2*-.1.2 can be reduced using rule (~1->1) ==> 1
+Found a new reduction rule: (~(~1->2)->(~2->1)) ==> (~1->2)
+Found a new reduction rule: (~(~1->2)->(1->~2)) ==> T
+*-*-.1.2*.2-.1 can be reduced using rule (~(1->2)->(2->1)) ==> T
+*-*-.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1*-.1.2 can be reduced using rule (~(~1->2)->(~2->1)) ==> (~1->2)
+*-*-.2.1*-.2.1 can be reduced using rule (~1->1) ==> 1
+*-*-.2.1*.1-.2 can be reduced using rule (~(1->2)->(2->1)) ==> T
+*-*-.2.1*.2-.1 can be reduced using rule (~(~1->2)->(1->~2)) ==> T
+*-*.1-.2-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+Found a new reduction rule: (~(1->~2)->(~1->2)) ==> T
+*-*.1-.2*-.2.1 can be reduced using rule (~(1->2)->(2->1)) ==> T
+*-*.1-.2*.1-.2 can be reduced using rule (~1->1) ==> 1
+Found a new reduction rule: (~(1->~2)->(2->~1)) ==> (1->~2)
+*-*.2-.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1*-.1.2 can be reduced using rule (~(1->2)->(2->1)) ==> T
+*-*.2-.1*-.2.1 can be reduced using rule (~(1->~2)->(~1->2)) ==> T
+*-*.2-.1*.1-.2 can be reduced using rule (~(1->~2)->(2->~1)) ==> (1->~2)
+*-*.2-.1*.2-.1 can be reduced using rule (~1->1) ==> 1
+*-*.1.2-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+**-.1.2-*-.1.2 can be reduced using rule ((2->1)->~(2->1)) ==> ~(2->1)
+Found a new reduction rule: ((~1->2)->~(~2->1)) ==> ~(~1->2)
+Found a new reduction rule: ((~1->2)->~(1->~2)) ==> ~((1->2)->~(2->1))
+Found a new reduction rule: ((~1->2)->~(2->~1)) ==> ~((1->2)->~(2->1))
+**-.2.1-*-.1.2 can be reduced using rule ((~1->2)->~(~2->1)) ==> ~(~1->2)
+**-.2.1-*-.2.1 can be reduced using rule ((2->1)->~(2->1)) ==> ~(2->1)
+**-.2.1-*.1-.2 can be reduced using rule ((~1->2)->~(2->~1)) ==> ~((1->2)->~(2->1))
+**-.2.1-*.2-.1 can be reduced using rule ((~1->2)->~(1->~2)) ==> ~((1->2)->~(2->1))
+Found a new reduction rule: ((1->~2)->~(~1->2)) ==> ~((1->2)->~(2->1))
+Found a new reduction rule: ((1->~2)->~(~2->1)) ==> ~((1->2)->~(2->1))
+**.1-.2-*.1-.2 can be reduced using rule ((2->1)->~(2->1)) ==> ~(2->1)
+Found a new reduction rule: ((1->~2)->~(2->~1)) ==> ~(1->~2)
+**.2-.1-*-.1.2 can be reduced using rule ((1->~2)->~(~2->1)) ==> ~((1->2)->~(2->1))
+**.2-.1-*-.2.1 can be reduced using rule ((1->~2)->~(~1->2)) ==> ~((1->2)->~(2->1))
+**.2-.1-*.1-.2 can be reduced using rule ((1->~2)->~(2->~1)) ==> ~(1->~2)
+**.2-.1-*.2-.1 can be reduced using rule ((2->1)->~(2->1)) ==> ~(2->1)
+*T**.1.2-*.2.1 can be reduced using rule (T->1) ==> 1
+*T**.2.1-*.1.2 can be reduced using rule (T->1) ==> 1
+*F**.1.2-*.2.1 can be reduced using rule (F->1) ==> T
+*F**.2.1-*.1.2 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->((1->2)->~(2->1))) ==> (1->~2)
+Found a new reduction rule: (1->((2->1)->~(1->2))) ==> (1->~2)
+*.2**.1.2-*.2.1 can be reduced using rule (1->((2->1)->~(1->2))) ==> (1->~2)
+*.2**.2.1-*.1.2 can be reduced using rule (1->((1->2)->~(2->1))) ==> (1->~2)
+The formulas lengths have been increased to 11
+*-**.1.2-*.2.1T can be reduced using rule (1->T) ==> T
+*-**.1.2-*.2.1F can be reduced using rule (1->F) ==> ~1
+Found a new reduction rule: (~((1->2)->~(2->1))->1) ==> (~1->2)
+Found a new reduction rule: (~((1->2)->~(2->1))->2) ==> (~1->2)
+*-**.2.1-*.1.2T can be reduced using rule (1->T) ==> T
+*-**.2.1-*.1.2F can be reduced using rule (1->F) ==> ~1
+*-**.2.1-*.1.2.1 can be reduced using rule (~((1->2)->~(2->1))->2) ==> (~1->2)
+*-**.2.1-*.1.2.2 can be reduced using rule (~((1->2)->~(2->1))->1) ==> (~1->2)
+Found a new reduction rule: (((1->2)->~(2->1))->~1) ==> (1->2)
+Found a new reduction rule: (((1->2)->~(2->1))->~2) ==> (2->1)
+***.2.1-*.1.2-.1 can be reduced using rule (((1->2)->~(2->1))->~2) ==> (2->1)
+***.2.1-*.1.2-.2 can be reduced using rule (((1->2)->~(2->1))->~1) ==> (1->2)
+*-*-.1.2-*-.1.2 can be reduced using rule (1->1) ==> T
+*-*-.1.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*-.2.1 can be reduced using rule (1->1) ==> T
+*-*-.2.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.1-.2 can be reduced using rule (1->1) ==> T
+*-*.1-.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.2-.1 can be reduced using rule (1->1) ==> T
+Found a new reduction rule: (~1->((1->2)->~(2->1))) ==> (~1->2)
+Found a new reduction rule: (~1->((2->1)->~(1->2))) ==> (~1->2)
+*-.2**.1.2-*.2.1 can be reduced using rule (~1->((2->1)->~(1->2))) ==> (~1->2)
+*-.2**.2.1-*.1.2 can be reduced using rule (~1->((1->2)->~(2->1))) ==> (~1->2)
+*T-**.1.2-*.2.1 can be reduced using rule (T->1) ==> 1
+*T-**.2.1-*.1.2 can be reduced using rule (T->1) ==> 1
+*F-**.1.2-*.2.1 can be reduced using rule (F->1) ==> T
+*F-**.2.1-*.1.2 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->~((1->2)->~(2->1))) ==> (1->2)
+Found a new reduction rule: (1->~((2->1)->~(1->2))) ==> (1->2)
+*.2-**.1.2-*.2.1 can be reduced using rule (1->~((2->1)->~(1->2))) ==> (1->2)
+*.2-**.2.1-*.1.2 can be reduced using rule (1->~((1->2)->~(2->1))) ==> (1->2)
+The formulas lengths have been increased to 12
+*-**.1.2-*.2.1-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.1.2-*.2.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.2.1-*.1.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.2.1-*.1.2-.2 can be reduced using rule (~1->~2) ==> (2->1)
+***.1.2-*.2.1*.1.2 can be reduced using rule ((1->2)->1) ==> 1
+***.1.2-*.2.1*.2.1 can be reduced using rule ((1->~2)->2) ==> 2
+***.2.1-*.1.2*.1.2 can be reduced using rule ((1->~2)->2) ==> 2
+***.2.1-*.1.2*.2.1 can be reduced using rule ((1->2)->1) ==> 1
+**.1.2**.1.2-*.2.1 can be reduced using rule (1->(1->2)) ==> (1->2)
+**.1.2**.2.1-*.1.2 can be reduced using rule (1->(2->~1)) ==> (1->~2)
+**.2.1**.1.2-*.2.1 can be reduced using rule (1->(2->~1)) ==> (1->~2)
+**.2.1**.2.1-*.1.2 can be reduced using rule (1->(1->2)) ==> (1->2)
+*-.1-**.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-**.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-**.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-**.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+The formulas lengths have been increased to 13
+*-**.1.2-*.2.1*.1.2 can be reduced using rule (~(1->2)->1) ==> T
+*-**.1.2-*.2.1*.2.1 can be reduced using rule (~(1->~2)->2) ==> T
+*-**.2.1-*.1.2*.1.2 can be reduced using rule (~(1->~2)->2) ==> T
+*-**.2.1-*.1.2*.2.1 can be reduced using rule (~(1->2)->1) ==> T
+***.1.2-*.2.1-*.1.2 can be reduced using rule ((1->2)->~1) ==> (1->~2)
+***.1.2-*.2.1-*.2.1 can be reduced using rule ((1->2)->2) ==> (~1->2)
+Found a new reduction rule: (((1->2)->~(2->1))->(~1->2)) ==> T
+Found a new reduction rule: (((1->2)->~(2->1))->(~2->1)) ==> T
+Found a new reduction rule: (((1->2)->~(2->1))->(1->~2)) ==> T
+Found a new reduction rule: (((1->2)->~(2->1))->(2->~1)) ==> T
+***.2.1-*.1.2-*.1.2 can be reduced using rule ((1->2)->2) ==> (~1->2)
+***.2.1-*.1.2-*.2.1 can be reduced using rule ((1->2)->~1) ==> (1->~2)
+***.2.1-*.1.2*-.1.2 can be reduced using rule (((1->2)->~(2->1))->(~2->1)) ==> T
+***.2.1-*.1.2*-.2.1 can be reduced using rule (((1->2)->~(2->1))->(~1->2)) ==> T
+***.2.1-*.1.2*.1-.2 can be reduced using rule (((1->2)->~(2->1))->(2->~1)) ==> T
+***.2.1-*.1.2*.2-.1 can be reduced using rule (((1->2)->~(2->1))->(1->~2)) ==> T
+*-*.1.2**.1.2-*.2.1 can be reduced using rule (~1->(1->2)) ==> T
+*-*.1.2**.2.1-*.1.2 can be reduced using rule (1->(2->1)) ==> T
+*-*.2.1**.1.2-*.2.1 can be reduced using rule (1->(2->1)) ==> T
+*-*.2.1**.2.1-*.1.2 can be reduced using rule (~1->(1->2)) ==> T
+Found a new reduction rule: ((~1->2)->((1->2)->~(2->1))) ==> (1->~2)
+Found a new reduction rule: ((~1->2)->((2->1)->~(1->2))) ==> (1->~2)
+**-.2.1**.1.2-*.2.1 can be reduced using rule ((~1->2)->((2->1)->~(1->2))) ==> (1->~2)
+**-.2.1**.2.1-*.1.2 can be reduced using rule ((~1->2)->((1->2)->~(2->1))) ==> (1->~2)
+Found a new reduction rule: ((1->~2)->((1->2)->~(2->1))) ==> (~1->2)
+Found a new reduction rule: ((1->~2)->((2->1)->~(1->2))) ==> (~1->2)
+**.2-.1**.1.2-*.2.1 can be reduced using rule ((1->~2)->((2->1)->~(1->2))) ==> (~1->2)
+**.2-.1**.2.1-*.1.2 can be reduced using rule ((1->~2)->((1->2)->~(2->1))) ==> (~1->2)
+**.1.2-**.1.2-*.2.1 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+**.1.2-**.2.1-*.1.2 can be reduced using rule (1->~(2->~1)) ==> (1->2)
+Found a new reduction rule: ((2->1)->~((1->2)->~(2->1))) ==> (1->2)
+Found a new reduction rule: ((2->1)->~((2->1)->~(1->2))) ==> (1->2)
+The formulas lengths have been increased to 14
+*-**.1.2-*.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.1.2-*.2.1-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+Found a new reduction rule: (~((1->2)->~(2->1))->(~1->2)) ==> (~1->2)
+Found a new reduction rule: (~((1->2)->~(2->1))->(~2->1)) ==> (~1->2)
+Found a new reduction rule: (~((1->2)->~(2->1))->(1->~2)) ==> (1->~2)
+Found a new reduction rule: (~((1->2)->~(2->1))->(2->~1)) ==> (1->~2)
+*-**.2.1-*.1.2-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.2.1-*.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.2.1-*.1.2*-.1.2 can be reduced using rule (~((1->2)->~(2->1))->(~2->1)) ==> (~1->2)
+*-**.2.1-*.1.2*-.2.1 can be reduced using rule (~((1->2)->~(2->1))->(~1->2)) ==> (~1->2)
+*-**.2.1-*.1.2*.1-.2 can be reduced using rule (~((1->2)->~(2->1))->(2->~1)) ==> (1->~2)
+*-**.2.1-*.1.2*.2-.1 can be reduced using rule (~((1->2)->~(2->1))->(1->~2)) ==> (1->~2)
+Found a new reduction rule: (((1->2)->~(2->1))->~(~1->2)) ==> ~((1->2)->~(2->1))
+Found a new reduction rule: (((1->2)->~(2->1))->~(~2->1)) ==> ~((1->2)->~(2->1))
+Found a new reduction rule: (((1->2)->~(2->1))->~(1->~2)) ==> ~((1->2)->~(2->1))
+Found a new reduction rule: (((1->2)->~(2->1))->~(2->~1)) ==> ~((1->2)->~(2->1))
+***.2.1-*.1.2-*-.1.2 can be reduced using rule (((1->2)->~(2->1))->~(~2->1)) ==> ~((1->2)->~(2->1))
+***.2.1-*.1.2-*-.2.1 can be reduced using rule (((1->2)->~(2->1))->~(~1->2)) ==> ~((1->2)->~(2->1))
+***.2.1-*.1.2-*.1-.2 can be reduced using rule (((1->2)->~(2->1))->~(2->~1)) ==> ~((1->2)->~(2->1))
+***.2.1-*.1.2-*.2-.1 can be reduced using rule (((1->2)->~(2->1))->~(1->~2)) ==> ~((1->2)->~(2->1))
+Found a new reduction rule: (~(~1->2)->((1->2)->~(2->1))) ==> (~1->2)
+Found a new reduction rule: (~(~1->2)->((2->1)->~(1->2))) ==> (~1->2)
+*-*-.2.1**.1.2-*.2.1 can be reduced using rule (~(~1->2)->((2->1)->~(1->2))) ==> (~1->2)
+*-*-.2.1**.2.1-*.1.2 can be reduced using rule (~(~1->2)->((1->2)->~(2->1))) ==> (~1->2)
+Found a new reduction rule: (~(1->~2)->((1->2)->~(2->1))) ==> (1->~2)
+Found a new reduction rule: (~(1->~2)->((2->1)->~(1->2))) ==> (1->~2)
+*-*.2-.1**.1.2-*.2.1 can be reduced using rule (~(1->~2)->((2->1)->~(1->2))) ==> (1->~2)
+*-*.2-.1**.2.1-*.1.2 can be reduced using rule (~(1->~2)->((1->2)->~(2->1))) ==> (1->~2)
+*-*.1.2-**.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-**.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-**.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-**.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+Found a new reduction rule: ((~1->2)->~((1->2)->~(2->1))) ==> ~((1->2)->~(2->1))
+Found a new reduction rule: ((~1->2)->~((2->1)->~(1->2))) ==> ~((1->2)->~(2->1))
+**-.2.1-**.1.2-*.2.1 can be reduced using rule ((~1->2)->~((2->1)->~(1->2))) ==> ~((1->2)->~(2->1))
+**-.2.1-**.2.1-*.1.2 can be reduced using rule ((~1->2)->~((1->2)->~(2->1))) ==> ~((1->2)->~(2->1))
+Found a new reduction rule: ((1->~2)->~((1->2)->~(2->1))) ==> ~((1->2)->~(2->1))
+Found a new reduction rule: ((1->~2)->~((2->1)->~(1->2))) ==> ~((1->2)->~(2->1))
+**.2-.1-**.1.2-*.2.1 can be reduced using rule ((1->~2)->~((2->1)->~(1->2))) ==> ~((1->2)->~(2->1))
+**.2-.1-**.2.1-*.1.2 can be reduced using rule ((1->~2)->~((1->2)->~(2->1))) ==> ~((1->2)->~(2->1))
+The formulas lengths have been increased to 15
+*-**.1.2-*.2.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.1.2-*.2.1-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.1.2-*.2.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.1.2-*.2.1-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.2.1-*.1.2-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.2.1-*.1.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.2.1-*.1.2-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.2.1-*.1.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-**.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-**.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-**.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-**.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-**.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-**.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-**.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-**.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+The formulas lengths have been increased to 16
+The formulas lengths have been increased to 17
+***.1.2-*.2.1**.1.2-*.2.1 can be reduced using rule (1->1) ==> T
+***.1.2-*.2.1**.2.1-*.1.2 can be reduced using rule ((1->~2)->(2->~1)) ==> T
+***.2.1-*.1.2**.1.2-*.2.1 can be reduced using rule ((1->~2)->(2->~1)) ==> T
+***.2.1-*.1.2**.2.1-*.1.2 can be reduced using rule (1->1) ==> T
+The formulas lengths have been increased to 18
+*-**.1.2-*.2.1**.1.2-*.2.1 can be reduced using rule (~1->1) ==> 1
+*-**.1.2-*.2.1**.2.1-*.1.2 can be reduced using rule (~(1->~2)->(2->~1)) ==> (1->~2)
+*-**.2.1-*.1.2**.1.2-*.2.1 can be reduced using rule (~(1->~2)->(2->~1)) ==> (1->~2)
+*-**.2.1-*.1.2**.2.1-*.1.2 can be reduced using rule (~1->1) ==> 1
+***.1.2-*.2.1-**.1.2-*.2.1 can be reduced using rule (1->~1) ==> ~1
+***.1.2-*.2.1-**.2.1-*.1.2 can be reduced using rule ((1->~2)->~(2->~1)) ==> ~(1->~2)
+***.2.1-*.1.2-**.1.2-*.2.1 can be reduced using rule ((1->~2)->~(2->~1)) ==> ~(1->~2)
+***.2.1-*.1.2-**.2.1-*.1.2 can be reduced using rule (1->~1) ==> ~1
+The formulas lengths have been increased to 19
+*-**.1.2-*.2.1-**.1.2-*.2.1 can be reduced using rule (1->1) ==> T
+*-**.1.2-*.2.1-**.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.2.1-*.1.2-**.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-**.2.1-*.1.2-**.2.1-*.1.2 can be reduced using rule (1->1) ==> T
+The formulas lengths have been increased to 20
+!!!!!! The Rule Database is Complete !!!
+
