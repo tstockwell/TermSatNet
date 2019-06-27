@@ -44,7 +44,7 @@ namespace TermSAT.RuleDatabase
     {
 
         readonly FormulaDatabase _database;
-        int _startingLength = 0;
+        readonly int _startingLength = 0;
         int _currentLength = 0;
         IEnumerator<Formula> _currentIterator;
 

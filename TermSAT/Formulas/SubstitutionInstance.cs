@@ -17,7 +17,6 @@
  ******************************************************************************/
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Threading.Tasks;
 
 namespace TermSAT.Formulas
 {
@@ -35,6 +34,7 @@ namespace TermSAT.Formulas
      */
     public class SubstitutionInstance
     {
+        private Formula substitutionInstance= null;
         public Formula Generalization { get; }
 
         public IDictionary<Variable, Formula> Substitutions { get; }
@@ -45,6 +45,18 @@ namespace TermSAT.Formulas
             Substitutions = (substitutions == null) ? 
                 ImmutableDictionary<Variable, Formula>.Empty : 
                 substitutions.ToImmutableDictionary();
+        }
+
+        public Formula Instance 
+        {
+            get
+            {
+                if (substitutionInstance == null)
+                {
+                    substitutionInstance= Generalization.CreateSubstitutionInstance(Substitutions);
+                }
+                return substitutionInstance;
+            }
         }
     }
 
@@ -92,7 +104,7 @@ namespace TermSAT.Formulas
         {
             var newAntecedent = Antecedent.CreateSubstitutionInstance(substitutions);
             var newConsequent = Consequent.CreateSubstitutionInstance(substitutions);
-            if (newAntecedent != Antecedent || newConsequent != Consequent)
+            if (!newAntecedent.Equals(Antecedent) || !newConsequent.Equals(Consequent))
                 return Implication.NewImplication(newAntecedent, newConsequent);
             return this;
         }

@@ -50,9 +50,8 @@ namespace TermSAT.RuleDatabase
      */
     public class FormulaConstructor : IEnumerator<Formula>
     {
-
-        FormulaDatabase _database;
-        int _formulaLength;
+        readonly FormulaDatabase _database;
+        readonly int _formulaLength;
 
         NegationFormulaConstructor _negationConstructor = null;
         ImplicationFormulaConstructor _ifthenConstructor = null;
@@ -187,7 +186,7 @@ namespace TermSAT.RuleDatabase
         IEnumerator<Formula> _rightIterator;
         IEnumerator<Formula> _consequents;
         Formula _antecedent = null;
-        int _formulaLength;
+        readonly int _formulaLength;
         FormulaDatabase _database;
 
         public ImplicationFormulaConstructor(FormulaDatabase database, int formulaLength, int lengthOfRightSideFormulas)
