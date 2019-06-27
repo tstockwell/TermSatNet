@@ -91,12 +91,16 @@ namespace TermSAT.RuleDatabase
                     _currentLength++;
                     Trace.WriteLine("The formulas lengths have been increased to " + _currentLength);
 
-                    if (TruthTable.MAX_TRUTH_TABLES <= _database.CountCanonicalTruthTables())
-                        if (_database.LengthOfLongestPossibleNonReducableFormula() < _currentLength)
+                    var truthTableCount= _database.CountCanonicalTruthTables();
+                    if (TruthTable.MAX_TRUTH_TABLES <= truthTableCount)
+                    {
+                        var longestPossibleFormula= _database.LengthOfLongestPossibleNonReducableFormula();
+                        if (longestPossibleFormula < _currentLength)
                         {
                             Trace.WriteLine("!!!!!! The Rule Database is Complete !!!");
                             return null;
                         }
+                    }
 
                     FormulaConstructor fc = new FormulaConstructor(_database, _currentLength);
                     if (fc.MoveNext())

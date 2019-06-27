@@ -26,6 +26,9 @@ namespace TermSAT.Tests
             tt= TruthTable.NewTruthTable("00");
             Assert.AreEqual("00", tt.ToString());
 
+            Assert.AreNotEqual(
+                TruthTable.NewTruthTable("**.1.2.3".ToFormula()), 
+                TruthTable.NewTruthTable(".3".ToFormula()));
         }
 
         FormulaDatabase database;
