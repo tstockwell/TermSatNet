@@ -94,6 +94,19 @@ namespace TermSAT.Tests
             Assert.AreEqual("*.1T", formula);
             formula= generator.GetNextWellFormedFormula();
             Assert.AreEqual("*.1F", formula);
+
+            // at one time the FormulaGenerator has a bug where it 
+            // didn't generate forumulas with more than 2 variables.
+            // So here we run the generator until the length of the 
+            // formulas == 6.  By that time at least one formula with 
+            // three variables must be genrated.
+            var variableCount= 0;
+            while ((formula= generator.GetNextWellFormedFormula()) != null) {
+                var c= formula.AllVariables.Count;
+                if (variableCount < c) 
+                    variableCount= c;
+            }
+            Assert.IsTrue(3 <= variableCount);
         }
     }
 }

@@ -148,7 +148,7 @@ namespace TermSAT.RuleDatabase
          * A formula can be reduced if it is a substitution instance of 
          * a previously generated non-canonical formula.
          * Since new formulas are assembled from previously generated canonical 
-         * formulas then all subformulas of the given formula are guaranteed
+         * formulas all subformulas of the given formula are guaranteed
          * to be non-reducible.   
          */
         private ReductionRule FormulaCanBeReduced(Formula formula)

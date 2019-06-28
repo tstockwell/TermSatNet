@@ -47,6 +47,13 @@ namespace TermSAT.Tests
         }
 
         [TestMethod]
+        public void TestFormulaVariables()
+        {
+            Assert.AreEqual(3, "**.1.2.3".ToFormula().AllVariables.Count);
+        }
+
+
+        [TestMethod]
         public void TestFormulaConstruction()
         {
             Assert.AreEqual(".1", Variable.NewVariable(1).ToString());

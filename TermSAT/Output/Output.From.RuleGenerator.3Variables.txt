@@ -1,0 +1,2213 @@
+'dotnet.exe' (CoreCLR: DefaultDomain): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Private.CoreLib.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.testplatform.testhost\16.1.1\lib\netstandard1.5\testhost.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Runtime.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.testplatform.objectmodel\16.1.1\lib\netstandard1.5\Microsoft.TestPlatform.CoreUtilities.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Diagnostics.Tracing.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Collections.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.testplatform.objectmodel\16.1.1\lib\netstandard1.5\Microsoft.TestPlatform.PlatformAbstractions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Runtime.Extensions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Diagnostics.Debug.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Threading.Tasks.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Diagnostics.Process.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.ComponentModel.Primitives.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Globalization.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.testplatform.testhost\16.1.1\lib\netstandard1.5\Microsoft.TestPlatform.CrossPlatEngine.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.testplatform.testhost\16.1.1\lib\netstandard1.5\Microsoft.TestPlatform.CommunicationUtilities.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.testplatform.objectmodel\16.1.1\lib\netstandard1.5\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.testplatform.testhost\16.1.1\lib\netstandard1.5\Microsoft.VisualStudio.TestPlatform.Common.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\newtonsoft.json\9.0.1\lib\netstandard1.0\Newtonsoft.Json.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Runtime.Serialization.Primitives.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Threading.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Diagnostics.TraceSource.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Runtime.InteropServices.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Threading.ThreadPool.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Net.Primitives.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.IO.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Net.Sockets.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Threading.Overlapped.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Net.NameResolution.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Private.Uri.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\Microsoft.Win32.Primitives.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Text.Encoding.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Reflection.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Dynamic.Runtime.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Linq.Expressions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Reflection.Extensions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Linq.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.ObjectModel.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Xml.XDocument.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Private.Xml.Linq.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Private.Xml.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Text.RegularExpressions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Reflection.Emit.ILGeneration.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Reflection.Primitives.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Reflection.Emit.Lightweight.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'Anonymously Hosted DynamicMethods Assembly'. 
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.IO.FileSystem.Primitives.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.IO.FileSystem.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Runtime.Loader.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\Dropbox\workspaces\TermSAT\TermSatNet\TermSAT\bin\Debug\netcoreapp2.0\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Reflection.TypeExtensions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\mstest.testframework\1.4.0\lib\netstandard1.0\Microsoft.VisualStudio.TestPlatform.TestFramework.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\Dropbox\workspaces\TermSAT\TermSatNet\TermSAT\bin\Debug\netcoreapp2.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\Dropbox\workspaces\TermSAT\TermSatNet\TermSAT\bin\Debug\netcoreapp2.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Xml.ReaderWriter.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Threading.Timer.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Xml.XmlDocument.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Resources.ResourceManager.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Runtime.InteropServices.RuntimeInformation.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\system.collections.immutable\1.5.0\lib\netstandard2.0\System.Collections.Immutable.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\netstandard.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\Dropbox\workspaces\TermSAT\TermSatNet\TermSAT\bin\Debug\netcoreapp2.0\TermSAT.dll'. Symbols loaded.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.entityframeworkcore\2.2.4\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.ComponentModel.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.ComponentModel.TypeConverter.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Collections.Concurrent.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\mstest.testframework\1.4.0\lib\netstandard1.0\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Diagnostics.TextWriterTraceListener.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Console.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.data.sqlite.core\2.2.4\lib\netstandard2.0\Microsoft.Data.Sqlite.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Data.Common.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.entityframeworkcore.sqlite.core\2.2.4\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Sqlite.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\sqlitepclraw.bundle_green\1.1.12\lib\netcoreapp\SQLitePCLRaw.batteries_v2.dll'. Module was built without symbols.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\sqlitepclraw.provider.e_sqlite3.netstandard11\1.1.12\lib\netstandard1.1\SQLitePCLRaw.provider.e_sqlite3.dll'. Module was built without symbols.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\sqlitepclraw.core\1.1.12\lib\netstandard1.1\SQLitePCLRaw.core.dll'. Module was built without symbols.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.entityframeworkcore.relational\2.2.4\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Relational.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.dependencyinjection.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.caching.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Security.Cryptography.Primitives.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Security.Cryptography.Algorithms.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.dependencyinjection\2.2.0\lib\netcoreapp2.0\Microsoft.Extensions.DependencyInjection.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\remotion.linq\2.2.0\lib\netstandard1.0\Remotion.Linq.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Users\zen\.nuget\packages\microsoft.entityframeworkcore.abstractions\2.2.4\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Abstractions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Transactions.Local.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\system.interactive.async\3.2.0\lib\netstandard2.0\System.Interactive.Async.dll'. 
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\system.diagnostics.diagnosticsource\4.5.0\lib\netstandard1.3\System.Diagnostics.DiagnosticSource.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.caching.memory\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.options\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Options.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.primitives\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.ComponentModel.Annotations.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Linq.Queryable.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.0.9\System.Threading.Thread.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'dotnet.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+T is canonical.
+F is canonical.
+.1 is canonical.
+.2 is canonical.
+.3 is canonical.
+The formulas lengths have been increased to 2
+Found a new reduction rule: ~T ==> F
+Found a new reduction rule: ~F ==> T
+-.1 is canonical.
+-.2 is canonical.
+-.3 is canonical.
+The formulas lengths have been increased to 3
+Found a new reduction rule: ~~1 ==> 1
+--.2 can be reduced using rule ~~1 ==> 1
+--.3 can be reduced using rule ~~1 ==> 1
+Found a new reduction rule: (T->T) ==> T
+Found a new reduction rule: (T->F) ==> F
+Found a new reduction rule: (T->1) ==> 1
+*T.2 can be reduced using rule (T->1) ==> 1
+*T.3 can be reduced using rule (T->1) ==> 1
+Found a new reduction rule: (F->T) ==> T
+Found a new reduction rule: (F->F) ==> T
+Found a new reduction rule: (F->1) ==> T
+*F.2 can be reduced using rule (F->1) ==> T
+*F.3 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->T) ==> T
+Found a new reduction rule: (1->F) ==> ~1
+Found a new reduction rule: (1->1) ==> T
+*.1.2 is canonical.
+*.1.3 is canonical.
+*.2T can be reduced using rule (1->T) ==> T
+*.2F can be reduced using rule (1->F) ==> ~1
+*.2.1 is canonical.
+*.2.2 can be reduced using rule (1->1) ==> T
+*.2.3 is canonical.
+*.3T can be reduced using rule (1->T) ==> T
+*.3F can be reduced using rule (1->F) ==> ~1
+*.3.1 is canonical.
+*.3.2 is canonical.
+*.3.3 can be reduced using rule (1->1) ==> T
+The formulas lengths have been increased to 4
+-*.1.2 is canonical.
+-*.1.3 is canonical.
+-*.2.1 is canonical.
+-*.2.3 is canonical.
+-*.3.1 is canonical.
+-*.3.2 is canonical.
+*-.1T can be reduced using rule (1->T) ==> T
+*-.1F can be reduced using rule (1->F) ==> ~1
+Found a new reduction rule: (~1->1) ==> 1
+*-.1.2 is canonical.
+*-.1.3 is canonical.
+*-.2T can be reduced using rule (1->T) ==> T
+*-.2F can be reduced using rule (1->F) ==> ~1
+*-.2.1 is canonical.
+*-.2.2 can be reduced using rule (~1->1) ==> 1
+*-.2.3 is canonical.
+*-.3T can be reduced using rule (1->T) ==> T
+*-.3F can be reduced using rule (1->F) ==> ~1
+*-.3.1 is canonical.
+*-.3.2 is canonical.
+*-.3.3 can be reduced using rule (~1->1) ==> 1
+*T-.1 can be reduced using rule (T->1) ==> 1
+*T-.2 can be reduced using rule (T->1) ==> 1
+*T-.3 can be reduced using rule (T->1) ==> 1
+*F-.1 can be reduced using rule (F->1) ==> T
+*F-.2 can be reduced using rule (F->1) ==> T
+*F-.3 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->~1) ==> ~1
+*.1-.2 is canonical.
+*.1-.3 is canonical.
+*.2-.1 is canonical.
+*.2-.2 can be reduced using rule (1->~1) ==> ~1
+*.2-.3 is canonical.
+*.3-.1 is canonical.
+*.3-.2 is canonical.
+*.3-.3 can be reduced using rule (1->~1) ==> ~1
+The formulas lengths have been increased to 5
+--*.1.2 can be reduced using rule ~~1 ==> 1
+--*.1.3 can be reduced using rule ~~1 ==> 1
+--*.2.1 can be reduced using rule ~~1 ==> 1
+--*.2.3 can be reduced using rule ~~1 ==> 1
+--*.3.1 can be reduced using rule ~~1 ==> 1
+--*.3.2 can be reduced using rule ~~1 ==> 1
+-*-.1.2 is canonical.
+-*-.1.3 is canonical.
+-*-.2.1 is canonical.
+-*-.2.3 is canonical.
+-*-.3.1 is canonical.
+-*-.3.2 is canonical.
+-*.1-.2 is canonical.
+-*.1-.3 is canonical.
+-*.2-.1 is canonical.
+-*.2-.3 is canonical.
+-*.3-.1 is canonical.
+-*.3-.2 is canonical.
+**.1.2T can be reduced using rule (1->T) ==> T
+**.1.2F can be reduced using rule (1->F) ==> ~1
+Found a new reduction rule: ((1->2)->1) ==> 1
+Found a new reduction rule: ((1->2)->2) ==> (~1->2)
+Found a new reduction rule: ((1->2)->3) ==> 3
+**.1.3T can be reduced using rule (1->T) ==> T
+**.1.3F can be reduced using rule (1->F) ==> ~1
+**.1.3.1 can be reduced using rule ((1->2)->1) ==> 1
+**.1.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3.3 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.2.1T can be reduced using rule (1->T) ==> T
+**.2.1F can be reduced using rule (1->F) ==> ~1
+**.2.1.1 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.2.1.2 can be reduced using rule ((1->2)->1) ==> 1
+**.2.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3T can be reduced using rule (1->T) ==> T
+**.2.3F can be reduced using rule (1->F) ==> ~1
+**.2.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3.2 can be reduced using rule ((1->2)->1) ==> 1
+**.2.3.3 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.3.1T can be reduced using rule (1->T) ==> T
+**.3.1F can be reduced using rule (1->F) ==> ~1
+**.3.1.1 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.3.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1.3 can be reduced using rule ((1->2)->1) ==> 1
+**.3.2T can be reduced using rule (1->T) ==> T
+**.3.2F can be reduced using rule (1->F) ==> ~1
+**.3.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2.2 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.3.2.3 can be reduced using rule ((1->2)->1) ==> 1
+*-.1-.1 can be reduced using rule (1->1) ==> T
+Found a new reduction rule: (~1->~2) ==> (2->1)
+*-.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-.2 can be reduced using rule (1->1) ==> T
+*-.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-.3 can be reduced using rule (1->1) ==> T
+*T*.1.2 can be reduced using rule (T->1) ==> 1
+*T*.1.3 can be reduced using rule (T->1) ==> 1
+*T*.2.1 can be reduced using rule (T->1) ==> 1
+*T*.2.3 can be reduced using rule (T->1) ==> 1
+*T*.3.1 can be reduced using rule (T->1) ==> 1
+*T*.3.2 can be reduced using rule (T->1) ==> 1
+*F*.1.2 can be reduced using rule (F->1) ==> T
+*F*.1.3 can be reduced using rule (F->1) ==> T
+*F*.2.1 can be reduced using rule (F->1) ==> T
+*F*.2.3 can be reduced using rule (F->1) ==> T
+*F*.3.1 can be reduced using rule (F->1) ==> T
+*F*.3.2 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->(1->2)) ==> (1->2)
+*.1*.1.3 can be reduced using rule (1->(1->2)) ==> (1->2)
+Found a new reduction rule: (1->(2->1)) ==> T
+Found a new reduction rule: (1->(2->3)) ==> (1->3)
+*.1*.3.1 can be reduced using rule (1->(2->1)) ==> T
+*.1*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2*.1.2 can be reduced using rule (1->(2->1)) ==> T
+*.2*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2*.2.1 can be reduced using rule (1->(1->2)) ==> (1->2)
+*.2*.2.3 can be reduced using rule (1->(1->2)) ==> (1->2)
+*.2*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2*.3.2 can be reduced using rule (1->(2->1)) ==> T
+*.3*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3*.1.3 can be reduced using rule (1->(2->1)) ==> T
+*.3*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3*.2.3 can be reduced using rule (1->(2->1)) ==> T
+*.3*.3.1 can be reduced using rule (1->(1->2)) ==> (1->2)
+*.3*.3.2 can be reduced using rule (1->(1->2)) ==> (1->2)
+The formulas lengths have been increased to 6
+--*-.1.2 can be reduced using rule ~~1 ==> 1
+--*-.1.3 can be reduced using rule ~~1 ==> 1
+--*-.2.1 can be reduced using rule ~~1 ==> 1
+--*-.2.3 can be reduced using rule ~~1 ==> 1
+--*-.3.1 can be reduced using rule ~~1 ==> 1
+--*-.3.2 can be reduced using rule ~~1 ==> 1
+--*.1-.2 can be reduced using rule ~~1 ==> 1
+--*.1-.3 can be reduced using rule ~~1 ==> 1
+--*.2-.1 can be reduced using rule ~~1 ==> 1
+--*.2-.3 can be reduced using rule ~~1 ==> 1
+--*.3-.1 can be reduced using rule ~~1 ==> 1
+--*.3-.2 can be reduced using rule ~~1 ==> 1
+*-*.1.2T can be reduced using rule (1->T) ==> T
+*-*.1.2F can be reduced using rule (1->F) ==> ~1
+Found a new reduction rule: (~(1->2)->1) ==> T
+Found a new reduction rule: (~(1->2)->2) ==> (1->2)
+Found a new reduction rule: (~(1->2)->3) ==> T
+*-*.1.3T can be reduced using rule (1->T) ==> T
+*-*.1.3F can be reduced using rule (1->F) ==> ~1
+*-*.1.3.1 can be reduced using rule (~(1->2)->1) ==> T
+*-*.1.3.2 can be reduced using rule (~(1->2)->3) ==> T
+*-*.1.3.3 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*.2.1T can be reduced using rule (1->T) ==> T
+*-*.2.1F can be reduced using rule (1->F) ==> ~1
+*-*.2.1.1 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*.2.1.2 can be reduced using rule (~(1->2)->1) ==> T
+*-*.2.1.3 can be reduced using rule (~(1->2)->3) ==> T
+*-*.2.3T can be reduced using rule (1->T) ==> T
+*-*.2.3F can be reduced using rule (1->F) ==> ~1
+*-*.2.3.1 can be reduced using rule (~(1->2)->3) ==> T
+*-*.2.3.2 can be reduced using rule (~(1->2)->1) ==> T
+*-*.2.3.3 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*.3.1T can be reduced using rule (1->T) ==> T
+*-*.3.1F can be reduced using rule (1->F) ==> ~1
+*-*.3.1.1 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*.3.1.2 can be reduced using rule (~(1->2)->3) ==> T
+*-*.3.1.3 can be reduced using rule (~(1->2)->1) ==> T
+*-*.3.2T can be reduced using rule (1->T) ==> T
+*-*.3.2F can be reduced using rule (1->F) ==> ~1
+*-*.3.2.1 can be reduced using rule (~(1->2)->3) ==> T
+*-*.3.2.2 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*.3.2.3 can be reduced using rule (~(1->2)->1) ==> T
+**-.1.2T can be reduced using rule (1->T) ==> T
+**-.1.2F can be reduced using rule (1->F) ==> ~1
+**-.1.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2.2 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**-.1.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3T can be reduced using rule (1->T) ==> T
+**-.1.3F can be reduced using rule (1->F) ==> ~1
+**-.1.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3.3 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**-.2.1T can be reduced using rule (1->T) ==> T
+**-.2.1F can be reduced using rule (1->F) ==> ~1
+**-.2.1.1 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**-.2.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3T can be reduced using rule (1->T) ==> T
+**-.2.3F can be reduced using rule (1->F) ==> ~1
+**-.2.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3.3 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**-.3.1T can be reduced using rule (1->T) ==> T
+**-.3.1F can be reduced using rule (1->F) ==> ~1
+**-.3.1.1 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**-.3.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2T can be reduced using rule (1->T) ==> T
+**-.3.2F can be reduced using rule (1->F) ==> ~1
+**-.3.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2.2 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**-.3.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2T can be reduced using rule (1->T) ==> T
+**.1-.2F can be reduced using rule (1->F) ==> ~1
+**.1-.2.1 can be reduced using rule ((1->2)->1) ==> 1
+**.1-.2.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3T can be reduced using rule (1->T) ==> T
+**.1-.3F can be reduced using rule (1->F) ==> ~1
+**.1-.3.1 can be reduced using rule ((1->2)->1) ==> 1
+**.1-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1T can be reduced using rule (1->T) ==> T
+**.2-.1F can be reduced using rule (1->F) ==> ~1
+**.2-.1.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1.2 can be reduced using rule ((1->2)->1) ==> 1
+**.2-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3T can be reduced using rule (1->T) ==> T
+**.2-.3F can be reduced using rule (1->F) ==> ~1
+**.2-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3.2 can be reduced using rule ((1->2)->1) ==> 1
+**.2-.3.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1T can be reduced using rule (1->T) ==> T
+**.3-.1F can be reduced using rule (1->F) ==> ~1
+**.3-.1.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1.3 can be reduced using rule ((1->2)->1) ==> 1
+**.3-.2T can be reduced using rule (1->T) ==> T
+**.3-.2F can be reduced using rule (1->F) ==> ~1
+**.3-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2.3 can be reduced using rule ((1->2)->1) ==> 1
+**.1.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+*-.1*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*T-*.1.2 can be reduced using rule (T->1) ==> 1
+*T-*.1.3 can be reduced using rule (T->1) ==> 1
+*T-*.2.1 can be reduced using rule (T->1) ==> 1
+*T-*.2.3 can be reduced using rule (T->1) ==> 1
+*T-*.3.1 can be reduced using rule (T->1) ==> 1
+*T-*.3.2 can be reduced using rule (T->1) ==> 1
+*T*-.1.2 can be reduced using rule (T->1) ==> 1
+*T*-.1.3 can be reduced using rule (T->1) ==> 1
+*T*-.2.1 can be reduced using rule (T->1) ==> 1
+*T*-.2.3 can be reduced using rule (T->1) ==> 1
+*T*-.3.1 can be reduced using rule (T->1) ==> 1
+*T*-.3.2 can be reduced using rule (T->1) ==> 1
+*T*.1-.2 can be reduced using rule (T->1) ==> 1
+*T*.1-.3 can be reduced using rule (T->1) ==> 1
+*T*.2-.1 can be reduced using rule (T->1) ==> 1
+*T*.2-.3 can be reduced using rule (T->1) ==> 1
+*T*.3-.1 can be reduced using rule (T->1) ==> 1
+*T*.3-.2 can be reduced using rule (T->1) ==> 1
+*F-*.1.2 can be reduced using rule (F->1) ==> T
+*F-*.1.3 can be reduced using rule (F->1) ==> T
+*F-*.2.1 can be reduced using rule (F->1) ==> T
+*F-*.2.3 can be reduced using rule (F->1) ==> T
+*F-*.3.1 can be reduced using rule (F->1) ==> T
+*F-*.3.2 can be reduced using rule (F->1) ==> T
+*F*-.1.2 can be reduced using rule (F->1) ==> T
+*F*-.1.3 can be reduced using rule (F->1) ==> T
+*F*-.2.1 can be reduced using rule (F->1) ==> T
+*F*-.2.3 can be reduced using rule (F->1) ==> T
+*F*-.3.1 can be reduced using rule (F->1) ==> T
+*F*-.3.2 can be reduced using rule (F->1) ==> T
+*F*.1-.2 can be reduced using rule (F->1) ==> T
+*F*.1-.3 can be reduced using rule (F->1) ==> T
+*F*.2-.1 can be reduced using rule (F->1) ==> T
+*F*.2-.3 can be reduced using rule (F->1) ==> T
+*F*.3-.1 can be reduced using rule (F->1) ==> T
+*F*.3-.2 can be reduced using rule (F->1) ==> T
+Found a new reduction rule: (1->~(1->2)) ==> (1->~2)
+*.1-*.1.3 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+Found a new reduction rule: (1->~(2->1)) ==> ~1
+Found a new reduction rule: (1->~(2->3)) ==> (1->~3)
+*.1-*.3.1 can be reduced using rule (1->~(2->1)) ==> ~1
+*.1-*.3.2 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.1*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.1*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.1*-.2.1 can be reduced using rule (1->(2->1)) ==> T
+*.1*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.1*-.3.1 can be reduced using rule (1->(2->1)) ==> T
+*.1*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.1*.1-.2 can be reduced using rule (1->(1->2)) ==> (1->2)
+*.1*.1-.3 can be reduced using rule (1->(1->2)) ==> (1->2)
+*.1*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.1*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.1*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.1*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2-*.1.2 can be reduced using rule (1->~(2->1)) ==> ~1
+*.2-*.1.3 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.2-*.2.1 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+*.2-*.2.3 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+*.2-*.3.1 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.2-*.3.2 can be reduced using rule (1->~(2->1)) ==> ~1
+*.2*-.1.2 can be reduced using rule (1->(2->1)) ==> T
+*.2*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2*-.3.2 can be reduced using rule (1->(2->1)) ==> T
+*.2*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2*.2-.1 can be reduced using rule (1->(1->2)) ==> (1->2)
+*.2*.2-.3 can be reduced using rule (1->(1->2)) ==> (1->2)
+*.2*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.2*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3-*.1.2 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*.1.3 can be reduced using rule (1->~(2->1)) ==> ~1
+*.3-*.2.1 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*.2.3 can be reduced using rule (1->~(2->1)) ==> ~1
+*.3-*.3.1 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+*.3-*.3.2 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+*.3*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3*-.1.3 can be reduced using rule (1->(2->1)) ==> T
+*.3*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3*-.2.3 can be reduced using rule (1->(2->1)) ==> T
+*.3*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*.3*.3-.1 can be reduced using rule (1->(1->2)) ==> (1->2)
+*.3*.3-.2 can be reduced using rule (1->(1->2)) ==> (1->2)
+The formulas lengths have been increased to 7
+*-*-.1.2T can be reduced using rule (1->T) ==> T
+*-*-.1.2F can be reduced using rule (1->F) ==> ~1
+*-*-.1.2.1 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.1.2.2 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*-.1.2.3 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.1.3T can be reduced using rule (1->T) ==> T
+*-*-.1.3F can be reduced using rule (1->F) ==> ~1
+*-*-.1.3.1 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.1.3.2 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.1.3.3 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*-.2.1T can be reduced using rule (1->T) ==> T
+*-*-.2.1F can be reduced using rule (1->F) ==> ~1
+*-*-.2.1.1 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*-.2.1.2 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.2.1.3 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.2.3T can be reduced using rule (1->T) ==> T
+*-*-.2.3F can be reduced using rule (1->F) ==> ~1
+*-*-.2.3.1 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.2.3.2 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.2.3.3 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*-.3.1T can be reduced using rule (1->T) ==> T
+*-*-.3.1F can be reduced using rule (1->F) ==> ~1
+*-*-.3.1.1 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*-.3.1.2 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.3.1.3 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.3.2T can be reduced using rule (1->T) ==> T
+*-*-.3.2F can be reduced using rule (1->F) ==> ~1
+*-*-.3.2.1 can be reduced using rule (~(1->2)->3) ==> T
+*-*-.3.2.2 can be reduced using rule (~(1->2)->2) ==> (1->2)
+*-*-.3.2.3 can be reduced using rule (~(1->2)->3) ==> T
+*-*.1-.2T can be reduced using rule (1->T) ==> T
+*-*.1-.2F can be reduced using rule (1->F) ==> ~1
+*-*.1-.2.1 can be reduced using rule (~(1->2)->1) ==> T
+*-*.1-.2.2 can be reduced using rule (~(1->2)->3) ==> T
+*-*.1-.2.3 can be reduced using rule (~(1->2)->3) ==> T
+*-*.1-.3T can be reduced using rule (1->T) ==> T
+*-*.1-.3F can be reduced using rule (1->F) ==> ~1
+*-*.1-.3.1 can be reduced using rule (~(1->2)->1) ==> T
+*-*.1-.3.2 can be reduced using rule (~(1->2)->3) ==> T
+*-*.1-.3.3 can be reduced using rule (~(1->2)->3) ==> T
+*-*.2-.1T can be reduced using rule (1->T) ==> T
+*-*.2-.1F can be reduced using rule (1->F) ==> ~1
+*-*.2-.1.1 can be reduced using rule (~(1->2)->3) ==> T
+*-*.2-.1.2 can be reduced using rule (~(1->2)->1) ==> T
+*-*.2-.1.3 can be reduced using rule (~(1->2)->3) ==> T
+*-*.2-.3T can be reduced using rule (1->T) ==> T
+*-*.2-.3F can be reduced using rule (1->F) ==> ~1
+*-*.2-.3.1 can be reduced using rule (~(1->2)->3) ==> T
+*-*.2-.3.2 can be reduced using rule (~(1->2)->1) ==> T
+*-*.2-.3.3 can be reduced using rule (~(1->2)->3) ==> T
+*-*.3-.1T can be reduced using rule (1->T) ==> T
+*-*.3-.1F can be reduced using rule (1->F) ==> ~1
+*-*.3-.1.1 can be reduced using rule (~(1->2)->3) ==> T
+*-*.3-.1.2 can be reduced using rule (~(1->2)->3) ==> T
+*-*.3-.1.3 can be reduced using rule (~(1->2)->1) ==> T
+*-*.3-.2T can be reduced using rule (1->T) ==> T
+*-*.3-.2F can be reduced using rule (1->F) ==> ~1
+*-*.3-.2.1 can be reduced using rule (~(1->2)->3) ==> T
+*-*.3-.2.2 can be reduced using rule (~(1->2)->3) ==> T
+*-*.3-.2.3 can be reduced using rule (~(1->2)->1) ==> T
+*-*.1.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+**-.1.2-.1 can be reduced using rule ((1->2)->1) ==> 1
+**-.1.2-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-.1 can be reduced using rule ((1->2)->1) ==> 1
+**-.1.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-.2 can be reduced using rule ((1->2)->1) ==> 1
+**-.2.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-.2 can be reduced using rule ((1->2)->1) ==> 1
+**-.2.3-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-.3 can be reduced using rule ((1->2)->1) ==> 1
+**-.3.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-.3 can be reduced using rule ((1->2)->1) ==> 1
+**.1-.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-.2 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.1-.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-.3 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.2-.1-.1 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.2-.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-.3 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.3-.1-.1 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.3-.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-.2 can be reduced using rule ((1->2)->2) ==> (~1->2)
+**.3-.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.1.2 can be reduced using rule (1->1) ==> T
+**.1.2*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.1.3 can be reduced using rule (1->1) ==> T
+**.1.3*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.2.1 can be reduced using rule (1->1) ==> T
+**.2.1*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.2.3 can be reduced using rule (1->1) ==> T
+**.2.3*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.3.1 can be reduced using rule (1->1) ==> T
+**.3.1*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.3.2 can be reduced using rule (1->1) ==> T
+*-.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1*-.1.2 can be reduced using rule (1->(1->2)) ==> (1->2)
+*-.1*-.1.3 can be reduced using rule (1->(1->2)) ==> (1->2)
+*-.1*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*.2-.1 can be reduced using rule (1->(2->1)) ==> T
+*-.1*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.1*.3-.1 can be reduced using rule (1->(2->1)) ==> T
+*-.1*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*-.2.1 can be reduced using rule (1->(1->2)) ==> (1->2)
+*-.2*-.2.3 can be reduced using rule (1->(1->2)) ==> (1->2)
+*-.2*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.1-.2 can be reduced using rule (1->(2->1)) ==> T
+*-.2*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.2*.3-.2 can be reduced using rule (1->(2->1)) ==> T
+*-.3-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*-.3.1 can be reduced using rule (1->(1->2)) ==> (1->2)
+*-.3*-.3.2 can be reduced using rule (1->(1->2)) ==> (1->2)
+*-.3*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*.1-.3 can be reduced using rule (1->(2->1)) ==> T
+*-.3*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*.2-.3 can be reduced using rule (1->(2->1)) ==> T
+*-.3*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-.3*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*T-*-.1.2 can be reduced using rule (T->1) ==> 1
+*T-*-.1.3 can be reduced using rule (T->1) ==> 1
+*T-*-.2.1 can be reduced using rule (T->1) ==> 1
+*T-*-.2.3 can be reduced using rule (T->1) ==> 1
+*T-*-.3.1 can be reduced using rule (T->1) ==> 1
+*T-*-.3.2 can be reduced using rule (T->1) ==> 1
+*T-*.1-.2 can be reduced using rule (T->1) ==> 1
+*T-*.1-.3 can be reduced using rule (T->1) ==> 1
+*T-*.2-.1 can be reduced using rule (T->1) ==> 1
+*T-*.2-.3 can be reduced using rule (T->1) ==> 1
+*T-*.3-.1 can be reduced using rule (T->1) ==> 1
+*T-*.3-.2 can be reduced using rule (T->1) ==> 1
+*F-*-.1.2 can be reduced using rule (F->1) ==> T
+*F-*-.1.3 can be reduced using rule (F->1) ==> T
+*F-*-.2.1 can be reduced using rule (F->1) ==> T
+*F-*-.2.3 can be reduced using rule (F->1) ==> T
+*F-*-.3.1 can be reduced using rule (F->1) ==> T
+*F-*-.3.2 can be reduced using rule (F->1) ==> T
+*F-*.1-.2 can be reduced using rule (F->1) ==> T
+*F-*.1-.3 can be reduced using rule (F->1) ==> T
+*F-*.2-.1 can be reduced using rule (F->1) ==> T
+*F-*.2-.3 can be reduced using rule (F->1) ==> T
+*F-*.3-.1 can be reduced using rule (F->1) ==> T
+*F-*.3-.2 can be reduced using rule (F->1) ==> T
+*.1-*-.1.2 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.1-*-.1.3 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.1-*-.2.1 can be reduced using rule (1->~(2->1)) ==> ~1
+*.1-*-.2.3 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.1-*-.3.1 can be reduced using rule (1->~(2->1)) ==> ~1
+*.1-*-.3.2 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.1-*.1-.2 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+*.1-*.1-.3 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+*.1-*.2-.1 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.1-*.2-.3 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.1-*.3-.1 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.1-*.3-.2 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.2-*-.1.2 can be reduced using rule (1->~(2->1)) ==> ~1
+*.2-*-.1.3 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.2-*-.2.1 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.2-*-.2.3 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.2-*-.3.1 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.2-*-.3.2 can be reduced using rule (1->~(2->1)) ==> ~1
+*.2-*.1-.2 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.2-*.1-.3 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.2-*.2-.1 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+*.2-*.2-.3 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+*.2-*.3-.1 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.2-*.3-.2 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*-.1.2 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*-.1.3 can be reduced using rule (1->~(2->1)) ==> ~1
+*.3-*-.2.1 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*-.2.3 can be reduced using rule (1->~(2->1)) ==> ~1
+*.3-*-.3.1 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*-.3.2 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*.1-.2 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*.1-.3 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*.2-.1 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*.2-.3 can be reduced using rule (1->~(2->3)) ==> (1->~3)
+*.3-*.3-.1 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+*.3-*.3-.2 can be reduced using rule (1->~(1->2)) ==> (1->~2)
+The formulas lengths have been increased to 8
+*-*-.1.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2*.1.2 can be reduced using rule (~1->1) ==> 1
+*-*.1.2*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.1.3 can be reduced using rule (~1->1) ==> 1
+*-*.1.3*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.2.1 can be reduced using rule (~1->1) ==> 1
+*-*.2.1*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.2.3 can be reduced using rule (~1->1) ==> 1
+*-*.2.3*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.3.1 can be reduced using rule (~1->1) ==> 1
+*-*.3.1*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.3.2 can be reduced using rule (~1->1) ==> 1
+**-.1.2*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.1.2 can be reduced using rule (1->~1) ==> ~1
+**.1.2-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.1.3 can be reduced using rule (1->~1) ==> ~1
+**.1.3-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.2.1 can be reduced using rule (1->~1) ==> ~1
+**.2.1-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.2.3 can be reduced using rule (1->~1) ==> ~1
+**.2.3-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.3.1 can be reduced using rule (1->~1) ==> ~1
+**.3.1-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.3.2 can be reduced using rule (1->~1) ==> ~1
+**.3.2*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+*-.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.1-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.2-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-.3-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+The formulas lengths have been increased to 9
+*-*-.1.2*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2-*.1.2 can be reduced using rule (1->1) ==> T
+*-*.1.2-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.2*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*.1.3 can be reduced using rule (1->1) ==> T
+*-*.1.3-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1.3*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.2.1 can be reduced using rule (1->1) ==> T
+*-*.2.1-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.1*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*.2.3 can be reduced using rule (1->1) ==> T
+*-*.2.3-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2.3*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*.3.1 can be reduced using rule (1->1) ==> T
+*-*.3.1-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.1*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.3.2 can be reduced using rule (1->1) ==> T
+*-*.3.2*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3.2*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+**-.1.2-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*-.1.2 can be reduced using rule (1->1) ==> T
+**-.1.2*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*-.1.3 can be reduced using rule (1->1) ==> T
+**-.1.3*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*-.2.1 can be reduced using rule (1->1) ==> T
+**-.2.1*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*-.2.3 can be reduced using rule (1->1) ==> T
+**-.2.3*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*-.3.1 can be reduced using rule (1->1) ==> T
+**-.3.1*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*-.3.2 can be reduced using rule (1->1) ==> T
+**-.3.2*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.1-.2 can be reduced using rule (1->1) ==> T
+**.1-.2*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.1-.3 can be reduced using rule (1->1) ==> T
+**.1-.3*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.2-.1 can be reduced using rule (1->1) ==> T
+**.2-.1*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.2-.3 can be reduced using rule (1->1) ==> T
+**.2-.3*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1*.3-.1 can be reduced using rule (1->1) ==> T
+**.3-.1*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2*.3-.2 can be reduced using rule (1->1) ==> T
+**.1.2-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.2-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1.3-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.1-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2.3-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.1-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3.2-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+The formulas lengths have been increased to 10
+*-*-.1.2-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2*-.1.2 can be reduced using rule (~1->1) ==> 1
+*-*-.1.2*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.2*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*-.1.3 can be reduced using rule (~1->1) ==> 1
+*-*-.1.3*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.1.3*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*-.2.1 can be reduced using rule (~1->1) ==> 1
+*-*-.2.1*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.1*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*-.2.3 can be reduced using rule (~1->1) ==> 1
+*-*-.2.3*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.2.3*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*-.3.1 can be reduced using rule (~1->1) ==> 1
+*-*-.3.1*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.1*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*-.3.2 can be reduced using rule (~1->1) ==> 1
+*-*-.3.2*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*-.3.2*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.1-.2 can be reduced using rule (~1->1) ==> 1
+*-*.1-.2*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.2*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.1-.3 can be reduced using rule (~1->1) ==> 1
+*-*.1-.3*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.1-.3*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.2-.1 can be reduced using rule (~1->1) ==> 1
+*-*.2-.1*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.1*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.2-.3 can be reduced using rule (~1->1) ==> 1
+*-*.2-.3*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.2-.3*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.1*.3-.1 can be reduced using rule (~1->1) ==> 1
+*-*.3-.1*.3-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2-*.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2*-.1.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*-.1.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*-.2.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*-.2.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*-.3.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*-.3.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.1-.2 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.1-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.2-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.2-.3 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.3-.1 can be reduced using rule (1->(2->3)) ==> (1->3)
+*-*.3-.2*.3-.2 can be reduced using rule (~1->1) ==> 1
+*-*.1.2-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.2-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1.3-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.1-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2.3-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.1-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3.2-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+**-.1.2-*-.1.2 can be reduced using rule (1->~1) ==> ~1
+**-.1.2-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.2-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*-.1.3 can be reduced using rule (1->~1) ==> ~1
+**-.1.3-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.1.3-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*-.2.1 can be reduced using rule (1->~1) ==> ~1
+**-.2.1-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.1-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*-.2.3 can be reduced using rule (1->~1) ==> ~1
+**-.2.3-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.2.3-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*-.3.1 can be reduced using rule (1->~1) ==> ~1
+**-.3.1-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.1-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*-.3.2 can be reduced using rule (1->~1) ==> ~1
+**-.3.2-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**-.3.2-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.1-.2 can be reduced using rule (1->~1) ==> ~1
+**.1-.2-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.2-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.1-.3 can be reduced using rule (1->~1) ==> ~1
+**.1-.3-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.1-.3-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.2-.1 can be reduced using rule (1->~1) ==> ~1
+**.2-.1-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.1-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.2-.3 can be reduced using rule (1->~1) ==> ~1
+**.2-.3-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.2-.3-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.1-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+The thread 0x5138 has exited with code 0 (0x0).
+**.3-.1-*.3-.1 can be reduced using rule (1->~1) ==> ~1
+**.3-.1-*.3-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*-.1.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*-.1.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*-.2.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*-.2.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*-.3.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*-.3.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.1-.2 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.1-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.2-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.2-.3 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.3-.1 can be reduced using rule ((1->2)->3) ==> 3
+**.3-.2-*.3-.2 can be reduced using rule (1->~1) ==> ~1
+The formulas lengths have been increased to 11
+*-*-.1.2-*-.1.2 can be reduced using rule (1->1) ==> T
+*-*-.1.2-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.2-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*-.1.3 can be reduced using rule (1->1) ==> T
+*-*-.1.3-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.1.3-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*-.2.1 can be reduced using rule (1->1) ==> T
+*-*-.2.1-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.1-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*-.2.3 can be reduced using rule (1->1) ==> T
+*-*-.2.3-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.2.3-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*-.3.1 can be reduced using rule (1->1) ==> T
+*-*-.3.1-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.1-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*-.3.2 can be reduced using rule (1->1) ==> T
+*-*-.3.2-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*-.3.2-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.1-.2 can be reduced using rule (1->1) ==> T
+*-*.1-.2-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.2-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*.1-.3 can be reduced using rule (1->1) ==> T
+*-*.1-.3-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.1-.3-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.2-.1 can be reduced using rule (1->1) ==> T
+*-*.2-.1-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.1-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*.2-.3 can be reduced using rule (1->1) ==> T
+*-*.2-.3-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.2-.3-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.1-*.3-.1 can be reduced using rule (1->1) ==> T
+*-*.3-.1-*.3-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*-.1.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*-.1.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*-.2.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*-.2.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*-.3.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*-.3.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.1-.2 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.1-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.2-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.2-.3 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.3-.1 can be reduced using rule (~1->~2) ==> (2->1)
+*-*.3-.2-*.3-.2 can be reduced using rule (1->1) ==> T
+The formulas lengths have been increased to 12
+The formulas lengths have been increased to 13
+The formulas lengths have been increased to 14
+The formulas lengths have been increased to 15
+The formulas lengths have been increased to 16
+The formulas lengths have been increased to 17
+The formulas lengths have been increased to 18
+The formulas lengths have been increased to 19
+The formulas lengths have been increased to 20
+The formulas lengths have been increased to 21
+The formulas lengths have been increased to 22
+The formulas lengths have been increased to 23
+The formulas lengths have been increased to 24
+The formulas lengths have been increased to 25
+The formulas lengths have been increased to 26
+The formulas lengths have been increased to 27
+The formulas lengths have been increased to 28
+The formulas lengths have been increased to 29
+The formulas lengths have been increased to 30
+The formulas lengths have been increased to 31
+The formulas lengths have been increased to 32
+The formulas lengths have been increased to 33
+The formulas lengths have been increased to 34
+The formulas lengths have been increased to 35
+The formulas lengths have been increased to 36
+The formulas lengths have been increased to 37
+The formulas lengths have been increased to 38
+The formulas lengths have been increased to 39
+The formulas lengths have been increased to 40
+The formulas lengths have been increased to 41
+The formulas lengths have been increased to 42
+The formulas lengths have been increased to 43
+The formulas lengths have been increased to 44
+The formulas lengths have been increased to 45
+The formulas lengths have been increased to 46
+The formulas lengths have been increased to 47
+The formulas lengths have been increased to 48
+The formulas lengths have been increased to 49
+The formulas lengths have been increased to 50
+The formulas lengths have been increased to 51
+The formulas lengths have been increased to 52
+The formulas lengths have been increased to 53
+The formulas lengths have been increased to 54
+The formulas lengths have been increased to 55
+The formulas lengths have been increased to 56
+The formulas lengths have been increased to 57
+The formulas lengths have been increased to 58
+The formulas lengths have been increased to 59
+The formulas lengths have been increased to 60
+The formulas lengths have been increased to 61
+The formulas lengths have been increased to 62
+The formulas lengths have been increased to 63
+The formulas lengths have been increased to 64
+The formulas lengths have been increased to 65
+The formulas lengths have been increased to 66
+The formulas lengths have been increased to 67
+The formulas lengths have been increased to 68
+The formulas lengths have been increased to 69
+The formulas lengths have been increased to 70
+The formulas lengths have been increased to 71
+The formulas lengths have been increased to 72
+The formulas lengths have been increased to 73
+The formulas lengths have been increased to 74
+The formulas lengths have been increased to 75
+The formulas lengths have been increased to 76
+The formulas lengths have been increased to 77
+The formulas lengths have been increased to 78
+The formulas lengths have been increased to 79
+The formulas lengths have been increased to 80
+The formulas lengths have been increased to 81
+The formulas lengths have been increased to 82
+The formulas lengths have been increased to 83
+The formulas lengths have been increased to 84
+The formulas lengths have been increased to 85
+The formulas lengths have been increased to 86
+The formulas lengths have been increased to 87
+The formulas lengths have been increased to 88
+The formulas lengths have been increased to 89
+The formulas lengths have been increased to 90
+The formulas lengths have been increased to 91
+The formulas lengths have been increased to 92
+The formulas lengths have been increased to 93
+The formulas lengths have been increased to 94
+The formulas lengths have been increased to 95
+The formulas lengths have been increased to 96
+The formulas lengths have been increased to 97
+The formulas lengths have been increased to 98
+The formulas lengths have been increased to 99
+The formulas lengths have been increased to 100
+The formulas lengths have been increased to 101
+The formulas lengths have been increased to 102
+The formulas lengths have been increased to 103
+The formulas lengths have been increased to 104
+The formulas lengths have been increased to 105
+The formulas lengths have been increased to 106
+The formulas lengths have been increased to 107
+The formulas lengths have been increased to 108
+The formulas lengths have been increased to 109
+The formulas lengths have been increased to 110
+The formulas lengths have been increased to 111
+The formulas lengths have been increased to 112
+The formulas lengths have been increased to 113
+The formulas lengths have been increased to 114
+The formulas lengths have been increased to 115
+The formulas lengths have been increased to 116
+The formulas lengths have been increased to 117
+The formulas lengths have been increased to 118
+The formulas lengths have been increased to 119
+The formulas lengths have been increased to 120
+The formulas lengths have been increased to 121
+The formulas lengths have been increased to 122
+The formulas lengths have been increased to 123
+The formulas lengths have been increased to 124
+The formulas lengths have been increased to 125
+The formulas lengths have been increased to 126
+The formulas lengths have been increased to 127
+The formulas lengths have been increased to 128
+The formulas lengths have been increased to 129
+The formulas lengths have been increased to 130
+The formulas lengths have been increased to 131
+The formulas lengths have been increased to 132
+The formulas lengths have been increased to 133
+The program '[16280] dotnet.exe' has exited with code -1 (0xffffffff).
