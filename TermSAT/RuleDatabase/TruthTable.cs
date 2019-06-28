@@ -62,11 +62,15 @@ namespace TermSAT.RuleDatabase
         private TruthTable(string valueText) : this(valueText.ToBitArray()) {  }
         private TruthTable(Formula formula) : this(ToBitArray(formula)) { }
 
-        public static TruthTable NewTruthTable(string valueText) => 
-            __cache.GetOrCreateValue(valueText, () => new TruthTable(valueText));
+        public static TruthTable NewTruthTable(string valueText) { 
+            __cache.GetValue(valueText, out TruthTable t, () => new TruthTable(valueText));
+            return t;
+        }
 
-        public static TruthTable NewTruthTable(Formula formula) =>
-            __formulaCache.GetOrCreateValue(formula, () => new TruthTable(formula));
+        public static TruthTable NewTruthTable(Formula formula) { 
+            __formulaCache.GetValue(formula, out TruthTable t, () => new TruthTable(formula));
+            return t;
+        }
 
         /// <summary>
         /// Create a bit array that represents a formula's truth table

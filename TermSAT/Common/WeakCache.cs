@@ -5,6 +5,11 @@ using System.Text;
 
 namespace TermSAT.Common
 {
+    static public class WeakCacheFlag
+    {
+        public static int Value= -1;
+    }
+
     /// <summary>
     ///    A convenince class for weakly caching items.
     ///    
@@ -25,14 +30,13 @@ namespace TermSAT.Common
 
         public WeakCache() { }
 
-        public TValue GetOrCreateValue(TKey key, Func<TValue> createValue)
+        public void GetValue(TKey key, out TValue value, Func<TValue> createValue)
         {
-            TValue value;
 
             // first try to get the value without locking anything
             if (cache.TryGetValue(key, out WeakReference<TValue> reference))
                 if (reference.TryGetTarget(out value))
-                    return value;
+                    return;
 
 
             // try again, with locking
@@ -53,8 +57,6 @@ namespace TermSAT.Common
                     }
                 }
             }
-
-            return value;
         }
         public void Remove(TKey key)
         {
@@ -62,6 +64,15 @@ namespace TermSAT.Common
             {
                 cache.Remove(key);
             }
+        }
+
+        public void Add(TKey key, TValue value)
+        {
+            lock (cache)
+            {
+                cache.Add(key, new WeakReference<TValue>(value));
+            }
+
         }
         
         public bool TryGetValue(TKey key, out TValue value)

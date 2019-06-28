@@ -40,10 +40,10 @@ namespace TermSAT.RuleDatabase
         public FormulaDatabase Database { get; private set; }
         public DatabaseReportOptions Options { get; private set; }
 
-        public DatabaseReport(FormulaDatabase database, DatabaseReportOptions options= null)
+        public DatabaseReport(FormulaDatabase database, DatabaseReportOptions options = null)
         {
-            Database= database;
-            Options = (options == null) ? new DatabaseReportOptions() : options;
+            Database = database;
+            Options = options ?? new DatabaseReportOptions();
         }
 
         public void Run()
@@ -77,7 +77,7 @@ namespace TermSAT.RuleDatabase
                 else
                 {
                     Trace.WriteLine(
-                        truthTable.ToString().PadRight(16) + 
+                        truthTable.ToString().PadRight(16) +
                         canonicalFormulas[0].Length.ToString().PadRight(9) +
                         canonicalFormulas.Count.ToString());
 
@@ -91,26 +91,14 @@ namespace TermSAT.RuleDatabase
 
             if (Options.ShowNonCanonicalFormulas)
             {
-                /*
-                 * List lengths and # of canonical formulas
-                 */
-                Trace.WriteLine("TRUTH VALUE     COUNT");
-                Trace.WriteLine("                ");
-                Trace.WriteLine("-------------   ------");
-                foreach (var truthTable in allTruthTables)
+                Trace.WriteLine("");
+                Trace.WriteLine("Non-Canonical forumas by length");
+                Trace.WriteLine("-------------------");
+                Database.GetAllNonCanonicalFormulas().ForEach(f => 
                 {
-                    var nonCanonicalFormulas = Database.GetNonCanonicalFormulas(truthTable);
-
-                    Trace.WriteLine(
-                        truthTable.ToString().PadRight(16) +
-                        nonCanonicalFormulas.Count.ToString());
-
-                    foreach (var formula in nonCanonicalFormulas)
-                    {
-                        Trace.WriteLine("          " + formula.ToString());
-                    }
-                    Trace.WriteLine("-------------   ------   ------");
-                }
+                    Trace.WriteLine("          " + f.ToString());
+                });
+                Trace.WriteLine("");
             }
 
             if (Options.ShowCanonicalFormulasInLexicalOrder)

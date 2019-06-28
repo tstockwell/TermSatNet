@@ -18,7 +18,12 @@ namespace TermSAT.Formulas
      */
     public partial class Variable : Formula
     {
-        static private readonly WeakCache<int, Variable> __cache = new WeakCache<int, Variable>();
+        /*
+         * Variables are currently never discarded.
+         * This might be a problem if millions of variables are created.
+         * A better caching strategy would be nice.
+         */
+        static private readonly Dictionary<int, Variable> __cache = new Dictionary<int, Variable>();
 
         public static readonly Variable ONE = NewVariable(1);
         public static readonly Variable TWO = NewVariable(2);
@@ -31,11 +36,13 @@ namespace TermSAT.Formulas
 
         public int Number { get; }
 
-        public static Variable NewVariable(int variableId)
+        public static Variable NewVariable(int i)
         {
-            if (variableId < 1)
-                throw new Exception("Variable numbers must be greater than 0");
-            return __cache.GetOrCreateValue(variableId, () => new Variable(variableId));
+            if (i < 1)
+                throw new TermSatException("Variable numbers must be greater than 0");
+            if (!__cache.TryGetValue(i, out Variable v))
+                __cache.Add(i, v= new Variable(i));
+            return v;
         }
 
         private Variable(int number) : base(1)
@@ -45,7 +52,7 @@ namespace TermSAT.Formulas
             _varlist = new List<Variable>() { this };
         }
 
-        ~Variable() => __cache.Remove(Number); // remove from cache
+        //~Variable() => __cache.Remove(Number); // remove from cache
 
         override public bool Evaluate(IDictionary<Variable, Boolean> valuation) => valuation[this];
 

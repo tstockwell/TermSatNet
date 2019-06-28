@@ -7,15 +7,15 @@ namespace TermSAT.Formulas
 {
     public partial class Implication : Formula
     {
-        static readonly WeakCache<Formula, WeakCache<Formula, Implication>> formulaCache = new WeakCache<Formula, WeakCache<Formula, Implication>>();
+        //static readonly WeakCache<Formula, WeakCache<Formula, Implication>> formulaCache = new WeakCache<Formula, WeakCache<Formula, Implication>>();
+        static private ConditionalWeakTable<Formula, ConditionalWeakTable<Formula, Implication>> __implications= 
+                new ConditionalWeakTable<Formula, ConditionalWeakTable<Formula, Implication>>();
 
         public static Implication NewImplication(Formula antecedent, Formula consequent)
         {
-            lock(formulaCache)
-            {
-                var implicationCache = formulaCache.GetOrCreateValue(antecedent, () => new WeakCache<Formula, Implication>());
-                return implicationCache.GetOrCreateValue(consequent, () => new Implication(antecedent, consequent));
-            }
+            var implications = __implications.GetValue(antecedent, (a) => new ConditionalWeakTable<Formula, Implication>());
+            var i= implications.GetValue(consequent, (a) => new Implication(antecedent, consequent));
+            return i;
         }
 
         public static implicit operator Implication(string formulaText) =>
@@ -33,16 +33,8 @@ namespace TermSAT.Formulas
 
         ~Implication()
         {
-            // clean up cache
-            lock (formulaCache)
-            {
-                if (formulaCache.TryGetValue(Antecedent, out WeakCache<Formula, Implication> implicationCache))
-                {
-                    implicationCache.Remove(Consequent);
-                    if (implicationCache.Count <= 0)
-                        formulaCache.Remove(Antecedent);
-                }
-            }
+            var i= GetHashCode();
+            var j= WeakCacheFlag.Value;
         }
 
         override public bool Evaluate(IDictionary<Variable, bool> values) => 

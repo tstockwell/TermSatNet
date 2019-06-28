@@ -1,16 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TermSAT.Common;
 
 namespace TermSAT.Formulas
 {
     public partial class Negation : Formula
     {
-        static private WeakCache<Formula, Negation> __cache = new WeakCache<Formula, Negation>();
+        static private ConditionalWeakTable<Formula, Negation> __negations= new ConditionalWeakTable<Formula, Negation>();
 
         public Formula Child { get; }
 
-        public static Negation NewNegation(Formula child) => __cache.GetOrCreateValue(child, () => new Negation(child));
+        public static Negation NewNegation(Formula child) { 
+            var n= __negations.GetValue(child, c => new Negation(child));
+            return n;
+        }
 
         public static implicit operator Negation(string formulaText) => formulaText.ToNegation();
 
@@ -22,7 +27,7 @@ namespace TermSAT.Formulas
         {
             Child = subFormula;
         }
-        ~Negation() => __cache.Remove(Child);
+        //~Negation() => __cache.Remove(Child);
 
         public override bool Evaluate(IDictionary<Variable, bool> valuation) => Child.Evaluate(valuation) ? false : true;
 
