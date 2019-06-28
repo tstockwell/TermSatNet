@@ -45,7 +45,7 @@ namespace TermSAT.RuleDatabase
     public class TruthTable
     {
 
-        public const int VARIABLE_COUNT= 2;
+        public const int VARIABLE_COUNT= 3;
 	    public const int MAX_TRUTH_VALUES= 1 << VARIABLE_COUNT;
 	    public const int MAX_TRUTH_TABLES= 1 << MAX_TRUTH_VALUES;
 
@@ -77,14 +77,13 @@ namespace TermSAT.RuleDatabase
 
             for (int i= 0; i < truthTable.Length; i++)
             {
-                var valuation = new Dictionary<Variable, bool>();
+                BitArray a = new BitArray(new int[] { i });
 
+                var valuation = new Dictionary<Variable, bool>();
                 for (int b= 1; b <= VARIABLE_COUNT; b++)
                 {
                     var variable = Variable.NewVariable(b);
-                    var mask = 1 << (b - 1);
-                    var iVariableValue= i & ~(mask);
-                    valuation.Add(variable, iVariableValue != 0);
+                    valuation.Add(variable, a[b-1]);
                 }
 
                 var formulaValue= formula.Evaluate(valuation);

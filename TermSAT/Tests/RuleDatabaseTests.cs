@@ -11,23 +11,6 @@ namespace TermSAT.Tests
     public class RuleDatabaseTests
     {
 
-        [TestMethod]
-        public void TruthTableTests()
-        {
-            // truth table for a formula
-            var tt= TruthTable.NewTruthTable("T".ToFormula());
-            Assert.AreEqual("FF", tt.ToString());
-            tt= TruthTable.NewTruthTable("F".ToFormula());
-            Assert.AreEqual("00", tt.ToString());
-
-            // truth table from hex string 
-            tt= TruthTable.NewTruthTable("FF");
-            Assert.AreEqual("FF", tt.ToString());
-            tt= TruthTable.NewTruthTable("00");
-            Assert.AreEqual("00", tt.ToString());
-
-        }
-
         FormulaDatabase database;
 
         [TestInitialize]
@@ -35,6 +18,39 @@ namespace TermSAT.Tests
         {
             database = new FormulaDatabase(":memory:");
             database.Clear();
+        }
+
+        [TestMethod]
+        public void ConstantTruthTableTests()
+        {
+            // truth table for a formula
+            var tt = TruthTable.NewTruthTable("T".ToFormula());
+            Assert.AreEqual("FF", tt.ToString());
+            tt = TruthTable.NewTruthTable("F".ToFormula());
+            Assert.AreEqual("00", tt.ToString());
+
+            // truth table from hex string 
+            tt = TruthTable.NewTruthTable("FF");
+            Assert.AreEqual("FF", tt.ToString());
+            tt = TruthTable.NewTruthTable("00");
+            Assert.AreEqual("00", tt.ToString());
+
+            tt = TruthTable.NewTruthTable(Variable.THREE);
+            Assert.AreEqual("0F", tt.ToString());
+
+        }
+
+        [TestMethod]
+        public void VariableTruthTableTests()
+        {
+            var tt = TruthTable.NewTruthTable(Variable.ONE);
+            Assert.AreEqual("55", tt.ToString());
+
+            tt = TruthTable.NewTruthTable(Variable.TWO);
+            Assert.AreEqual("33", tt.ToString());
+
+            tt = TruthTable.NewTruthTable(Variable.THREE);
+            Assert.AreEqual("0F", tt.ToString());
         }
 
         [TestMethod]
