@@ -17,6 +17,7 @@
  ******************************************************************************/
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -105,81 +106,99 @@ namespace TermSAT.RuleDatabase
      * @author Ted Stockwell
      *
      */
-    public class FormulaDatabase
+    public class FormulaDatabase : IDisposable
     {
 
-        RuleDatabaseContext RuleContext { get; set; }
+        string ConnectionString { get; set; }
+        SqliteConnection Connection {  get; set; }
 
-        protected SqliteConnection Connection { get; set; }
 
         /// <param name="datasource">path to a file, or ':memory:' to create a memory-based db</param>
         public FormulaDatabase(string datasource)
         {
-            Connection = new SqliteConnection("DataSource="+datasource);
+            //ConnectionString = "DataSource=" + datasource + ";Pooling=True;Max Pool Size=100;";
+            ConnectionString = "DataSource=" + datasource;
+            Connection = new SqliteConnection(ConnectionString);
             Connection.Open();
+            using (var ctx = GetDatabaseContext())
+            {
+                ctx.Database.EnsureCreated();
+            }
+        }
 
+
+        private RuleDatabaseContext GetDatabaseContext()
+        {
             var options = new DbContextOptionsBuilder()
                 .UseSqlite(Connection)
                 .Options;
 
-            RuleContext = new RuleDatabaseContext(options);
-            RuleContext.Database.EnsureCreated();
+            return new RuleDatabaseContext(options);
         }
 
         public void Clear()
         {
-            this.RuleContext.Database.ExecuteSqlCommand("DELETE FROM FormulaRecords");
+            using (var ctx = GetDatabaseContext())
+            {
+                ctx.Database.ExecuteSqlCommand("DELETE FROM FormulaRecords");
+            }
         }
 
         public Formula GetLastGeneratedFormula()
         {
-            var record = this.RuleContext.FormulaRecords.AsNoTracking()
-                .OrderByDescending(f => f.Id)
-                
-                .FirstOrDefault();
+            using (var ctx = GetDatabaseContext())
+            {
+                var record = ctx.FormulaRecords.AsNoTracking()
+                    .OrderByDescending(f => f.Id)
 
-            var formula = record != null ? Formula.Parse(record.Text) : null;
-            return formula;
+                    .FirstOrDefault();
+
+                var formula = record != null ? Formula.Parse(record.Text) : null;
+                return formula;
+            }
         }
 
         public List<Formula> GetCanonicalFormulas(TruthTable truthTable)
         {
-            var records = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == true)
-                .OrderBy(f => f.Id)
-                .ToList();
-            var formulas = records.Select(r => Formula.Parse(r.Text)).ToList();
-            return formulas;
+            using (var ctx = GetDatabaseContext())
+            {
+                var records = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == true)
+                    .OrderBy(f => f.Id)
+                    .ToList();
+                var formulas = records.Select(r => Formula.Parse(r.Text)).ToList();
+                return formulas;
+            }
         }
 
         public List<Formula> GetNonCanonicalFormulas(TruthTable truthTable)
         {
-            var records = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == false)
-                .OrderBy(f => f.Id)
-                .ToList();
-            var formulas = records.Select(r => Formula.Parse(r.Text)).ToList();
-            return formulas;
+            using (var ctx = GetDatabaseContext())
+            {
+                var records = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == false)
+                    .OrderBy(f => f.Id)
+                    .ToList();
+                var formulas = records.Select(r => Formula.Parse(r.Text)).ToList();
+                return formulas;
+            }
         }
 
-
-        public void Shutdown()
-        {
-            try { RuleContext.Dispose(); } catch { } finally { RuleContext= null; }
-            try { Connection.Dispose(); } catch { } finally { Connection= null; }
-        }
 
         public int GetLengthOfLongestCanonicalFormula()
         {
-            var formula = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true)
-                .OrderByDescending(f => f.Length)
-                .FirstOrDefault();
+            using (var ctx = GetDatabaseContext())
+            {
+                var formula = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.IsCanonical == true)
+                    .OrderByDescending(f => f.Length)
+                    .FirstOrDefault();
 
-            if (formula == null)
-                return 0;
+                if (formula == null)
+                    return 0;
 
-            return formula.Length;
+                return formula.Length;
+            }
         }
 
         /**
@@ -198,88 +217,112 @@ namespace TermSAT.RuleDatabase
 
         public List<Formula> FindCanonicalFormulasByLength(int size)
         {
-            var records = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.Length == size && f.IsCanonical == true)
-                .OrderBy(f => f.Id)
-                .ToList();
-            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-            return formulas;
+            using (var ctx = GetDatabaseContext())
+            {
+                var records = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.Length == size && f.IsCanonical == true)
+                    .OrderBy(f => f.Id)
+                    .ToList();
+                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
+                return formulas;
+            }
         }
 
         public void AddFormula(Formula formula, bool isCanonical)
         {
-            var record = new FormulaRecord
+            using (var ctx = GetDatabaseContext())
             {
-                Text = formula.ToString(),
-                IsCanonical = isCanonical,
-                Length = formula.Length,
-                TruthValue = TruthTable.NewTruthTable(formula).ToString()
-            };
+                var record = new FormulaRecord
+                {
+                    Text = formula.ToString(),
+                    IsCanonical = isCanonical,
+                    Length = formula.Length,
+                    TruthValue = TruthTable.NewTruthTable(formula).ToString()
+                };
 
-            RuleContext.FormulaRecords.Add(record);
-            RuleContext.SaveChanges();
-            RuleContext.DetachAllEntities();
+                ctx.FormulaRecords.Add(record);
+                ctx.SaveChanges();
+                ctx.DetachAllEntities();
+            }
         }
 
         public List<Formula> GetAllNonCanonicalFormulas(int maxLength)
         {
-            var records = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.Length <= maxLength && f.IsCanonical == false)
-                .ToList();
-            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-            return formulas;
+            using (var ctx = GetDatabaseContext())
+            {
+                var records = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.Length <= maxLength && f.IsCanonical == false)
+                    .ToList();
+                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
+                return formulas;
+            }
         }
         public List<Formula> GetAllNonCanonicalFormulas()
         {
-            var records = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == false)
-                .OrderBy(f => f.Length)
-                .ThenBy(f => f.Text)
-                .ToList();
-            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-            return formulas;
+            using (var ctx = GetDatabaseContext())
+            {
+                var records = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.IsCanonical == false)
+                    .OrderBy(f => f.Length)
+                    .ThenBy(f => f.Text)
+                    .ToList();
+                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
+                return formulas;
+            }
         }
         public List<Formula> GetAllCanonicalFormulas()
         {
-            var records = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true)
-                .OrderBy(f => f.Length)
-                .ThenBy(f => f.Text)
-                .ToList();
-            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-            return formulas;
+            using (var ctx = GetDatabaseContext())
+            {
+                var records = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.IsCanonical == true)
+                    .OrderBy(f => f.Length)
+                    .ThenBy(f => f.Text)
+                    .ToList();
+                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
+                return formulas;
+            }
         }
         public List<Formula> GetAllCanonicalFormulasInLexicalOrder()
         {
-            var records = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true)
-                .OrderBy(f => f.Text)
-                .ToList();
-            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-            return formulas;
+            using (var ctx = GetDatabaseContext())
+            {
+                var records = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.IsCanonical == true)
+                    .OrderBy(f => f.Text)
+                    .ToList();
+                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
+                return formulas;
+            }
         }
         public List<TruthTable> GetAllTruthTables()
         {
-            var truthValues = RuleContext.FormulaRecords.AsNoTracking()
-                .OrderBy(f => f.TruthValue)
-                .Select(f => f.TruthValue)
-                .Distinct()
-                .ToList();
-            var truthTables = truthValues.Select(v => TruthTable.NewTruthTable(v)).ToList();
-            return truthTables;
+            using (var ctx = GetDatabaseContext())
+            {
+                var truthValues = ctx.FormulaRecords.AsNoTracking()
+                    .OrderBy(f => f.TruthValue)
+                    .Select(f => f.TruthValue)
+                    .Distinct()
+                    .ToList();
+                var truthTables = truthValues.Select(v => TruthTable.NewTruthTable(v)).ToList();
+                return truthTables;
+            }
         }
 
         public int GetLengthOfCanonicalFormulas(TruthTable truthTable)
         {
-            var formula = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true && f.TruthValue == truthTable.ToString())
-                .OrderBy(f => f.Id)
-                .FirstOrDefault();
+            using (var ctx = GetDatabaseContext())
+            {
+                var formula = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.IsCanonical == true && f.TruthValue == truthTable.ToString())
+                    .OrderBy(f => f.Id)
+                    .FirstOrDefault();
 
-            if (formula == null)
-                return 0;
+                if (formula == null)
+                    return 0;
 
-            return formula.Length;
+                return formula.Length;
+            }
         }
 
         /**
@@ -287,58 +330,77 @@ namespace TermSAT.RuleDatabase
          */
         public Formula FindCanonicalFormula(Formula formula)
         {
-            var truthTableText = TruthTable.NewTruthTable(formula).ToString();
+            using (var ctx = GetDatabaseContext())
+            {
+                var truthTableText = TruthTable.NewTruthTable(formula).ToString();
 
-            var record = RuleContext.FormulaRecords.AsNoTracking()
-                .AsNoTracking()
-                .Where(f => f.IsCanonical == true && f.TruthValue == truthTableText)
-                .OrderBy(f => f.Id)
-                .FirstOrDefault();
+                var record = ctx.FormulaRecords.AsNoTracking()
+                    .AsNoTracking()
+                    .Where(f => f.IsCanonical == true && f.TruthValue == truthTableText)
+                    .OrderBy(f => f.Id)
+                    .FirstOrDefault();
 
-            if (record == null)
-                return null;
+                if (record == null)
+                    return null;
 
-            var canonicalFormula = Formula.Parse(record.Text);
+                var canonicalFormula = Formula.Parse(record.Text);
 
-            return canonicalFormula;
+                return canonicalFormula;
+            }
         }
 
         public int CountNonCanonicalFormulas()
         {
-            var count = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == false)
-                .Count();
-            return count;
+            using (var ctx = GetDatabaseContext())
+            {
+                var count = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.IsCanonical == false)
+                    .Count();
+                return count;
+            }
         }
 
         public int CountCanonicalFormulas()
         {
-            var count = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true)
-                .Count();
-            return count;
+            using (var ctx = GetDatabaseContext())
+            {
+                var count = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.IsCanonical == true)
+                    .Count();
+                return count;
+            }
         }
 
 
         public long CountCanonicalTruthTables()
         {
-            var count = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true)
-                .Select(f => f.TruthValue)
-                .Distinct()
-                .Count();
-            return count;
+            using (var ctx = GetDatabaseContext())
+            {
+                var count = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.IsCanonical == true)
+                    .Select(f => f.TruthValue)
+                    .Distinct()
+                    .Count();
+                return count;
+            }
         }
 
         public List<Formula> GetAllFormulas(TruthTable truthTable)
         {
-            var records = RuleContext.FormulaRecords.AsNoTracking()
-                .Where(f => f.TruthValue == truthTable.ToString())
-                .ToList();
-            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-            return formulas;
+            using (var ctx = GetDatabaseContext())
+            {
+                var records = ctx.FormulaRecords.AsNoTracking()
+                    .Where(f => f.TruthValue == truthTable.ToString())
+                    .ToList();
+                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
+                return formulas;
+            }
         }
 
+        public void Dispose()
+        {
+            // do nothing
+        }
     }
 
 }

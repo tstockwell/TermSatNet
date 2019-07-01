@@ -162,7 +162,7 @@ namespace TermSAT.RuleDatabase
 
         private void Shutdown()
         {
-            _database.Shutdown();
+            _database.Dispose();
         }
 
 
