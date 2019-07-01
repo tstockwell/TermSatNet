@@ -23,8 +23,6 @@ namespace TermSAT.Formulas
         public override bool Evaluate(IDictionary<Variable, bool> valuation) => this == TRUE ? true : false;
 
         public override void GetAllSubterms(ICollection<Formula> subterms) => subterms.Add(this);
-
-        public override IList<Variable> AllVariables { get => ImmutableList<Variable>.Empty; }
     }
 }
 

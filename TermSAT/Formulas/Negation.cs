@@ -39,8 +39,6 @@ namespace TermSAT.Formulas
             subterms.Add(this);
         }
 
-        public override IList<Variable> AllVariables { get => Child.AllVariables; }
-
         public override string ToString() => "-" + Child.ToString();
     }
 

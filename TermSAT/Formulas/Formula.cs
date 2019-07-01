@@ -64,7 +64,6 @@ namespace TermSAT.Formulas
      */
     abstract public partial class Formula : IEquatable<Formula>, IComparable<Formula>
     {
-        private static readonly ConditionalWeakTable<Object, List<Variable>> __varListCache = new ConditionalWeakTable<Object, List<Variable>>();
 
         /// <summary>
         /// Provide implicit cast from strings to Formulas.
@@ -368,13 +367,6 @@ namespace TermSAT.Formulas
             }
         }
         abstract public void GetAllSubterms(ICollection<Formula> subterms);
-
-        /**
-         * Returns an ordered list of the variable that occur in this formula.
-         * The returned list may be empty.
-         */
-        abstract public IList<Variable> AllVariables { get; }
-
 
         /**
          * Two rules are syntactically equal if they are identical except for variable names.

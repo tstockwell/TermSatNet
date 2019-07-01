@@ -47,20 +47,6 @@ namespace TermSAT.Formulas
             subterms.Add(this);
         }
 
-        public override IList<Variable> AllVariables
-        {
-            get
-            {
-                var vars = new HashSet<Variable>();
-                vars.UnionWith(Antecedent.AllVariables);
-                vars.UnionWith(Consequent.AllVariables);
-                var l= new List<Variable>();
-                l.AddRange(vars);
-                l.Sort();
-                return l;
-            }
-        }
-
         override public bool ContainsVariable(Variable variable) => 
             Antecedent.ContainsVariable(variable) || Consequent.ContainsVariable(variable);
 

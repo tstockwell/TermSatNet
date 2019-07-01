@@ -16,7 +16,7 @@ namespace TermSAT.Formulas
      * For instance, ".1".
      *
      */
-    public partial class Variable : Formula
+    public partial class Variable : Formula, IEquatable<Variable>, IComparable<Variable>
     {
         /*
          * Variables are currently never discarded.
@@ -32,7 +32,6 @@ namespace TermSAT.Formulas
         public static implicit operator Variable(string formulaText) => FormulaParser.ToFormula(formulaText) as Variable;
 
         string _text;
-        readonly List<Variable> _varlist;
 
         public int Number { get; }
 
@@ -49,7 +48,6 @@ namespace TermSAT.Formulas
         {
             _text = "." + number;
             Number = number;
-            _varlist = new List<Variable>() { this };
         }
 
         //~Variable() => __cache.Remove(Number); // remove from cache
@@ -62,6 +60,14 @@ namespace TermSAT.Formulas
 
         public override void GetAllSubterms(ICollection<Formula> subterms) => subterms.Add(this);
 
-        override public IList<Variable> AllVariables { get => _varlist; }
+        public int CompareTo(Variable other)
+        {
+            return this.Number.CompareTo(other.Number);
+        }
+
+        public bool Equals(Variable other)
+        {
+            return this.Number.Equals(other.Number);
+        }
     }
 }

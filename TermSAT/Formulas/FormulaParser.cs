@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace TermSAT.Formulas
@@ -11,11 +12,21 @@ namespace TermSAT.Formulas
         public static Negation ToNegation(this string formulaText) => ToFormula(formulaText) as Negation;
         public static Implication ToImplication(this string formulaText) => ToFormula(formulaText) as Implication;
 
+        private static readonly ConditionalWeakTable<string, Formula> __cache = new ConditionalWeakTable<string, Formula>();
+
+
         /**
          * Parses out the first formula from the beginning of the given string
          */
         public static Formula ToFormula(this string formulaText)
         {
+            Formula formula;
+            lock (__cache)
+            {
+                if (__cache.TryGetValue(formulaText, out formula))
+                    return formula;
+            }
+
             // find the end of the formula
             int last = -1;
             {
@@ -85,8 +96,12 @@ namespace TermSAT.Formulas
             if (stack.Count != 1)
                 throw new Exception("Invalid postcondition after evaluating formula wellformedness: count < 1");
 
-            Formula formula2 = stack.Pop();
-            return formula2;
+            formula = stack.Pop();
+            lock (__cache)
+            {
+                __cache.AddOrUpdate(formulaText, formula);
+            }
+            return formula;
         }
 
     }

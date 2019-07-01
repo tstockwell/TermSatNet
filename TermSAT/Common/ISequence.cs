@@ -10,7 +10,7 @@ namespace TermSAT.Common
     /// I kinda wish that C# defined a marker interface for immutability so that I had a way to define 
     /// sequences and thier items as immutable.
     /// </summary>
-    public interface ISequence<TItem> : IComparable<ISequence<TItem>>, IEquatable<ISequence<TItem>>, IEnumerable<TItem>
+    public interface ISequence<TItem> : IEnumerable<TItem>
         where TItem : IComparable<TItem>, IEquatable<TItem> 
     {
         TItem this[int index] { get; }
@@ -33,6 +33,24 @@ namespace TermSAT.Common
         public int CompareTo(ISequence<char> other) => Value.CompareTo(other.ToString());
         public bool Equals(ISequence<char> other) => Value.Equals(other.ToString());
         public IEnumerator<char> GetEnumerator() => Value.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Value.GetEnumerator();
+    }
+
+
+    /// <summary>
+    /// ISequence adapter interface for lists.
+    /// </summary>
+    public class ListSequence<TValue> : ISequence<TValue>
+        where TValue : IComparable<TValue>, IEquatable<TValue>
+    {
+        public readonly IList<TValue> Value;
+
+        public ListSequence(IList<TValue> value) { Value = value; }
+
+        public TValue this[int index] => Value[index];
+        public override string ToString() => Value.ToString();
+        public int Length => Value.Count;
+        public IEnumerator<TValue> GetEnumerator() => Value.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => Value.GetEnumerator();
     }
 
