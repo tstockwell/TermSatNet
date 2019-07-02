@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using TermSAT.Common;
 
@@ -42,43 +43,73 @@ namespace TermSAT.Formulas
     ///  
     ///  There are many indexing techniques used in SAT solvers that are based on various string 
     ///  indexing and matching techniques, and formula sequences give us a way to represent 
-    ///  formulas as strings in a memory efficient way that takes advantage of the existing 
-    ///  structure of formulas in TermSAT.
-    ///  You might be thinking that implementing the IFormulaSequence API is a lot of work compared 
-    ///  to just using string to represent formulas.  But I have now enough experience with SAT solvers 
-    ///  to know that efficient use of memory is very important. 
-    ///  One advantage of FormulaSequences is that, since they are just an interface added to Formulas 
-    ///  and have no data of their own, they use no extra memory.
+    ///  formulas as strings in a convenient way.
     ///
     /// </summary>
     public interface IFormulaSequence : ISequence<Formula> { }
 
 
-    public partial class Formula : IFormulaSequence
+    public static class FormulaSequenceExtensions 
     {
+        public static FormulaSequence ToSequence(this Formula formula) => FormulaSequence.GetSequence(formula);
+    }
+
+    public class FormulaSequence : IFormulaSequence
+    {
+        private static Formula[] TRUE = new Formula[] { Constant.TRUE };
+        private static Formula[] FALSE = new Formula[] { Constant.TRUE };
+        private static ConditionalWeakTable<Formula, FormulaSequence> sequences = 
+            new ConditionalWeakTable<Formula, FormulaSequence>();
+
+        public static FormulaSequence GetSequence(Formula f)
+        {
+            FormulaSequence sequence;
+            if (!sequences.TryGetValue(f, out sequence))
+            {
+                lock (sequences)
+                {
+                    if (sequences.TryGetValue(f, out sequence))
+                        return sequence;
+
+                    var s = new Formula[f.Length];
+                    int i = 0;
+                    var e = new FormulaEnumerator(f);
+                    while (e.MoveNext())
+                        s[i++] = e.Current;
+
+                    sequence = new FormulaSequence(s);
+                    sequences.Add(f, sequence);
+                }
+            }
+
+            return sequence;
+        }
+
         private Formula[] formulaEnumeration;
 
-        partial void Initialize()
+        private FormulaSequence(Formula[] formulaEnumeration)
         {
-            formulaEnumeration= new Formula[Length];
-
-            int i= 0;
-            var e= new FormulaEnumerator(this);
-            while (e.MoveNext())
-                formulaEnumeration[i++]= e.Current;
+            this.formulaEnumeration = formulaEnumeration;
         }
+
+        public int Length { get => formulaEnumeration[0].Length; }
 
         public Formula this[int index]  { get => formulaEnumeration[index];  }
 
-        public int CompareTo(ISequence<Formula> other) => throw new NotImplementedException();
+        public int CompareTo(ISequence<Formula> other) => this[0].CompareTo(other[0]);
 
-        public bool Equals(ISequence<Formula> other) => this.Equals(other as Formula);
+        public bool Equals(ISequence<Formula> other) => this[0].Equals(other[0]);
 
-        public IEnumerator<Formula> GetEnumerator() => new FormulaEnumerator(this);
+        public IEnumerator<Formula> GetEnumerator() => (IEnumerator<Formula>)formulaEnumeration.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => new FormulaEnumerator(this);
+        IEnumerator IEnumerable.GetEnumerator() => formulaEnumeration.GetEnumerator();
     }
 
+    /**
+     * This class enumerates all of a Formula's subformulas in the same order as they 
+     * are written.  Basically that means that implication antecedents come before consequents.
+     * The first formula returned is the enumerated formula itself.
+     */
     public class FormulaEnumerator : IEnumerator<Formula>
     {
         private readonly Formula formula;

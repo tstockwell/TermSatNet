@@ -33,7 +33,7 @@ namespace TermSAT.RuleDatabase
 
         override public string ToString()
         {
-            return Formula.ToPrettyString() + " ==> " + Reduction.ToPrettyString();
+            return Formula.ToString() + " ==> " + Reduction.ToString();
         }
     }
 

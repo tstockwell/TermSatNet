@@ -51,7 +51,7 @@ namespace TermSAT.Formulas
     {
         public InstanceRecognizer() { }
 
-        public void Add(Formula formula) => Add(formula /* formulas are thier own key */, formula);
+        public void Add(Formula formula) => Add(formula.ToSequence(), formula);
 
         /**
          * Returns a list of formulas in this InstanceRecogniser that are generalizations of 
@@ -88,7 +88,7 @@ namespace TermSAT.Formulas
 
         public IList<SearchResult> FindGeneralizationNodes(Formula formula, int maxMatchCount)
         {
-            var visitor = new RecognizerVisitor(formula, maxMatchCount);
+            var visitor = new RecognizerVisitor(formula.ToSequence(), maxMatchCount);
             var matches = Accept(visitor);
             return matches;
         }
@@ -112,10 +112,10 @@ namespace TermSAT.Formulas
             Stack<IDictionary<Variable, Formula>> _substitutions = new Stack<IDictionary<Variable, Formula>>();
             Stack<int> _position = new Stack<int>();
 
-            public Formula FormulaToMatch { get; private set; }
+            public FormulaSequence FormulaToMatch { get; private set; }
             public int MaxMatchCount { get; private set; }
 
-            public RecognizerVisitor(Formula formulaToMatch, int maxMatchCount)
+            public RecognizerVisitor(FormulaSequence formulaToMatch, int maxMatchCount)
             {
                 MaxMatchCount = maxMatchCount;
                 FormulaToMatch = formulaToMatch;

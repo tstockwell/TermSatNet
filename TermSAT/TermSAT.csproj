@@ -37,4 +37,8 @@
     <Folder Include="obj\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Solver\RuleRepository.cs" />
+  </ItemGroup>
+
 </Project>

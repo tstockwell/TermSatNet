@@ -43,7 +43,7 @@ namespace TermSAT.Solver
     public static const String dbURL = "jdbc:h2:db/rules-index;ACCESS_MODE_DATA=r";
 
 
-    class RepositoryNode extends TrieMap.NodeImpl<Formula> {
+    class RepositoryNode : TrieMap.NodeImpl<Formula> {
 		
 		readonly int _id;
 		readonly int _canonicalID;
@@ -52,7 +52,7 @@ namespace TermSAT.Solver
     {
         if (_children == null)
         {
-            synchronized(this) {
+            lock(this) {
                 if (_children == null)
                 {
                     _children = loadChildren(this);
@@ -66,7 +66,7 @@ namespace TermSAT.Solver
     {
         if (_children == null)
         {
-            synchronized(this) {
+            lock(this) {
                 if (_children == null)
                 {
                     _children = loadChildren(this);
@@ -74,7 +74,7 @@ namespace TermSAT.Solver
             }
         }
         return super.getChildNode(symbol);
-    };
+    }
 
     RepositoryNode() { this(0, null, null, 0, 0); }
     RepositoryNode(int id, NodeImpl<Formula> parent, Character symbol, int depth, int canonicalID)
@@ -148,13 +148,13 @@ private Map<Character, TrieMap.NodeImpl<Formula>> loadChildren(RepositoryNode no
                 }
                 formulaText += symbol;
                 Formula noncanonicalFormula = Formula.createFormula(formulaText);
-                assert noncanonicalFormula != null;
+                Debug.Assert(noncanonicalFormula != null);
                 rn.setValue(noncanonicalFormula);
             }
             nodes.add(rn);
         }
         Map<Character, TrieMap.NodeImpl<Formula>> children = new HashMap<Character, TrieMap.NodeImpl<Formula>>();
-        for (RepositoryNode rn: nodes)
+        foreach (RepositoryNode rn in nodes)
             children.put(rn.getCharacter(), rn);
         return children;
     }
@@ -227,7 +227,7 @@ public Collection<Formula> findAllReductions(Formula formula)
     if (matches == null || matches.isEmpty())
         return Collections.emptyList();
     ArrayList<Formula> reductions = new ArrayList<Formula>();
-    for (NodeInfo info:matches)
+    foreach (NodeInfo info in matches)
     {
         RepositoryNode rn = (RepositoryNode)info.node;
         Formula canonicalFormula = getCanonicalFormula(rn._canonicalID);

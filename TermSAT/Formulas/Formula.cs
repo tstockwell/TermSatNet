@@ -83,8 +83,6 @@ namespace TermSAT.Formulas
             Length = length;
         }
 
-        partial void Initialize();
-
         /// <summary>
         ///     Here's an important point to understand about formula ordering...
         /// 
