@@ -100,8 +100,6 @@ namespace TermSAT.Formulas
     {
         private static readonly ConditionalWeakTable<Implication, IList<Variable>> __varListCache = new ConditionalWeakTable<Implication, IList<Variable>>();
 
-        TrieMap<ISequence<Variable>, Variable, IList<Variable>> __listCache = new TrieMap<ISequence<Variable>, Variable, IList<Variable>>();
-
         public override IList<Variable> AllVariables
         {
             get
@@ -125,23 +123,8 @@ namespace TermSAT.Formulas
                     sortedVars.AddRange(vars);
                     sortedVars.Sort();
 
-
-                    // the newly created list is probably similar to some previously created list
-                    // there's no point in having 100s of thousands of similar lists in memory, 
-                    // look for the same list in the cache of lists and use that intead.
-                    var sequence = new ListSequence<Variable>(sortedVars);
-                    IList<Variable> variables2;
-                    if (__listCache.TryGetValue(sequence, out variables2))
-                    {
-                        variables = variables2;
-                    }
-                    else
-                    {
-                        variables = sortedVars;
-                        __listCache.Add(sequence, variables);
-                        __varListCache.Add(this, variables);
-
-                    }
+                    variables = sortedVars;
+                    __varListCache.Add(this, variables);
                 }
 
                 return variables;

@@ -56,117 +56,72 @@ namespace TermSAT.Formulas
 
     public partial class Formula : IFormulaSequence
     {
-        abstract public Formula this[int index] { get; }
+        private Formula[] formulaEnumeration;
 
-        public int CompareTo(ISequence<Formula> other)
+        partial void Initialize()
         {
-            throw new NotImplementedException();
+            formulaEnumeration= new Formula[Length];
+
+            int i= 0;
+            var e= new FormulaEnumerator(this);
+            while (e.MoveNext())
+                formulaEnumeration[i++]= e.Current;
         }
 
-        public bool Equals(ISequence<Formula> other)
-        {
-            return this.Equals(other as Formula);
-        }
+        public Formula this[int index]  { get => formulaEnumeration[index];  }
 
-        public IEnumerator<Formula> GetEnumerator()
-        {
-            return new FormulaEnumerator(this);
-        }
+        public int CompareTo(ISequence<Formula> other) => throw new NotImplementedException();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new FormulaEnumerator(this);
-        }
-    }
+        public bool Equals(ISequence<Formula> other) => this.Equals(other as Formula);
 
-    public partial class Constant
-    {
-        override public Formula this[int index]
-        {
-            get
-            {
-                if (index != 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                return this;
-            }
-        }
-    }
+        public IEnumerator<Formula> GetEnumerator() => new FormulaEnumerator(this);
 
-    public partial class Variable
-    {
-        override public Formula this[int index]
-        {
-            get
-            {
-                if (index != 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                return this;
-            }
-        }
-    }
-
-    public partial class Negation
-    {
-        override public Formula this[int index]
-        {
-            get
-            {
-                if (index < 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                if (index == 0)
-                    return this;
-                return Child[index - 1];
-            }
-        }
-    }
-
-    public partial class Implication
-    {
-        override public Formula this[int index]
-        {
-            get
-            {
-                if (index < 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                if (index == 0)
-                    return this;
-                int a = Antecedent.Length;
-                if (index <= a)
-                    return Antecedent[index - 1];
-                return Consequent[index - a - 1];
-            }
-        }
+        IEnumerator IEnumerable.GetEnumerator() => new FormulaEnumerator(this);
     }
 
     public class FormulaEnumerator : IEnumerator<Formula>
     {
-        private Formula formula;
-        private readonly int startingPosition;
-        int position = 0;
+        private readonly Formula formula;
+        private readonly Stack<Formula> stack= new Stack<Formula>();
 
         public Formula Current { get; private set; }
 
         object IEnumerator.Current { get { return Current; } }
 
-        public FormulaEnumerator(Formula formula, int startingPosition = 0)
+        public FormulaEnumerator(Formula formula)
         {
             this.formula= formula;
-            this.position = this.startingPosition = startingPosition;
         }
 
         public void Dispose() { /* do nothing */ }
 
         public bool MoveNext()
         {
-            if (formula.Length <= position)
-                return false;
-            Current = formula[position++];
+            if (Current == null) 
+            { 
+                Current= formula;
+                return true;
+            }
+            if (Current is Constant || Current is Variable)
+            {
+                if (stack.Count <= 0)
+                    return false;
+                Current= stack.Pop();
+                return true;
+            }
+            if (Current is Negation)
+            {
+                Current= (Current as Negation).Child;
+                return true;
+            }
+
+            stack.Push((Current as Implication).Consequent);
+            Current= (Current as Implication).Antecedent;
             return true;
         }
 
         public void Reset()
         {
-            this.position = this.startingPosition;
             this.Current = null;
         }
     }

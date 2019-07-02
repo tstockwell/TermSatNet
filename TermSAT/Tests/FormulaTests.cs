@@ -55,14 +55,6 @@ namespace TermSAT.Tests
             Assert.IsTrue("**.1.2*.3.1".ToFormula().AllVariables.Contains(Variable.ONE));
             Assert.IsTrue("**.1.2*.3.1".ToFormula().AllVariables.Contains(Variable.TWO));
             Assert.IsTrue("**.1.2*.3.1".ToFormula().AllVariables.Contains(Variable.THREE));
-
-            // Since many many formulas will have the same collection of variables in them, the AllVariables 
-            // property is suppose to cache the lists and reuse them.
-            // The AllVariables propert should not only cache variable lists for each formula, 
-            // it should make sure that no list is created more than once.
-            // So, not only should the two formulas below produce lists with the same variables, the lists 
-            // tehmselves should be the same list.
-            Assert.IsTrue("**.3.2*.2.1".ToFormula().AllVariables == "**.1.2.3".ToFormula().AllVariables);
         }
 
 
