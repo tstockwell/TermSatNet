@@ -131,6 +131,7 @@ namespace TermSAT.Tests
                 {
                     Implication formula1 = "***.1.2.3.4";
                     Implication formula2 = Implication.NewImplication(formula1, formula1);
+                    var formula2Subformulas= formula2.ToSequence();
 
                     Implication rule1 = "*.1.2";
                     InstanceRecognizer recognizer = new InstanceRecognizer() { rule1 };
@@ -141,47 +142,48 @@ namespace TermSAT.Tests
                     Assert.AreEqual(match.Substitutions[Variable.TWO], formula1);
 
                     var substitution = match.Generalization.CreateSubstitutionInstance(match.Substitutions);
+                    var substitutionSubformulas = substitution.ToSequence();
 
                     if (!formula2.Equals(substitution))
                     {
                         if (formula2.GetHashCode() != substitution.GetHashCode())
                         {
                             // test variables ****.1.2.3.4***.1.2.3.4
-                            Assert.AreEqual(Variable.ONE.GetHashCode(), substitution[4].GetHashCode());
-                            Assert.AreEqual(Variable.ONE.GetHashCode(), substitution[11].GetHashCode());
-                            Assert.AreEqual(Variable.ONE.GetHashCode(), formula2[4].GetHashCode());
-                            Assert.AreEqual(Variable.ONE.GetHashCode(), formula2[11].GetHashCode());
-                            Assert.AreEqual(Variable.TWO.GetHashCode(), substitution[5].GetHashCode());
-                            Assert.AreEqual(Variable.TWO.GetHashCode(), substitution[12].GetHashCode());
-                            Assert.AreEqual(Variable.TWO.GetHashCode(), formula2[5].GetHashCode());
-                            Assert.AreEqual(Variable.TWO.GetHashCode(), formula2[12].GetHashCode());
-                            Assert.AreEqual(Variable.THREE.GetHashCode(), substitution[6].GetHashCode());
-                            Assert.AreEqual(Variable.THREE.GetHashCode(), substitution[13].GetHashCode());
-                            Assert.AreEqual(Variable.THREE.GetHashCode(), formula2[6].GetHashCode());
-                            Assert.AreEqual(Variable.THREE.GetHashCode(), formula2[13].GetHashCode());
+                            Assert.AreEqual(Variable.ONE.GetHashCode(), substitutionSubformulas[4].GetHashCode());
+                            Assert.AreEqual(Variable.ONE.GetHashCode(), substitutionSubformulas[11].GetHashCode());
+                            Assert.AreEqual(Variable.ONE.GetHashCode(), formula2Subformulas[4].GetHashCode());
+                            Assert.AreEqual(Variable.ONE.GetHashCode(), formula2Subformulas[11].GetHashCode());
+                            Assert.AreEqual(Variable.TWO.GetHashCode(), substitutionSubformulas[5].GetHashCode());
+                            Assert.AreEqual(Variable.TWO.GetHashCode(), substitutionSubformulas[12].GetHashCode());
+                            Assert.AreEqual(Variable.TWO.GetHashCode(), formula2Subformulas[5].GetHashCode());
+                            Assert.AreEqual(Variable.TWO.GetHashCode(), formula2Subformulas[12].GetHashCode());
+                            Assert.AreEqual(Variable.THREE.GetHashCode(), substitutionSubformulas[6].GetHashCode());
+                            Assert.AreEqual(Variable.THREE.GetHashCode(), substitutionSubformulas[13].GetHashCode());
+                            Assert.AreEqual(Variable.THREE.GetHashCode(), formula2Subformulas[6].GetHashCode());
+                            Assert.AreEqual(Variable.THREE.GetHashCode(), formula2Subformulas[13].GetHashCode());
                             var four= Variable.NewVariable(4);
-                            Assert.AreEqual(four.GetHashCode(), substitution[7].GetHashCode());
-                            Assert.AreEqual(four.GetHashCode(), substitution[14].GetHashCode());
-                            Assert.AreEqual(four.GetHashCode(), formula2[7].GetHashCode());
-                            Assert.AreEqual(four.GetHashCode(), formula2[14].GetHashCode());
+                            Assert.AreEqual(four.GetHashCode(), substitutionSubformulas[7].GetHashCode());
+                            Assert.AreEqual(four.GetHashCode(), substitutionSubformulas[14].GetHashCode());
+                            Assert.AreEqual(four.GetHashCode(), formula2Subformulas[7].GetHashCode());
+                            Assert.AreEqual(four.GetHashCode(), formula2Subformulas[14].GetHashCode());
 
                             // test innermost implications
-                            Assert.AreEqual(formula2[3].GetHashCode(), substitution[3].GetHashCode());
-                            Assert.AreEqual(formula2[10].GetHashCode(), substitution[10].GetHashCode());
-                            Assert.AreEqual(formula2[3].GetHashCode(), substitution[10].GetHashCode());
+                            Assert.AreEqual(formula2Subformulas[3].GetHashCode(), substitutionSubformulas[3].GetHashCode());
+                            Assert.AreEqual(formula2Subformulas[10].GetHashCode(), substitutionSubformulas[10].GetHashCode());
+                            Assert.AreEqual(formula2Subformulas[3].GetHashCode(), substitutionSubformulas[10].GetHashCode());
 
                             // test next outer implications
-                            Assert.AreEqual(formula2[2].GetHashCode(), substitution[2].GetHashCode());
-                            Assert.AreEqual(formula2[9].GetHashCode(), substitution[9].GetHashCode());
-                            Assert.AreEqual(formula2[2].GetHashCode(), substitution[9].GetHashCode());
+                            Assert.AreEqual(formula2Subformulas[2].GetHashCode(), substitutionSubformulas[2].GetHashCode());
+                            Assert.AreEqual(formula2Subformulas[9].GetHashCode(), substitutionSubformulas[9].GetHashCode());
+                            Assert.AreEqual(formula2Subformulas[2].GetHashCode(), substitutionSubformulas[9].GetHashCode());
 
                             // test next outer implications
-                            Assert.AreEqual(formula2[1].GetHashCode(), substitution[1].GetHashCode());
-                            Assert.AreEqual(formula2[8].GetHashCode(), substitution[8].GetHashCode());
-                            Assert.AreEqual(formula2[1].GetHashCode(), substitution[8].GetHashCode());
+                            Assert.AreEqual(formula2Subformulas[1].GetHashCode(), substitutionSubformulas[1].GetHashCode());
+                            Assert.AreEqual(formula2Subformulas[8].GetHashCode(), substitutionSubformulas[8].GetHashCode());
+                            Assert.AreEqual(formula2Subformulas[1].GetHashCode(), substitutionSubformulas[8].GetHashCode());
 
                             // test next outer implications
-                            Assert.AreEqual(formula2[0].GetHashCode(), substitution[0].GetHashCode());
+                            Assert.AreEqual(formula2Subformulas[0].GetHashCode(), substitutionSubformulas[0].GetHashCode());
                         }
                         Assert.Fail("We have two different instances of the same formuals, formulas have not been properly cached");
                     }

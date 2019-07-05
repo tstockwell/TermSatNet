@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text;
 using System.Threading.Tasks;
 using TermSAT.Formulas;
@@ -17,6 +18,98 @@ namespace TermSAT.RuleDatabase
     /// </summary>
     public static class ReductionAlgorithms
     {
+        // Denotes a reduction to given formula that will reduce the formula 
+        // to simpler yet equivalent formula
+        public class SingleReplacementReduction
+        {
+            public SingleReplacementReduction(Formula formula)
+            {
+                Formula= formula;
+            }
+
+            public Formula Formula {  get; internal set; }
+
+            /// <summary>
+            /// An enumeration of the indexes of subformulas within the formula to be reduced 
+            /// and thier replacements
+            /// </summary>
+            public IDictionary<int, Formula> Replacements {  get; internal set;}
+
+            public Formula ReducedFormula {  get => ToFormula(Formula.ToSequence(), Replacements); }
+        }
+
+        /**
+         * Creates a new formula from a DFS ordering and some changes
+         */
+        public static Formula ToFormula(this FormulaSequence sequence,  IDictionary<int, Formula> replacements)
+        {
+            Formula formula;
+
+            Stack<Formula> stack = new Stack<Formula>();
+            for (int i = sequence.Length; 0 < i--;)
+            {
+                if (!replacements.TryGetValue(i, out Formula subformula))
+                    subformula = sequence[i];
+                if (subformula is Negation)
+                {
+                    Formula f = stack.Pop();
+                    stack.Push(Negation.NewNegation(f));
+                }
+                else if (subformula is Implication)
+                {
+                    Formula antecendent = stack.Pop();
+                    Formula consequent = stack.Pop();
+                    stack.Push(Implication.NewImplication(antecendent, consequent));
+                }
+                else if (subformula is Variable)
+                {
+                    stack.Push(subformula);
+                }
+                else if (subformula == Constant.TRUE)
+                {
+                    stack.Push(Constant.TRUE);
+                }
+                else if (subformula == Constant.FALSE)
+                {
+                    stack.Push(Constant.FALSE);
+                }
+                else
+                    throw new Exception("wtf");
+            }
+
+            if (stack.Count != 1)
+                throw new Exception("hmm, looks like an invalid formula DFS ordering");
+
+            formula = stack.Pop();
+            return formula;
+        }
+
+
+        /// <summary>
+        /// Information about the last implication encountered while reducing a formula
+        /// </summary>
+        struct ImplicationState
+        {
+            // the index of the operator of which this subformula is an argument, or -1
+            public int iPrevOperator;
+
+            /* The trigger value is the value that needs to be assigned to the subformula 
+             * associated with this state in order to force the immediately preceding 
+             * implication to a value.
+             * May be null if either T or F can force the containing operator to a fixed value.
+             */
+            public Constant Trigger;
+
+            /* This value is the value to which the subformula associated with this state can be forced.
+             * 
+             * Implications can only be forced to T by a single replacement (note: implications 
+             * could be forced to either T or F by multiple replacements of the same subformula, I suspect 
+             * that this will be a future 'algorithmic replacement rule' that I'll discover).
+             * May be null if this subformula can be forced to any value.
+             */
+            public Constant TriggeredValue;
+        }
+
         /// <summary>
         /// While developing TermSAT, the RuleGenerator program was used to generate reduction rules 
         /// for all formulas of three variables or less.  Then it was discovered that all these 
@@ -29,8 +122,8 @@ namespace TermSAT.RuleDatabase
         /// if replacing all occurences of formula C in the consequent with either T or F makes the entire 
         /// consequent true (and hence, makes the original formula true) then 
         /// replace all occurences of C that appear in the original formula's antecendent with the opposite 
-        /// value. For instance, if replacing C with T makes the consequent true then replace all occurences 
-        /// of C in the antecedent with F.
+        /// value. For instance, if replacing C with T makes a consequent true then replace all occurences 
+        /// of C in the associated antecedent with F.
         /// 
         /// Also, the converse is true...
         /// 
@@ -38,53 +131,161 @@ namespace TermSAT.RuleDatabase
         /// if replacing all occurence of formula C in the antecedent with either T or F makes the entire 
         /// antecedent false (and hence, makes the original formula true) then 
         /// replace all occurences of C that appear in the original formula's consequent with the opposite 
-        /// value. For instance, if replacing C with T makes the antecedent true then replace all occurences 
+        /// value. For instance, if replacing C with T makes the antecedent false then replace all occurences 
         /// of C in the consequent with F.
         /// 
-        /// Since the set of reduction rules generated by the RuleGenerator for 3 variables are sufficient to reduce 
-        /// all substitution instances of formulas with three variables (augmented with a few rules to eliminate 
-        /// constants and double negatives) the single replacement rules is also 
-        /// sufficient for redcing all substitution instances of formulas with three variables.
+        /// I hope, but as of 7/2019 don't know for a fact yet, that while the set of reduction rules 
+        /// generated by the RuleGenerator for 3 variables are not complete, the single replacement rule 
+        /// is.  
+        /// That's because the set of rules generated by the RuleGenerator is finite whiel the single 
+        /// replacement rule is essentially the equivalent of an infinite set of similar reduction rules.
         /// 
-        /// The single replacement rule is far more powerful than all the reduction rules it replaces since 
-        /// the single replacement rule is essentially the equivalent of an infinite set of similar reduction rules.
         /// That makes me wonder...  an infinite number of reductions rules would be necessary in order to reduce 
         /// boolean formulas of arbitrary length, but maybe there are is a finite set of 'algorithmic rules' 
         /// that are sufficient to solve arbitrary boolean formulas.
-        /// So... my plan is to keep generating new reduction rules as a way to discover new 'algorithmic' rules.
-        /// Perhaps at some point I'll be able to show that a finite set of algortmic rules is sufficient 
+        /// So... my plan is to use a completion algorithm to keep generating new reduction rules as a way to 
+        /// discover new 'algorithmic' rules.
+        /// Perhaps at some point I'll be able to show that a finite set of 'algortmic rules' is sufficient 
         /// to solve SAT problems.
         /// 
         /// </summary>
         /// <returns>A reduced formula, or the original formula if the orginal formula connot be reduced.</returns>
-        public static async Task<Formula> ReduceUsingSingleReplacement(Formula formula)
+        public static bool TryReduceUsingSingleReplacement(Formula formula, out SingleReplacementReduction reduction)
         {
-            if (formula is Constant)
-                return formula;
+            //while (true)
+            //{
+            //    if (formula is Constant)
+            //        return formula;
+            //    if (formula is Variable)
+            //        return formula;
+            //    if (formula is Negation)
+            //    {
+            //        formula= (formula as Negation).Child;
+            //        continue;
+            //    }
+            //    if (formula is Implication)
+            //    {
 
-            if (formula is Variable)
-                return formula;
+            //    }
+            //}
 
-            if (formula is Negation)
+            reduction= null;
+
+            if (formula.Length <= 1)
             {
-                var child = (formula as Negation).Child;
-                var reducedChild = await ReduceUsingSingleReplacement(child);
-                if (reducedChild != child)
-                    return Negation.NewNegation(reducedChild);
-                return formula;
+                if (formula is Variable)
+                    reduction= new SingleReplacementReduction(formula)
+                    {
+                        Replacements= new Dictionary<int, Formula>() { [0]= Constant.TRUE }
+                    };
+                return true;
             }
 
-            Implication i = formula as Implication;
-            var consequentTask = Task.Run(() => { return ReduceUsingSingleReplacement(i.Consequent); });
-            var antecedentTask = Task.Run(() => { return ReduceUsingSingleReplacement(i.Antecedent); });
+            var reducedFormula = formula;
+            var sequence = formula.ToSequence();
 
-            var consequent = await consequentTask;
-            var antecedent = await consequentTask;
+            // we'll visit all subformulas in the given formula's dfs ordering and fill in this 
+            // array of stats as we go.
+            // These stats are used to quicly navigate to prior encountered implications
+            var states = new List<ImplicationState>(sequence.Length)
+            {
+                new ImplicationState()
+                {
+                    iPrevOperator = -1,
+                    Trigger = null,
+                    TriggeredValue = (formula is Implication) ? Constant.TRUE : null
+                }
+            };
 
-            if (consequent != i.Consequent || antecedent != i.Antecedent)
-                return Implication.NewImplication(antecedent, consequent);
 
-            return formula;
+            // Visit all the subformulas, keeping track of the implications encountered 
+            for (int i = 1; i < sequence.Length && reduction == null; i++)
+            {
+                var subformula = sequence[i];
+                var previousSubformula = sequence[i - 1];
+
+                var thisState= new ImplicationState();
+                states.Add(thisState);
+                var previousState= states[i - 1];
+
+                if (previousSubformula is Implication)
+                {
+                    thisState.iPrevOperator= i-1;
+                    thisState.Trigger= Constant.FALSE; // antecedents must be false to make preceding implication true
+                }
+                else if (previousSubformula is Negation)
+                {
+                    thisState.iPrevOperator= previousState.iPrevOperator;
+                    thisState.Trigger = 
+                        (previousState.Trigger == Constant.TRUE) ? 
+                            Constant.FALSE : 
+                        (previousState.Trigger == Constant.FALSE) ? 
+                            Constant.TRUE : 
+                            null;
+                }
+                else if (previousSubformula is Variable)
+                {
+                    // if this subformula is not preceded by an implication or negation 
+                    // then it must be the start of the consequent for the preceding implication.
+                    thisState.iPrevOperator= previousState.iPrevOperator;
+                    thisState.Trigger = null;  
+                }
+                else if (previousSubformula is Constant)
+                {
+                    thisState.iPrevOperator= previousState.iPrevOperator;
+                    thisState.Trigger = previousSubformula as Constant;  
+                }
+                else
+                    throw new TermSatException("wtf");
+
+                thisState.TriggeredValue =  (subformula is Implication) ? Constant.TRUE : 
+                                            (subformula is Constant) ? subformula as Constant :
+                                            null;
+
+
+                // find the index of the first implication that we can reduce, if any
+                var iPrevOperator = thisState.iPrevOperator;
+                var iCurrentSubformula = i;
+                while (0 <= iPrevOperator && reduction == null)
+                {
+                    var prevOperatorState= states[iPrevOperator];
+                    var currentState= states[iCurrentSubformula];
+
+                    var canForcePreviousOperator = 
+                            currentState.Trigger == null || currentState.TriggeredValue == null 
+                            || currentState.Trigger == currentState.TriggeredValue;
+
+                    if (!canForcePreviousOperator)
+                        break;
+
+                    if (sequence[iPrevOperator] is Implication)
+                    {
+                        // does starting subformula occur in associated antecedent/consequent?
+                        var implication= sequence[iPrevOperator] as Implication;
+                        var isAntecedent= iCurrentSubformula <= iPrevOperator + implication.Antecedent.Length;
+                        int start= iPrevOperator + 1 + (isAntecedent ? implication.Antecedent.Length : 0);
+                        int end= iPrevOperator + implication.Antecedent.Length + (isAntecedent ? implication.Consequent.Length : 0);
+                        for (int s= start; s <= end; s++)
+                        {
+                            if (sequence[s] == subformula)
+                            {
+                                if (reduction == null)
+                                    reduction= new SingleReplacementReduction(formula)
+                                    {
+                                        Replacements= new Dictionary<int, Formula>()
+                                    };
+
+                                reduction.Replacements.Add(s, thisState.Trigger == Constant.TRUE ? Constant.FALSE : Constant.TRUE);
+                            }
+                        }
+                    }
+
+                    iCurrentSubformula = iPrevOperator;
+                    iPrevOperator = prevOperatorState.iPrevOperator;
+                }
+            }
+
+            return reduction != null;
         }
     }
 }

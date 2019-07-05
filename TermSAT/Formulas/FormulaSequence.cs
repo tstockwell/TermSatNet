@@ -56,15 +56,14 @@ namespace TermSAT.Formulas
 
     public class FormulaSequence : IFormulaSequence
     {
-        private static Formula[] TRUE = new Formula[] { Constant.TRUE };
-        private static Formula[] FALSE = new Formula[] { Constant.TRUE };
+        private static readonly Formula[] TRUE = new Formula[] { Constant.TRUE };
+        private static readonly Formula[] FALSE = new Formula[] { Constant.TRUE };
         private static ConditionalWeakTable<Formula, FormulaSequence> sequences = 
             new ConditionalWeakTable<Formula, FormulaSequence>();
 
         public static FormulaSequence GetSequence(Formula f)
         {
-            FormulaSequence sequence;
-            if (!sequences.TryGetValue(f, out sequence))
+            if (!sequences.TryGetValue(f, out FormulaSequence sequence))
             {
                 lock (sequences)
                 {

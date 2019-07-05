@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TermSAT", "TermSAT\TermSAT.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{5AFACEBF-9868-423F-ACD3-A738245BFE28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuleGenerator", "Scripts\RuleGenerator\RuleGenerator.csproj", "{D6F3F06E-6D71-4326-8149-D279F434C03C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuleGenerator", "Scripts\RuleGenerator\RuleGenerator.csproj", "{D6F3F06E-6D71-4326-8149-D279F434C03C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{054F8D54-81BB-4C17-8662-9B622D56449F} = {054F8D54-81BB-4C17-8662-9B622D56449F}
 	EndProjectSection

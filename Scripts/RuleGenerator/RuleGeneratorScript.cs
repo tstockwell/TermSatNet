@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using TermSAT.RuleDatabase;
 
 namespace RuleGeneratorScript
@@ -14,6 +15,8 @@ namespace RuleGeneratorScript
 
         public static void Main(string[] args)
         {
+            Trace.Listeners.Add(new TextWriterTraceListener(System.Console.Out));
+            Trace.Listeners.Add(new TextWriterTraceListener("rules-trace-" + TruthTable.VARIABLE_COUNT + ".txt"));
 
             var database = new FormulaDatabase(DATABASE_PATH);
             database.Clear();
