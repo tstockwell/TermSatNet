@@ -1,4 +1,12 @@
-﻿using System;
+﻿/**
+ * NOTE: This implementation of FormulaSequence creates an array to hold the sequence in memory, so it is a little faster that 
+ * the alternative implementation that is just a simple API on top of a Formula.
+ * I have opted to go with the less fast but much less memory-intensive implementation but I keep this around 
+ * just in case I wanto an alternative.
+ */
+
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -46,17 +54,19 @@ namespace TermSAT.Formulas
     ///  formulas as strings in a convenient way.
     ///
     /// </summary>
-
     public interface IFormulaSequence : ISequence<Formula> { }
 
-    public static class FormulaSequenceExtensions
+
+    public static class FormulaSequenceExtensions 
     {
         public static FormulaSequence ToSequence(this Formula formula) => FormulaSequence.GetSequence(formula);
     }
 
     public class FormulaSequence : IFormulaSequence
     {
-        private static ConditionalWeakTable<Formula, FormulaSequence> sequences =
+        private static readonly Formula[] TRUE = new Formula[] { Constant.TRUE };
+        private static readonly Formula[] FALSE = new Formula[] { Constant.TRUE };
+        private static ConditionalWeakTable<Formula, FormulaSequence> sequences = 
             new ConditionalWeakTable<Formula, FormulaSequence>();
 
         public static FormulaSequence GetSequence(Formula f)
@@ -67,7 +77,14 @@ namespace TermSAT.Formulas
                 {
                     if (sequences.TryGetValue(f, out sequence))
                         return sequence;
-                    sequence = new FormulaSequence(f);
+
+                    var s = new Formula[f.Length];
+                    int i = 0;
+                    var e = new FormulaEnumerator(f);
+                    while (e.MoveNext())
+                        s[i++] = e.Current;
+
+                    sequence = new FormulaSequence(s);
                     sequences.Add(f, sequence);
                 }
             }
@@ -75,86 +92,25 @@ namespace TermSAT.Formulas
             return sequence;
         }
 
-        public Formula Formula { get; private set; }
+        private Formula[] formulaEnumeration;
 
-        private FormulaSequence(Formula formula)
+        private FormulaSequence(Formula[] formulaEnumeration)
         {
-            Formula = formula;
+            this.formulaEnumeration = formulaEnumeration;
         }
 
-        public int Length => Formula.Length;
+        public int Length { get => formulaEnumeration[0].Length; }
 
-        public IEnumerator<Formula> GetEnumerator() => new FormulaEnumerator(Formula);
+        public Formula this[int index]  { get => formulaEnumeration[index];  }
 
-        IEnumerator IEnumerable.GetEnumerator() => new FormulaEnumerator(Formula);
+        public int CompareTo(ISequence<Formula> other) => this[0].CompareTo(other[0]);
 
-        public Formula this[int index] { get => Formula[index]; }
+        public bool Equals(ISequence<Formula> other) => this[0].Equals(other[0]);
+
+        public IEnumerator<Formula> GetEnumerator() => (IEnumerator<Formula>)formulaEnumeration.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => formulaEnumeration.GetEnumerator();
     }
-
-    partial class Formula
-    {
-        abstract public Formula this[int index] { get; }
-    }
-
-    partial class Constant
-    {
-        override public Formula this[int index]
-        {
-            get
-            {
-                if (index != 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                return this;
-            }
-        }
-    }
-
-    partial class Variable
-    {
-        override public Formula this[int index]
-        {
-            get
-            {
-                if (index != 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                return this;
-            }
-        }
-    }
-
-    public partial class Negation
-    {
-        override public Formula this[int index]
-        {
-            get
-            {
-                if (index < 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                if (index == 0)
-                    return this;
-                return Child[index - 1];
-            }
-        }
-    }
-
-    public partial class Implication
-    {
-        override public Formula this[int index]
-        {
-            get
-            {
-                if (index < 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                if (index == 0)
-                    return this;
-                int a = Antecedent.Length;
-                if (index <= a)
-                    return Antecedent[index - 1];
-                return Consequent[index - a - 1];
-            }
-        }
-    }
-
 
     /**
      * This class enumerates all of a Formula's subformulas in the same order as they 
@@ -164,7 +120,7 @@ namespace TermSAT.Formulas
     public class FormulaEnumerator : IEnumerator<Formula>
     {
         private readonly Formula formula;
-        private readonly Stack<Formula> stack = new Stack<Formula>();
+        private readonly Stack<Formula> stack= new Stack<Formula>();
 
         public Formula Current { get; private set; }
 
@@ -172,33 +128,33 @@ namespace TermSAT.Formulas
 
         public FormulaEnumerator(Formula formula)
         {
-            this.formula = formula;
+            this.formula= formula;
         }
 
         public void Dispose() { /* do nothing */ }
 
         public bool MoveNext()
         {
-            if (Current == null)
-            {
-                Current = formula;
+            if (Current == null) 
+            { 
+                Current= formula;
                 return true;
             }
             if (Current is Constant || Current is Variable)
             {
                 if (stack.Count <= 0)
                     return false;
-                Current = stack.Pop();
+                Current= stack.Pop();
                 return true;
             }
             if (Current is Negation)
             {
-                Current = (Current as Negation).Child;
+                Current= (Current as Negation).Child;
                 return true;
             }
 
             stack.Push((Current as Implication).Consequent);
-            Current = (Current as Implication).Antecedent;
+            Current= (Current as Implication).Antecedent;
             return true;
         }
 
@@ -207,7 +163,6 @@ namespace TermSAT.Formulas
             this.Current = null;
         }
     }
-
 
 
 }

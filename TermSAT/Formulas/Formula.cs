@@ -84,22 +84,24 @@ namespace TermSAT.Formulas
         }
 
         /// <summary>
+        /// 
         ///     Here's an important point to understand about formula ordering...
         /// 
-        ///     ... In order to prove that TermSAT's set of reduction rules is 'complete' we 
-        ///         need to create an ordering of formulas in terms of 'simplicity'.
-        ///         That is, 'simpler' formulas must come before more 'complex' formulas 
-        ///         in the ordering.
-        /// 
-        ///     ... However, in order to use formulas in indexes we often want formulas ordered 
-        ///         lexically.
-        /// 
-        ///     The ordering implemented here does both (I hope).
-        /// 
-        ///     Also, note that the characters used to represent formulas as strings were 
-        ///     specifically chosen so that the string representations of a formula naturally 
-        ///     sort in the same order as formulas.  
-        /// 
+        ///     In order to prove that TermSAT's set of reduction rules is 'complete' we 
+        ///     need to create an ordering of formulas in terms of 'simplicity'.
+        ///     That is, 'simpler' formulas must come before more 'complex' formulas in the ordering.
+        ///     
+        ///     This method implements TermSAT's ordering.
+        ///     Here are the rules...
+        ///     ...shorter formulas are simpler than longer formulas.
+        ///     
+        ///     The following rules apply when comparing formulas of the same length.
+        ///     Note: variables always have a length == 1
+        ///     ...constants are simpler than any other formula, T is simpler than F.
+        ///     ...variables are simpler than negation or implication
+        ///     ...negation is simpler than implication
+        ///     ...implications with simpler antecendents are simpler other implications.
+        ///     
         /// </summary>
         public int CompareTo(Formula other)
         {

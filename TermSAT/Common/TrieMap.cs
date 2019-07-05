@@ -32,8 +32,7 @@ namespace TermSAT.Common
      * @author ted.stockwell
      *
      */
-    public class TrieMap<TKey, TItem, TValue> : IDictionary<TKey, TValue>
-        where TKey : ISequence<TItem> 
+    public class TrieMap<TItem, TValue> : IDictionary<IEnumerator<TItem>, TValue>
         where TItem : IComparable<TItem>, IEquatable<TItem> 
     {
         /// <summary>
@@ -49,10 +48,10 @@ namespace TermSAT.Common
             TItem Key { get; } 
 
             bool IsRoot();
-            TValue FindValue(TKey key);
+            TValue FindValue(IEnumerator<TItem> key);
             TResult Accept<TResult>(IVisitor<TResult> visitor);
-            TValue Add(TKey key, TValue value);
-            TValue Remove(TKey key);
+            TValue Add(IEnumerator<TItem> key, TValue value);
+            TValue Remove(IEnumerator<TItem> key);
         }
 
         public interface IVisitor<TResult>
@@ -114,17 +113,17 @@ namespace TermSAT.Common
                 return visitor.Result;
             }
 
-            public TValue Add(TKey key, TValue value)
+            public TValue Add(IEnumerator<TItem> key, TValue value)
             {
                 // if at end of key then return the value of this node
-                if (key.Length - 1 <= Depth)
+                if (!key.MoveNext())
                 {
                     var oldValue = Value;
                     Value = value;
                     return oldValue;
                 }
 
-                var symbol = key[Depth+1];
+                var symbol = key.Current;
 
                 if (_children == null)
                     _children = new Dictionary<TItem, INode>();
@@ -137,19 +136,19 @@ namespace TermSAT.Common
                 return n.Add(key, value);
             }
 
-            public TValue FindValue(TKey key)
+            public TValue FindValue(IEnumerator<TItem> key)
             {
-                if (key.Length - 1 <= Depth)
+                if (!key.MoveNext())
                     return Value;
-                var item = key[Depth + 1];
+                var item = key.Current;
                 if (!Children.TryGetValue(item, out INode n))
                     return default(TValue);
                 return n.FindValue(key);
             }
 
-            public TValue Remove(TKey key)
+            public TValue Remove(IEnumerator<TItem> key)
             {
-                if (key.Length - 1 <= Depth)
+                if (!key.MoveNext())
                 {
                     var oldValue = Value;
                     Value = default(TValue);
@@ -160,7 +159,7 @@ namespace TermSAT.Common
                     return oldValue;
                 }
 
-                var symbol = key[Depth + 1];
+                var symbol = key.Current;
                 var childNode = Children[symbol];
                 if (childNode == null)
                     return default(TValue);
@@ -185,7 +184,7 @@ namespace TermSAT.Common
 
         public bool IsEmpty { get { return Count <= 0; } }
 
-        public ICollection<TKey> Keys { 
+        public ICollection<IEnumerator<TItem>> Keys { 
             /*
              * The TrieMap implementation will have to be refactored to support the retrieval of keys.
              * Currently TrieMap does not retain references to the original keys and cannot create new keys.
@@ -227,7 +226,7 @@ namespace TermSAT.Common
         /// if the ley is not found, because I think that's stupid.
         /// It's normal to look for items that are not necessarily in the container, it's is NOT an error.
         /// </summary>
-        public TValue this[TKey key] {
+        public TValue this[IEnumerator<TItem> key] {
             get { return _root.FindValue(key); }
             set
             {
@@ -238,7 +237,7 @@ namespace TermSAT.Common
             }
         }
 
-        public bool Remove(TKey key)
+        public bool Remove(IEnumerator<TItem> key)
         {
             if (IsReadOnly)
                 return false;
@@ -248,7 +247,7 @@ namespace TermSAT.Common
             return valueWasRemoved;
         }
 
-        public void Add(TKey key, TValue value)
+        public void Add(IEnumerator<TItem> key, TValue value)
         {
             if (!IsReadOnly)
             {
@@ -261,13 +260,13 @@ namespace TermSAT.Common
             }
         }
 
-        public void Add(KeyValuePair<TKey, TValue> item)
+        public void Add(KeyValuePair<IEnumerator<TItem>, TValue> item)
         {
             Add(item.Key, item.Value);
         }
 
 
-        public bool TryGetValue(TKey key, out TValue value)
+        public bool TryGetValue(IEnumerator<TItem> key, out TValue value)
         {
             value = _root.FindValue(key);
             return value != null;
@@ -285,27 +284,27 @@ namespace TermSAT.Common
             return visitor.Result;
         }
 
-        public bool ContainsKey(TKey key)
+        public bool ContainsKey(IEnumerator<TItem> key)
         {
             return this[key] != null;
         }
 
-        bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
+        bool ICollection<KeyValuePair<IEnumerator<TItem>, TValue>>.Contains(KeyValuePair<IEnumerator<TItem>, TValue> item)
         {
             throw new NotSupportedException();
         }
 
-        void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        void ICollection<KeyValuePair<IEnumerator<TItem>, TValue>>.CopyTo(KeyValuePair<IEnumerator<TItem>, TValue>[] array, int arrayIndex)
         {
             throw new System.NotImplementedException();
         }
 
-        bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item)
+        bool ICollection<KeyValuePair<IEnumerator<TItem>, TValue>>.Remove(KeyValuePair<IEnumerator<TItem>, TValue> item)
         {
             throw new NotSupportedException();
         }
 
-        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
+        IEnumerator<KeyValuePair<IEnumerator<TItem>, TValue>> IEnumerable<KeyValuePair<IEnumerator<TItem>, TValue>>.GetEnumerator()
         {
             throw new NotSupportedException();
         }

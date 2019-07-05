@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <Compile Remove="Common\ServerCommandLineInterface.cs" />
+    <Compile Remove="Formulas\FormulaSequence-Array.cs" />
     <Compile Remove="RuleDatabase\TruthTables.cs" />
     <Compile Remove="Solver\RuleRepository.cs" />
     <Compile Remove="Tests\CompletionTests.cs" />
