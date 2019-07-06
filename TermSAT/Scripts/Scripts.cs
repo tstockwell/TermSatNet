@@ -23,7 +23,7 @@ namespace TermSAT.Scripts
         {
             var database = new FormulaDatabase(DATABASE_PATH);
             database.Clear();
-            new RuleGenerator(database).Run();
+            new RuleGenerator(database, new FormulaGenerator(database)).Run();
         }
 
         [TestMethod]

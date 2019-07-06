@@ -131,7 +131,7 @@ namespace TermSAT.Tests
                 {
                     Implication formula1 = "***.1.2.3.4";
                     Implication formula2 = Implication.NewImplication(formula1, formula1);
-                    var formula2Subformulas= formula2.ToSequence();
+                    var formula2Subformulas= formula2.GetDFSOrdering();
 
                     Implication rule1 = "*.1.2";
                     InstanceRecognizer recognizer = new InstanceRecognizer() { rule1 };
@@ -142,7 +142,7 @@ namespace TermSAT.Tests
                     Assert.AreEqual(match.Substitutions[Variable.TWO], formula1);
 
                     var substitution = match.Generalization.CreateSubstitutionInstance(match.Substitutions);
-                    var substitutionSubformulas = substitution.ToSequence();
+                    var substitutionSubformulas = substitution.GetDFSOrdering();
 
                     if (!formula2.Equals(substitution))
                     {
@@ -239,15 +239,21 @@ namespace TermSAT.Tests
             SubstitutionInstance match;
             ICollection<SubstitutionInstance> matches;
             Formula substitution;
+            InstanceRecognizer recognizer;
 
             Formula formula1 = "***.1.2.3.4";
             Formula formula2 = Implication.NewImplication(formula1, formula1);
 
+            recognizer = new InstanceRecognizer { "*.1T" };
+            Assert.AreEqual(1, recognizer.FindAllGeneralizations("*.1T").Count);
+
             Formula rule1 = "*.1.2";
-            InstanceRecognizer recognizer = new InstanceRecognizer() { rule1 };
+            recognizer = new InstanceRecognizer() { rule1 };
 
+            var substitutions= recognizer.FindAllGeneralizations(formula1);
+            Assert.AreEqual(1, substitutions.Count);
+            Assert.AreEqual(2, substitutions[0].Substitutions.Count);
 
-            Assert.AreEqual(1, recognizer.FindAllGeneralizations(formula1).Count);
             Assert.AreEqual(1, recognizer.FindAllGeneralizations(formula2).Count);
 
             match = recognizer.FindFirstGeneralization(formula2);

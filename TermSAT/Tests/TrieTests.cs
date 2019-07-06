@@ -12,14 +12,14 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestBasicOperations()
         {
-            var tree= new TrieMap<StringSequence, char, string>();
+            var tree= new TrieIndex<char, string>();
 
             // after creating tree, make sure its empty and Count==0
             Assert.IsTrue(tree.IsEmpty);
             Assert.AreEqual(0, tree.Count);
 
             // add a avalue, make sure we can get it back
-            var key1 = new StringSequence("123");
+            var key1 = "123";
             var value1= "value123";
             tree.Add(key1, value1);
             var result1= tree[key1];
@@ -34,7 +34,7 @@ namespace TermSAT.Tests
             Assert.AreEqual(1, tree.Count);
 
             // add a 2nd, similar key.
-            var key2 = new StringSequence("12x");
+            var key2 = "12x";
             var value2 = "value12x";
             tree.Add(key2, value2);
             var result2= tree[key2];
@@ -48,7 +48,7 @@ namespace TermSAT.Tests
             Assert.IsFalse(tree.IsEmpty);
 
             // and a third similar key
-            var key3 = new StringSequence("12x4");
+            var key3 = "12x4";
             var value3 = "value12x4";
             tree.Add(key3, value3);
             var result3 = tree[key3];
@@ -63,7 +63,7 @@ namespace TermSAT.Tests
             Assert.IsFalse(tree.IsEmpty);
 
             // and a forth.  This key has a unique prefix
-            var key4 = new StringSequence("--12x4");
+            var key4 = "--12x4";
             var value4 = "value--12x4";
             tree.Add(key4, value4);
             var result4 = tree[key4];
@@ -106,17 +106,17 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestVisitor()
         {
-            var dictionary = new Dictionary<StringSequence, string>()
+            var dictionary = new Dictionary<string, string>()
             {
-                { new StringSequence("12435"), "value12345" },
-                { new StringSequence("12436"), "value12436" },
-                { new StringSequence("12735"), "value12735" },
-                { new StringSequence("x2435"), "valuex2435" },
-                { new StringSequence("x2436"), "valuex2436" },
-                { new StringSequence("x2735"), "valuex2735" }
+                { "12435", "value12345" },
+                { "12436", "value12436" },
+                { "12735", "value12735" },
+                { "x2435", "valuex2435" },
+                { "x2436", "valuex2436" },
+                { "x2735", "valuex2735" }
             };
 
-            var tree = new TrieMap<StringSequence, char, string>();
+            var tree = new TrieIndex<char, string>();
             foreach (var k in dictionary.Keys)
             {
                 tree.Add(k, dictionary[k]);
@@ -132,8 +132,8 @@ namespace TermSAT.Tests
             Assert.AreEqual(18, visitor.AllNodesLeft.Count);
 
             // must all be unique nodes
-            Assert.AreEqual(18, new HashSet<TrieMap<StringSequence, char, string>.INode>(visitor.AllNodesVisited).Count);
-            Assert.AreEqual(18, new HashSet<TrieMap<StringSequence, char, string>.INode>(visitor.AllNodesLeft).Count);
+            Assert.AreEqual(18, new HashSet<TrieIndex<char, string>.INode>(visitor.AllNodesVisited).Count);
+            Assert.AreEqual(18, new HashSet<TrieIndex<char, string>.INode>(visitor.AllNodesLeft).Count);
 
             // values found are exactly what's in the dictionary
             foreach (var v in visitor.AllValuesFound)
@@ -150,17 +150,17 @@ namespace TermSAT.Tests
     /// <summary>
     /// Visits all the nodes in a trie andcollects a bunch of information
     /// </summary>
-    class TestVisitor : TrieMap<StringSequence, char, string>.IVisitor<string>
+    class TestVisitor : TrieIndex<char, string>.IVisitor<string>
     {
         public bool IsComplete => false; // visit all nodes
 
         public string Result { get; private set; } = "ok";
 
-        public List<TrieMap<StringSequence, char, string>.INode> AllNodesVisited = new List<TrieMap<StringSequence, char, string>.INode>();
-        public List<TrieMap<StringSequence, char, string>.INode> AllNodesLeft = new List<TrieMap<StringSequence, char, string>.INode>();
+        public List<TrieIndex<char, string>.INode> AllNodesVisited = new List<TrieIndex<char, string>.INode>();
+        public List<TrieIndex<char, string>.INode> AllNodesLeft = new List<TrieIndex<char, string>.INode>();
         public List<string> AllValuesFound = new List<string>();
 
-        public void Leave(TrieMap<StringSequence, char, string>.INode node)
+        public void Leave(TrieIndex<char, string>.INode node)
         {
             AllNodesLeft.Add(node);
             if (node.Value != default(string))
@@ -169,7 +169,7 @@ namespace TermSAT.Tests
             }
         }
 
-        public bool Visit(TrieMap<StringSequence, char, string>.INode node)
+        public bool Visit(TrieIndex<char, string>.INode node)
         {
             AllNodesVisited.Add(node);
             return true; // visit children

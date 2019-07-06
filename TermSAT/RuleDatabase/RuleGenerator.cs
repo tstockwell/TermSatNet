@@ -56,9 +56,10 @@ namespace TermSAT.RuleDatabase
         private FormulaDatabase _database;
         private InstanceRecognizer _recognizer = new InstanceRecognizer();
 
-        public RuleGenerator(FormulaDatabase database)
+        public RuleGenerator(FormulaDatabase database, FormulaGenerator formulaGenerator)
         {
             _database = database;
+            _formulaGenerator= formulaGenerator;
         }
 
 
@@ -75,6 +76,8 @@ namespace TermSAT.RuleDatabase
                 {
 
                     ProcessFormula(formula);
+
+                    var previousFormula= formula;
                     formula = _formulaGenerator.GetNextWellFormedFormula();
                 }
 
@@ -90,17 +93,15 @@ namespace TermSAT.RuleDatabase
 
         }
 
-        private void Setup()
+        protected void Setup()
         {
-            _formulaGenerator = new FormulaGenerator(_database);
-
             foreach (var formula in _database.GetAllNonCanonicalFormulas())
             {
                 _recognizer.Add(formula);
             }
         }
 
-        private void ProcessFormula(Formula formula)
+        public void ProcessFormula(Formula formula)
         {
 
             ReductionRule reductionRule = FormulaCanBeReduced(formula);
@@ -130,16 +131,34 @@ namespace TermSAT.RuleDatabase
 
         private bool IsCanonicalFormula(Formula formula)
         {
-            int length = _database.GetLengthOfCanonicalFormulas(TruthTable.NewTruthTable(formula));
+            var truthTable = TruthTable.NewTruthTable(formula);
+            int length = _database.GetLengthOfCanonicalFormulas(truthTable);
 
             // if there are no canonical formulas in the database then this is the first
-            if (length <= 0) 
-                return true; 
+            if (length <= 0)
+                return true;
 
             // if the length of the formulas is longer than the equivalent canonical formula 
             // then it can't be canonical
             if (length < formula.Length)
                 return false;
+
+            if (length == formula.Length)
+            {
+                /* 
+                 * In order to eventually be able to prove that TermSAT is confluent, there can only be 
+                 * a single canonical form for any formula.
+                 * So, if there is already a canonical formula with the same truth table 
+                 * as this formula then we make this formula a reduction rule.
+                 * 
+                 * NOTE:  The FormulaGenerator class should be pumping out formulas in the same order 
+                 * as the TermSAT formula ordering, implemented by Formula.CompareTo.  So the canonical 
+                 * formula for any truth value should be the 'simplest' formula among the all shortest 
+                 * formulas that have the same truth table.
+    			 */
+                if (0 < _database.GetCanonicalFormulas(truthTable).Count)
+                    return false;
+            }
 
             return true;
         }
@@ -157,6 +176,20 @@ namespace TermSAT.RuleDatabase
             if (match == null)
                 return null;
             Formula canonicalFormula = _database.FindCanonicalFormula(match.Generalization);
+
+            // if 
+            //  the canonical form of the generalization is the same length as the generalization 
+            //  (in other words, if the result of applying the associated reduction rule will 
+            //  result in a new formula of the same length as the formula being checked) 
+            // then 
+            //  the formula to be checked is only reducable if the reduced formula is simpler
+            if (canonicalFormula.Length == match.Generalization.Length)
+            {
+                var reducedFormula = canonicalFormula.CreateSubstitutionInstance(match.Substitutions);
+                if (0 <= reducedFormula.CompareTo(formula))
+                    return null;
+            }
+
             return new ReductionRule(match.Generalization, canonicalFormula);
         }
 

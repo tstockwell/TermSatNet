@@ -35,13 +35,13 @@ namespace TermSAT.RuleDatabase
             /// </summary>
             public IDictionary<int, Formula> Replacements {  get; internal set;}
 
-            public Formula ReducedFormula {  get => ToFormula(Formula.ToSequence(), Replacements); }
+            public Formula ReducedFormula {  get => ToFormula(Formula.GetDFSOrdering(), Replacements); }
         }
 
         /**
          * Creates a new formula from a DFS ordering and some changes
          */
-        public static Formula ToFormula(this FormulaSequence sequence,  IDictionary<int, Formula> replacements)
+        public static Formula ToFormula(this DFSOrdering sequence,  IDictionary<int, Formula> replacements)
         {
             Formula formula;
 
@@ -182,7 +182,7 @@ namespace TermSAT.RuleDatabase
             }
 
             var reducedFormula = formula;
-            var sequence = formula.ToSequence();
+            var sequence = formula.GetDFSOrdering();
 
             // we'll visit all subformulas in the given formula's dfs ordering and fill in this 
             // array of stats as we go.

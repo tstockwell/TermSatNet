@@ -17,7 +17,7 @@ namespace TermSAT.Common
      * with that node; instead, its position in the tree defines the key with which 
      * it is associated.
      * 
-     * TermSAT uses a trie as an index that's used to quickly find substitution instances
+     * TermSAT uses a trie as a kind of index that's used to quickly find substitution instances
 	 * and unifications of a given formula in a large set of formulas.
      * TermSAT requires a trie that can work directly with formulas, thus an off the shelf trie, 
      * that uses strings as keys, was not suitable for TermSAT's purposes.
@@ -32,7 +32,7 @@ namespace TermSAT.Common
      * @author ted.stockwell
      *
      */
-    public class TrieMap<TItem, TValue> : IDictionary<IEnumerator<TItem>, TValue>
+    public class TrieIndex<TItem, TValue> : IDictionary<IEnumerable<TItem>, TValue>
         where TItem : IComparable<TItem>, IEquatable<TItem> 
     {
         /// <summary>
@@ -178,13 +178,13 @@ namespace TermSAT.Common
         private readonly NodeImpl _root= new NodeImpl(null, default(TItem), -1);
         public int Count { get; protected set; } = 0;
 
-        public TrieMap()
+        public TrieIndex()
         {
         }
 
         public bool IsEmpty { get { return Count <= 0; } }
 
-        public ICollection<IEnumerator<TItem>> Keys { 
+        public ICollection<IEnumerable<TItem>> Keys { 
             /*
              * The TrieMap implementation will have to be refactored to support the retrieval of keys.
              * Currently TrieMap does not retain references to the original keys and cannot create new keys.
@@ -226,8 +226,8 @@ namespace TermSAT.Common
         /// if the ley is not found, because I think that's stupid.
         /// It's normal to look for items that are not necessarily in the container, it's is NOT an error.
         /// </summary>
-        public TValue this[IEnumerator<TItem> key] {
-            get { return _root.FindValue(key); }
+        public TValue this[IEnumerable<TItem> key] {
+            get { return _root.FindValue(key.GetEnumerator()); }
             set
             {
                 if (!IsReadOnly)
@@ -237,38 +237,38 @@ namespace TermSAT.Common
             }
         }
 
-        public bool Remove(IEnumerator<TItem> key)
+        public bool Remove(IEnumerable<TItem> key)
         {
             if (IsReadOnly)
                 return false;
-            bool valueWasRemoved = !_root.Remove(key).Equals(default(TValue));
+            bool valueWasRemoved = !_root.Remove(key.GetEnumerator()).Equals(default(TValue));
             if (valueWasRemoved)
                 Count--;
             return valueWasRemoved;
         }
 
-        public void Add(IEnumerator<TItem> key, TValue value)
+        public void Add(IEnumerable<TItem> key, TValue value)
         {
             if (!IsReadOnly)
             {
                 if (value == null)
                     throw new NotSupportedException("This implementation does not support null values");
 
-                var previousValue = _root.Add(key, value);
+                var previousValue = _root.Add(key.GetEnumerator(), value);
                 if (previousValue == null || previousValue.Equals(default(TValue)))
                     Count++;
             }
         }
 
-        public void Add(KeyValuePair<IEnumerator<TItem>, TValue> item)
+        public void Add(KeyValuePair<IEnumerable<TItem>, TValue> item)
         {
             Add(item.Key, item.Value);
         }
 
 
-        public bool TryGetValue(IEnumerator<TItem> key, out TValue value)
+        public bool TryGetValue(IEnumerable<TItem> key, out TValue value)
         {
-            value = _root.FindValue(key);
+            value = _root.FindValue(key.GetEnumerator());
             return value != null;
         }
 
@@ -284,27 +284,27 @@ namespace TermSAT.Common
             return visitor.Result;
         }
 
-        public bool ContainsKey(IEnumerator<TItem> key)
+        public bool ContainsKey(IEnumerable<TItem> key)
         {
             return this[key] != null;
         }
 
-        bool ICollection<KeyValuePair<IEnumerator<TItem>, TValue>>.Contains(KeyValuePair<IEnumerator<TItem>, TValue> item)
+        bool ICollection<KeyValuePair<IEnumerable<TItem>, TValue>>.Contains(KeyValuePair<IEnumerable<TItem>, TValue> item)
         {
             throw new NotSupportedException();
         }
 
-        void ICollection<KeyValuePair<IEnumerator<TItem>, TValue>>.CopyTo(KeyValuePair<IEnumerator<TItem>, TValue>[] array, int arrayIndex)
+        void ICollection<KeyValuePair<IEnumerable<TItem>, TValue>>.CopyTo(KeyValuePair<IEnumerable<TItem>, TValue>[] array, int arrayIndex)
         {
             throw new System.NotImplementedException();
         }
 
-        bool ICollection<KeyValuePair<IEnumerator<TItem>, TValue>>.Remove(KeyValuePair<IEnumerator<TItem>, TValue> item)
+        bool ICollection<KeyValuePair<IEnumerable<TItem>, TValue>>.Remove(KeyValuePair<IEnumerable<TItem>, TValue> item)
         {
             throw new NotSupportedException();
         }
 
-        IEnumerator<KeyValuePair<IEnumerator<TItem>, TValue>> IEnumerable<KeyValuePair<IEnumerator<TItem>, TValue>>.GetEnumerator()
+        IEnumerator<KeyValuePair<IEnumerable<TItem>, TValue>> IEnumerable<KeyValuePair<IEnumerable<TItem>, TValue>>.GetEnumerator()
         {
             throw new NotSupportedException();
         }

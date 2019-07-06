@@ -13,19 +13,20 @@ namespace TermSAT.Formulas
     /// This source module extends the Formula class with an API that represents Formulas as an array of all the 
     /// subformulas in the formula, ordered from the leftmost subformula (the formula itself) to the rightmost 
     /// subformula (the last constant or variable that appears in the formula).
-    /// TermSAT calls such an array is called a 'formula sequence'.
-    /// It's also called a <a href='https://en.wikipedia.org/wiki/Depth-first_search#DFS_ordering'>DFS ordering</a>.
+    /// TermSAT calls such an array is called a 'formula ordering'.
+    /// This particular ordering is known as a <a href='https://en.wikipedia.org/wiki/Depth-first_search#DFS_ordering'>DFS ordering</a>.
     /// 
-    /// FormulaSequences are useful for constructing indexes of sets of formulas.
-    /// The indexes built from FormulaSequence make it possible to quickly find substitution instances and unifications 
+    /// FormulaOrderings are useful for constructing indexes of sets of formulas.
+    /// The indexes built from DFSOrdering make it possible to quickly find substitution instances and unifications 
     /// of a given formula in a large set of formulas.
+    /// I expect that in the future it will be necessary to express formulas in different ordering, for indexing purposes. 
     /// 
     /// Also, FormulaSequences can be easier to use that a vistor API when implementing formula reduction algorithms and such.
     /// 
     /// Example:
     /// Given the formula...
     ///     *a*-bc
-    /// ...the associated FormulaSequence is a list of a the subformuals from right to left...
+    /// ...the associated DFSOrdering is a list of a the subformuals from right to left...
     ///     { *a*-bc, a, *-bc, -b, b, c }
     ///  The above list of formulas is exactly the same enumeration of formulas that would be obtained 
     ///  by navigating the original formula in a depth first enumeration (enumerating antecents before 
@@ -49,25 +50,36 @@ namespace TermSAT.Formulas
 
     public interface IFormulaSequence : ISequence<Formula> { }
 
-    public static class FormulaSequenceExtensions
+    /// <summary>
+    ///   Defines an interface to a list of formulas in some order.
+    /// </summary>
+    public interface IFormulaOrdering : IEnumerable<Formula>
     {
-        public static FormulaSequence ToSequence(this Formula formula) => FormulaSequence.GetSequence(formula);
+        Formula this[int index] { get; }
+
+        int Length { get; }
     }
 
-    public class FormulaSequence : IFormulaSequence
-    {
-        private static ConditionalWeakTable<Formula, FormulaSequence> sequences =
-            new ConditionalWeakTable<Formula, FormulaSequence>();
 
-        public static FormulaSequence GetSequence(Formula f)
+    public static class FormulaSequenceExtensions
+    {
+        public static DFSOrdering GetDFSOrdering(this Formula formula) => DFSOrdering.GetDFSOrdering(formula);
+    }
+
+    public class DFSOrdering : IFormulaSequence
+    {
+        private static ConditionalWeakTable<Formula, DFSOrdering> sequences =
+            new ConditionalWeakTable<Formula, DFSOrdering>();
+
+        public static DFSOrdering GetDFSOrdering(Formula f)
         {
-            if (!sequences.TryGetValue(f, out FormulaSequence sequence))
+            if (!sequences.TryGetValue(f, out DFSOrdering sequence))
             {
                 lock (sequences)
                 {
                     if (sequences.TryGetValue(f, out sequence))
                         return sequence;
-                    sequence = new FormulaSequence(f);
+                    sequence = new DFSOrdering(f);
                     sequences.Add(f, sequence);
                 }
             }
@@ -77,81 +89,69 @@ namespace TermSAT.Formulas
 
         public Formula Formula { get; private set; }
 
-        private FormulaSequence(Formula formula)
+        private DFSOrdering(Formula formula)
         {
             Formula = formula;
         }
 
         public int Length => Formula.Length;
 
-        public IEnumerator<Formula> GetEnumerator() => new FormulaEnumerator(Formula);
+        public IEnumerator<Formula> GetEnumerator() => new FormulaDFSEnumerator(Formula);
 
-        IEnumerator IEnumerable.GetEnumerator() => new FormulaEnumerator(Formula);
+        IEnumerator IEnumerable.GetEnumerator() => new FormulaDFSEnumerator(Formula);
 
-        public Formula this[int index] { get => Formula[index]; }
+        public Formula this[int index] { get => Formula.GetFormulaAtPosition(index); }
     }
 
-    partial class Formula
+    public partial class Formula
     {
-        abstract public Formula this[int index] { get; }
+        abstract public Formula GetFormulaAtPosition(int index);
     }
 
-    partial class Constant
+    public partial class Constant
     {
-        override public Formula this[int index]
+        override public Formula GetFormulaAtPosition(int index)
         {
-            get
-            {
-                if (index != 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                return this;
-            }
+            if (index != 0)
+                throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
+            return this;
         }
     }
 
-    partial class Variable
+    public partial class Variable
     {
-        override public Formula this[int index]
+        override public Formula GetFormulaAtPosition(int index)
         {
-            get
-            {
-                if (index != 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                return this;
-            }
+            if (index != 0)
+                throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
+            return this;
         }
     }
 
-    public partial class Negation
+    public partial class Negation : Formula
     {
-        override public Formula this[int index]
+        override public Formula GetFormulaAtPosition(int index)
         {
-            get
-            {
-                if (index < 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                if (index == 0)
-                    return this;
-                return Child[index - 1];
-            }
+            if (index < 0)
+                throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
+            if (index == 0)
+                return this;
+            return Child.GetFormulaAtPosition(index - 1);
         }
     }
 
     public partial class Implication
     {
-        override public Formula this[int index]
+        override public Formula GetFormulaAtPosition(int index)
         {
-            get
-            {
-                if (index < 0)
-                    throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
-                if (index == 0)
-                    return this;
-                int a = Antecedent.Length;
-                if (index <= a)
-                    return Antecedent[index - 1];
-                return Consequent[index - a - 1];
-            }
+            if (index < 0)
+                throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
+            if (index == 0)
+                return this;
+            int a = Antecedent.Length;
+            if (index <= a)
+                return Antecedent.GetFormulaAtPosition(index - 1);
+            return Consequent.GetFormulaAtPosition(index - a - 1);
         }
     }
 
@@ -161,7 +161,7 @@ namespace TermSAT.Formulas
      * are written.  Basically that means that implication antecedents come before consequents.
      * The first formula returned is the enumerated formula itself.
      */
-    public class FormulaEnumerator : IEnumerator<Formula>
+    public class FormulaDFSEnumerator : IEnumerator<Formula>
     {
         private readonly Formula formula;
         private readonly Stack<Formula> stack = new Stack<Formula>();
@@ -170,7 +170,7 @@ namespace TermSAT.Formulas
 
         object IEnumerator.Current { get { return Current; } }
 
-        public FormulaEnumerator(Formula formula)
+        public FormulaDFSEnumerator(Formula formula)
         {
             this.formula = formula;
         }

@@ -55,7 +55,7 @@ namespace TermSAT.RuleDatabase
 
         NegationFormulaConstructor _negationConstructor = null;
         ImplicationFormulaConstructor _ifthenConstructor = null;
-        int _rightLength;
+        int _antecedentLength;
 
         public Formula Current { get; private set; }
 
@@ -83,7 +83,7 @@ namespace TermSAT.RuleDatabase
             _database = database;
             _formulaLength = formulaLength;
             _negationConstructor = new NegationFormulaConstructor(_database, _formulaLength);
-            _rightLength = formulaLength - 1;
+            _antecedentLength = 1;
 
 
             // skip formulas until we're at the starting formula
@@ -110,9 +110,9 @@ namespace TermSAT.RuleDatabase
                     }
                     _negationConstructor.Dispose();
                     _negationConstructor = null;
-                    if (_rightLength < 1)
+                    if (_formulaLength - 1 < _antecedentLength)
                         return false;
-                    _ifthenConstructor = new ImplicationFormulaConstructor(_database, _formulaLength, _rightLength);
+                    _ifthenConstructor = new ImplicationFormulaConstructor(_database, _formulaLength, _antecedentLength);
                 }
                 else
                 {
@@ -125,8 +125,8 @@ namespace TermSAT.RuleDatabase
                     }
                     _ifthenConstructor.Dispose();
                     _ifthenConstructor = null;
-                    if (0 < --_rightLength)
-                        _ifthenConstructor = new ImplicationFormulaConstructor(_database, _formulaLength, _rightLength);
+                    if (_antecedentLength++ < _formulaLength)
+                        _ifthenConstructor = new ImplicationFormulaConstructor(_database, _formulaLength, _antecedentLength);
                 }
             }
         }
@@ -183,17 +183,17 @@ namespace TermSAT.RuleDatabase
     class ImplicationFormulaConstructor : IEnumerator<Formula>
     {
 
-        IEnumerator<Formula> _rightIterator;
+        IEnumerator<Formula> antecedentIterator;
         IEnumerator<Formula> _consequents;
         Formula _antecedent = null;
         readonly int _formulaLength;
         FormulaDatabase _database;
 
-        public ImplicationFormulaConstructor(FormulaDatabase database, int formulaLength, int lengthOfRightSideFormulas)
+        public ImplicationFormulaConstructor(FormulaDatabase database, int formulaLength, int lengthAntecedents)
         {
             _database= database;
             _formulaLength = formulaLength;
-            _rightIterator = _database.FindCanonicalFormulasByLength(lengthOfRightSideFormulas).GetEnumerator();
+            antecedentIterator = _database.FindCanonicalFormulasByLength(lengthAntecedents).GetEnumerator();
         }
 
         public Formula Current { get { return Implication.NewImplication(_antecedent, _consequents.Current); } }
@@ -202,11 +202,11 @@ namespace TermSAT.RuleDatabase
 
         public void Dispose()
         {
-            if (_rightIterator != null)
-                _rightIterator.Dispose();
+            if (antecedentIterator != null)
+                antecedentIterator.Dispose();
             if (_consequents != null)
                 _consequents.Dispose();
-            _rightIterator = null;
+            antecedentIterator = null;
             _consequents = null;
             _antecedent = null;
         }
@@ -233,12 +233,12 @@ namespace TermSAT.RuleDatabase
 
             if (_antecedent == null) // start enumerating next antecent
             {
-                if (!_rightIterator.MoveNext()) // no more antecedents
+                if (!antecedentIterator.MoveNext()) // no more antecedents
                 {
                     Dispose();
                     return false;
                 }
-                _antecedent= _rightIterator.Current;
+                _antecedent= antecedentIterator.Current;
                 _consequents?.Dispose();
                 _consequents= null;
 
