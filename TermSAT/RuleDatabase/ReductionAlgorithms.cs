@@ -18,77 +18,11 @@ namespace TermSAT.RuleDatabase
     /// </summary>
     public static class ReductionAlgorithms
     {
-        // Denotes a reduction to given formula that will reduce the formula 
-        // to simpler yet equivalent formula
-        public class SingleReplacementReduction
-        {
-            public SingleReplacementReduction(Formula formula)
-            {
-                Formula= formula;
-            }
-
-            public Formula Formula {  get; internal set; }
-
-            /// <summary>
-            /// An enumeration of the indexes of subformulas within the formula to be reduced 
-            /// and thier replacements
-            /// </summary>
-            public IDictionary<int, Formula> Replacements {  get; internal set;}
-
-            public Formula ReducedFormula {  get => ToFormula(Formula.GetDFSOrdering(), Replacements); }
-        }
-
-        /**
-         * Creates a new formula from a DFS ordering and some changes
-         */
-        public static Formula ToFormula(this DFSOrdering sequence,  IDictionary<int, Formula> replacements)
-        {
-            Formula formula;
-
-            Stack<Formula> stack = new Stack<Formula>();
-            for (int i = sequence.Length; 0 < i--;)
-            {
-                if (!replacements.TryGetValue(i, out Formula subformula))
-                    subformula = sequence[i];
-                if (subformula is Negation)
-                {
-                    Formula f = stack.Pop();
-                    stack.Push(Negation.NewNegation(f));
-                }
-                else if (subformula is Implication)
-                {
-                    Formula antecendent = stack.Pop();
-                    Formula consequent = stack.Pop();
-                    stack.Push(Implication.NewImplication(antecendent, consequent));
-                }
-                else if (subformula is Variable)
-                {
-                    stack.Push(subformula);
-                }
-                else if (subformula == Constant.TRUE)
-                {
-                    stack.Push(Constant.TRUE);
-                }
-                else if (subformula == Constant.FALSE)
-                {
-                    stack.Push(Constant.FALSE);
-                }
-                else
-                    throw new Exception("wtf");
-            }
-
-            if (stack.Count != 1)
-                throw new Exception("hmm, looks like an invalid formula DFS ordering");
-
-            formula = stack.Pop();
-            return formula;
-        }
-
 
         /// <summary>
         /// Information about the last implication encountered while reducing a formula
         /// </summary>
-        struct ImplicationState
+        private class ImplicationState
         {
             // the index of the operator of which this subformula is an argument, or -1
             public int iPrevOperator;
@@ -150,7 +84,7 @@ namespace TermSAT.RuleDatabase
         /// 
         /// </summary>
         /// <returns>A reduced formula, or the original formula if the orginal formula connot be reduced.</returns>
-        public static bool TryReduceUsingSingleReplacement(Formula formula, out SingleReplacementReduction reduction)
+        public static bool TryReduceUsingSingleReplacement(Formula formula, out ReplacementReduction reduction)
         {
             //while (true)
             //{
@@ -171,15 +105,9 @@ namespace TermSAT.RuleDatabase
 
             reduction= null;
 
+            // if formula is a single symbol then it can't be reduced
             if (formula.Length <= 1)
-            {
-                if (formula is Variable)
-                    reduction= new SingleReplacementReduction(formula)
-                    {
-                        Replacements= new Dictionary<int, Formula>() { [0]= Constant.TRUE }
-                    };
-                return true;
-            }
+                return false;
 
             var reducedFormula = formula;
             var sequence = formula.GetDFSOrdering();
@@ -270,7 +198,7 @@ namespace TermSAT.RuleDatabase
                             if (sequence[s] == subformula)
                             {
                                 if (reduction == null)
-                                    reduction= new SingleReplacementReduction(formula)
+                                    reduction= new ReplacementReduction(formula)
                                     {
                                         Replacements= new Dictionary<int, Formula>()
                                     };
@@ -287,5 +215,30 @@ namespace TermSAT.RuleDatabase
 
             return reduction != null;
         }
+
+
+        ///// <summary>
+        ///// Removes constants from a formula
+        ///// </summary>
+        ///// <returns>A reduced formula, or the original formula if the orginal formula connot be reduced.</returns>
+        //public static bool TryReduceConstants(FlatTerm flatterm, out ReplacementReduction reduction)
+        //{
+        //    reduction = null;
+            
+        //    // if formula is a single symbol then it can't be reduced
+        //    if (flatterm.Length <= 1)
+        //        return false;
+
+        //    for (int i= 1; i < flatterm.Length; i++)
+        //    {
+        //        if (flatterm[i] is Constant)
+        //        {
+        //            if (flatterm[i-1] is Negation)
+        //        }
+        //    }
+
+        //    return reduction != null;
+        //}
+
     }
 }

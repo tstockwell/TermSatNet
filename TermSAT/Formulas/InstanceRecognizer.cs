@@ -149,7 +149,7 @@ namespace TermSAT.Formulas
                         currentPosition++;
                     }
 
-                    // if this node is variable then get the substitution associated 
+                    // if this node is a variable then get the substitution associated 
                     // with the variable.
                     // If there is no substitution then create one 
                     else if (Symbol.IsVariable(currentSymbol))

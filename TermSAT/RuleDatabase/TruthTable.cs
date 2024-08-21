@@ -45,7 +45,7 @@ namespace TermSAT.RuleDatabase
     public class TruthTable
     {
 
-        public const int VARIABLE_COUNT= 3;
+        public const int VARIABLE_COUNT= 4;
 	    public const int MAX_TRUTH_VALUES= 1 << VARIABLE_COUNT;
 	    public const int MAX_TRUTH_TABLES= 1 << MAX_TRUTH_VALUES;
 

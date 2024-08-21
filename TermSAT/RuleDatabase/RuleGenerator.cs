@@ -183,6 +183,10 @@ namespace TermSAT.RuleDatabase
             //  result in a new formula of the same length as the formula being checked) 
             // then 
             //  the formula to be checked is only reducable if the reduced formula is simpler
+            //
+            // This check is required because the reduction rules that reduce all the shortest 
+            // formulas for a truth table to a single formula are conditional, they are only 
+            // applied when the result is 'simpler'.
             if (canonicalFormula.Length == match.Generalization.Length)
             {
                 var reducedFormula = canonicalFormula.CreateSubstitutionInstance(match.Substitutions);

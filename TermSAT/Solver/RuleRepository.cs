@@ -39,10 +39,6 @@ namespace TermSAT.Solver
     {
 
 
-    public static const String driver = "org.h2.Driver";
-    public static const String dbURL = "jdbc:h2:db/rules-index;ACCESS_MODE_DATA=r";
-
-
     class RepositoryNode : TrieMap.NodeImpl<Formula> {
 		
 		readonly int _id;

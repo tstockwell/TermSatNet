@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuleGenerator", "Scripts\Ru
 		{054F8D54-81BB-4C17-8662-9B622D56449F} = {054F8D54-81BB-4C17-8662-9B622D56449F}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReMarck", "ReMarck\ReMarck.csproj", "{F963EAF6-727D-4C86-B262-464A14A2C7E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{D6F3F06E-6D71-4326-8149-D279F434C03C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6F3F06E-6D71-4326-8149-D279F434C03C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6F3F06E-6D71-4326-8149-D279F434C03C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F963EAF6-727D-4C86-B262-464A14A2C7E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F963EAF6-727D-4C86-B262-464A14A2C7E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F963EAF6-727D-4C86-B262-464A14A2C7E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F963EAF6-727D-4C86-B262-464A14A2C7E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

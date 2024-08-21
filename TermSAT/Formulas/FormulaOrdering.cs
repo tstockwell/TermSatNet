@@ -8,20 +8,112 @@ using TermSAT.Common;
 namespace TermSAT.Formulas
 {
 
+    public interface IFormulaSequence : ISequence<Formula> { }
+
+    // Expresses a reduction to a formula as a change to the formula's dfs odering
+    public class ReplacementReduction
+    {
+        public ReplacementReduction(Formula formula)
+        {
+            Formula = formula;
+        }
+
+        public Formula Formula { get; internal set; }
+
+        /// <summary>
+        /// An enumeration of the indexes of subformulas within the formula to be reduced 
+        /// and thier replacements
+        /// </summary>
+        public IDictionary<int, Formula> Replacements { get; internal set; }
+
+        public Formula ReducedFormula { get => Formula.GetDFSOrdering().ToFormula(Replacements); }
+    }
+
+
+    /// <summary>
+    ///   Defines an interface to a list of formulas in some order.
+    /// </summary>
+    public interface IFormulaOrdering : IEnumerable<Formula>
+    {
+        Formula this[int index] { get; }
+
+        int Length { get; }
+    }
+
+
+    public static class FormulaSequenceExtensions
+    {
+        public static FlatTerm GetDFSOrdering(this Formula formula) => FlatTerm.GetFlatTerm(formula);
+
+        /**
+         * Creates a new formula from a DFS ordering and some changes
+         */
+        public static Formula ToFormula(this FlatTerm sequence, IDictionary<int, Formula> replacements)
+        {
+            Formula formula;
+
+            Stack<Formula> stack = new Stack<Formula>();
+            for (int i = sequence.Length; 0 < i--;)
+            {
+                if (!replacements.TryGetValue(i, out Formula subformula))
+                    subformula = sequence[i];
+                if (subformula is Negation)
+                {
+                    Formula f = stack.Pop();
+                    stack.Push(Negation.NewNegation(f));
+                }
+                else if (subformula is Implication)
+                {
+                    Formula antecendent = stack.Pop();
+                    Formula consequent = stack.Pop();
+                    stack.Push(Implication.NewImplication(antecendent, consequent));
+                }
+                else if (subformula is Variable)
+                {
+                    stack.Push(subformula);
+                }
+                else if (subformula == Constant.TRUE)
+                {
+                    stack.Push(Constant.TRUE);
+                }
+                else if (subformula == Constant.FALSE)
+                {
+                    stack.Push(Constant.FALSE);
+                }
+                else
+                    throw new Exception("wtf");
+            }
+
+            if (stack.Count != 1)
+                throw new Exception("hmm, looks like an invalid formula DFS ordering");
+
+            formula = stack.Pop();
+            return formula;
+        }
+
+
+    }
+
+
     /// <summary>
     /// 
     /// This source module extends the Formula class with an API that represents Formulas as an array of all the 
     /// subformulas in the formula, ordered from the leftmost subformula (the formula itself) to the rightmost 
     /// subformula (the last constant or variable that appears in the formula).
-    /// TermSAT calls such an array is called a 'formula ordering'.
-    /// This particular ordering is known as a <a href='https://en.wikipedia.org/wiki/Depth-first_search#DFS_ordering'>DFS ordering</a>.
+    /// TermSAT calls such an array a 'flatterm'.
+    /// The name FlatTerm comes from the chapter on Term Indexing in the book 
+    /// 'Handbook of Automated Reasoning',  by R Sekar, V Ramakrishnan, and Andrei Voronkov.
     /// 
-    /// FormulaOrderings are useful for constructing indexes of sets of formulas.
-    /// The indexes built from DFSOrdering make it possible to quickly find substitution instances and unifications 
+    /// The particular ordering implemented by flatterms is known as a 
+    /// <a href='https://en.wikipedia.org/wiki/Depth-first_search#DFS_ordering'>DFS ordering</a>, or a 
+    /// <a href='https://en.wikipedia.org/wiki/Prefix_order'>prefix ordering</a>.
+    /// 
+    /// FlatTerms are useful for constructing indexes of sets of formulas.
+    /// The indexes built from FlatTerms make it possible to quickly find substitution instances and unifications 
     /// of a given formula in a large set of formulas.
     /// I expect that in the future it will be necessary to express formulas in different ordering, for indexing purposes. 
     /// 
-    /// Also, FormulaSequences can be easier to use that a vistor API when implementing formula reduction algorithms and such.
+    /// Also, FlatTerms can be easier to use that a vistor API when implementing formula reduction algorithms and such.
     /// 
     /// Example:
     /// Given the formula...
@@ -47,39 +139,20 @@ namespace TermSAT.Formulas
     ///  formulas as strings in a convenient way.
     ///
     /// </summary>
-
-    public interface IFormulaSequence : ISequence<Formula> { }
-
-    /// <summary>
-    ///   Defines an interface to a list of formulas in some order.
-    /// </summary>
-    public interface IFormulaOrdering : IEnumerable<Formula>
+    public class FlatTerm : IFormulaSequence
     {
-        Formula this[int index] { get; }
+        private static ConditionalWeakTable<Formula, FlatTerm> sequences =
+            new ConditionalWeakTable<Formula, FlatTerm>();
 
-        int Length { get; }
-    }
-
-
-    public static class FormulaSequenceExtensions
-    {
-        public static DFSOrdering GetDFSOrdering(this Formula formula) => DFSOrdering.GetDFSOrdering(formula);
-    }
-
-    public class DFSOrdering : IFormulaSequence
-    {
-        private static ConditionalWeakTable<Formula, DFSOrdering> sequences =
-            new ConditionalWeakTable<Formula, DFSOrdering>();
-
-        public static DFSOrdering GetDFSOrdering(Formula f)
+        public static FlatTerm GetFlatTerm(Formula f)
         {
-            if (!sequences.TryGetValue(f, out DFSOrdering sequence))
+            if (!sequences.TryGetValue(f, out FlatTerm sequence))
             {
                 lock (sequences)
                 {
                     if (sequences.TryGetValue(f, out sequence))
                         return sequence;
-                    sequence = new DFSOrdering(f);
+                    sequence = new FlatTerm(f);
                     sequences.Add(f, sequence);
                 }
             }
@@ -89,7 +162,7 @@ namespace TermSAT.Formulas
 
         public Formula Formula { get; private set; }
 
-        private DFSOrdering(Formula formula)
+        private FlatTerm(Formula formula)
         {
             Formula = formula;
         }

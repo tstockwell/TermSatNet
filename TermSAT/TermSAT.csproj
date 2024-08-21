@@ -16,7 +16,9 @@
     <Compile Remove="Common\ServerCommandLineInterface.cs" />
     <Compile Remove="Formulas\FormulaSequence-Array.cs" />
     <Compile Remove="RuleDatabase\TruthTables.cs" />
+    <Compile Remove="Solver\CompletionGenerator.cs" />
     <Compile Remove="Solver\RuleRepository.cs" />
+    <Compile Remove="Solver\Solver.cs" />
     <Compile Remove="Tests\CompletionTests.cs" />
     <Compile Remove="Tests\RuleReductionTests.cs" />
     <Compile Remove="Tests\RuleRepositoryTests.cs" />
@@ -39,7 +41,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Solver\CompletionGenerator.cs" />
     <None Include="Solver\RuleRepository.cs" />
+    <None Include="Solver\Solver.cs" />
   </ItemGroup>
 
 </Project>

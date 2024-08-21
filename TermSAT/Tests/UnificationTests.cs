@@ -29,8 +29,8 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestUnification()
         {
-            Formula one = "*1.T";
-            Formula two = "*T2.";
+            Formula one = "*.1T";
+            Formula two = "*T.2";
             var unification = Formula.Unify(one, two);
             Assert.IsNotNull(unification, "A unifying substitution should have been found");
             Formula expectedFormula = "*TT";
@@ -39,9 +39,9 @@ namespace TermSAT.Tests
             unifyingInstance = two.CreateSubstitutionInstance(unification);
             Assert.AreEqual(expectedFormula, unifyingInstance, "Incorrect unification");
 
-            one = "*1.2.";
-            two = "*-3.3.";
-            expectedFormula = "*-3.3.";
+            one = "*.1.2";
+            two = "*-.3.3";
+            expectedFormula = "*-.3.3";
             unification = Formula.Unify(one, two);
             Assert.IsNotNull(unification, "A unifying substitution should have been found");
             unifyingInstance = one.CreateSubstitutionInstance(unification);
@@ -49,9 +49,9 @@ namespace TermSAT.Tests
             unifyingInstance = two.CreateSubstitutionInstance(unification);
             Assert.AreEqual(expectedFormula, unifyingInstance, "Incorrect unification");
 
-            one = "**1.2.*1.3.";
-            two = "**4.*5.6.6.";
-            expectedFormula = "**4.*5.*4.3.*4.3.";
+            one = "**.1.2*.1.3";
+            two = "**.4*.5.6.6";
+            expectedFormula = "**.4*.5*.4.3*.4.3";
             unification = Formula.Unify(one, two);
             Assert.IsNotNull(unification, "A unifying substitution should have been found");
                    
@@ -61,26 +61,26 @@ namespace TermSAT.Tests
             Assert.AreEqual(expectedFormula, unifyingInstance, "Incorrect unification");
 
             // this example used to cause Formula.createFormula to lock up
-            one = "*2.*1.2.";
-            two = "*-*-*2.*1.2.*1.-*2.*1.2.*1.-*2.*1.2.";
+            one = "*.2*.1.2";
+            two = "*-*-*.2*.1.2*.1-*.2*.1.2*.1-*.2*.1.2";
             unification = Formula.Unify(one, two);
             Assert.IsNull(unification, "A unifying substitution should not have been found");
 
             // this example used to cause Formula.createFormula to lock up
-            one = "***1.2.-*2.1.3.";
-            two = "****1.2.-*2.1.3.-*-*3.1.2.";
+            one = "***.1.2-*.2.1.3";
+            two = "****.1.2-*.2.1.3-*-*.3.1.2";
             unification = Formula.Unify(one, two);
             Assert.IsNull(unification, "A unifying substitution should not have been found");
 
             one = "T";
-            two = "****1.2.-*2.1.3.-*-*3.1.2.";
+            two = "****.1.2-*.2.1.3-*-*.3.1.2";
             unification = Formula.Unify(one, two);
             Assert.IsNull(unification, "A unifying substitution should not have been found");
 
             // this example is from Figure 10 in
             // http://comjnl.oxfordjournals.org/content/34/1/2.full.pdf
-            one = "**1.2.3.";
-            two = "*-1.1.";
+            one = "**.1.2.3";
+            two = "*-.1.1";
             unification = Formula.Unify(one, two);
             Assert.IsNull(unification, "A unifying substitution should not have been found");
         }
