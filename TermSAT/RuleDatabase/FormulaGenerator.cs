@@ -34,7 +34,7 @@ namespace TermSAT.RuleDatabase
      * created canonical formulas in the formula database.
      * 
      * This program greatly reduces the number of formulas that need to be considered 
-     * by the RuleGenerate by only using previously generated canonical formulas to 
+     * by the RuleGenerator by only using previously generated canonical formulas to 
      * generate new formulas (because, obviously, non-canonical formulas can be reduced 
      * by previously generated reduction rules).   
      * 
@@ -46,18 +46,28 @@ namespace TermSAT.RuleDatabase
         readonly FormulaDatabase _database;
         int _currentLength = 0;
         IEnumerator<Formula> _currentIterator;
+        readonly int _maxVariableCount;
+        readonly int _truthTableSize;
+        readonly long _maxTruthTables;
 
+
+        // a list of all possible formulas of length = 1
         List<Formula> _startingFormulas = new List<Formula>();
 
 
-        public FormulaGenerator(FormulaDatabase database)
+        public FormulaGenerator(FormulaDatabase database, int maxVariableCount)
         {
             _database = database;
+            _maxVariableCount = maxVariableCount;
+            _truthTableSize = 1 << _maxVariableCount;
+            _maxTruthTables = 1 << _truthTableSize;
 
             _startingFormulas.Add(Constant.TRUE);
             _startingFormulas.Add(Constant.FALSE);
-            for (int i = 1; i <= TruthTable.VARIABLE_COUNT; i++)
+            for (int i = 1; i <= maxVariableCount; i++)
+            {
                 _startingFormulas.Add(Variable.NewVariable(i));
+            }
         }
 
         public Formula GetStartingFormula()
@@ -71,10 +81,19 @@ namespace TermSAT.RuleDatabase
             else
             {
                 _currentLength = formula.Length;
-                _currentIterator = new FormulaConstructor(_database, formula);
+                _currentIterator = GetFormulaConstructor(_database, formula);
             }
             _currentIterator.MoveNext();
             return _currentIterator.Current;
+        }
+
+        public virtual IEnumerator<Formula> GetFormulaConstructor(FormulaDatabase database, Formula startingFormula)
+        {
+            return new FormulaConstructor(database, startingFormula);
+        }
+        public virtual IEnumerator<Formula> GetFormulaConstructor(FormulaDatabase database, int formulaLength)
+        {
+            return new FormulaConstructor(database, formulaLength);
         }
 
         public Formula GetNextWellFormedFormula()
@@ -84,16 +103,16 @@ namespace TermSAT.RuleDatabase
 
                 _currentIterator.Dispose();
 
-                FormulaConstructor nextConstructor = null;
+                IEnumerator<Formula> nextConstructor = null;
                 while (nextConstructor == null)
                 {
                     _currentLength++;
                     Trace.WriteLine("The formulas lengths have been increased to " + _currentLength);
 
                     var truthTableCount= _database.CountCanonicalTruthTables();
-                    if (TruthTable.MAX_TRUTH_TABLES <= truthTableCount)
+                    if (_maxTruthTables <= truthTableCount)
                     {
-                        var longestPossibleFormula= _database.LengthOfLongestPossibleNonReducableFormula();
+                        var longestPossibleFormula= _database.LengthOfLongestPossibleNonReducibleFormula();
                         if (longestPossibleFormula < _currentLength)
                         {
                             Trace.WriteLine("!!!!!! The Rule Database is Complete !!!");
@@ -101,7 +120,7 @@ namespace TermSAT.RuleDatabase
                         }
                     }
 
-                    FormulaConstructor fc = new FormulaConstructor(_database, _currentLength);
+                    IEnumerator<Formula> fc = GetFormulaConstructor(_database, _currentLength);
                     if (fc.MoveNext())
                         nextConstructor = fc;
                 }

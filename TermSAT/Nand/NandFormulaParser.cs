@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using TermSAT.Formulas;
 
-namespace TermSAT.Formulas
+namespace TermSAT.Nand
 {
-    public static class FormulaParser
+    public static class NandFormulaParser
     {
-        public static Constant ToConstant(this string formulaText) => ToFormula(formulaText) as Constant;
-        public static Variable ToVariable(this string formulaText) => ToFormula(formulaText) as Variable;
-        public static Negation ToNegation(this string formulaText) => ToFormula(formulaText) as Negation;
-        public static Implication ToImplication(this string formulaText) => ToFormula(formulaText) as Implication;
 
         private static readonly ConditionalWeakTable<string, Formula> __cache = new ConditionalWeakTable<string, Formula>();
 
@@ -18,7 +15,7 @@ namespace TermSAT.Formulas
         /**
          * Parses out the first formula from the beginning of the given string
          */
-        public static Formula ToFormula(this string formulaText)
+        public static Formula ToNandFormula(this string formulaText)
         {
             Formula formula;
             lock (__cache)
@@ -37,8 +34,6 @@ namespace TermSAT.Formulas
                     char c = formulaText[i];
                     switch (c)
                     {
-                        case '-': break;
-                        case '*': count--; break;
                         case '|': count--; break;
                         case 'T': count++; break;
                         case 'F': count++; break;
@@ -52,29 +47,18 @@ namespace TermSAT.Formulas
                 }
             }
             if (last < 0)
-                throw new Exception("Not a valid formula:" + formulaText);
+                throw new Exception("Not a valid nand formula:" + formulaText);
 
 
-            Stack<Formula> stack = new Stack<Formula>();
+            Stack<Formula> stack = new ();
             for (int i = last; 0 < i--;)
             {
                 char c = formulaText[i];
-                if (Symbol.IsNegation(c))
+                if (Symbol.IsNand(c))
                 {
-                    Formula f = stack.Pop();
-                    stack.Push(Negation.NewNegation(f));
-                }
-                else if (Symbol.IsImplication(c))
-                {
-                    Formula antecedent = stack.Pop();
+                    Formula antecendent = stack.Pop();
                     Formula consequent = stack.Pop();
-                    stack.Push(Implication.NewImplication(antecedent, consequent));
-                }
-                else if (Symbol.IsNand(c))
-                {
-                    Formula antecedent = stack.Pop();
-                    Formula consequent = stack.Pop();
-                    stack.Push(Nand.NewNand(antecedent, consequent));
+                    stack.Push(Formulas.Nand.NewNand(antecendent, consequent));
                 }
                 else if (Symbol.IsTrue(c))
                 {

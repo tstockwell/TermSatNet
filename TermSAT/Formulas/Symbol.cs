@@ -26,6 +26,7 @@ namespace TermSAT.Formulas
         public static Symbol Variable = new Symbol('.');
         public static Symbol Negation = new Symbol('-');
         public static Symbol Implication = new Symbol('*');
+        public static Symbol Nand = new Symbol('|');
 
         public static Symbol True = new Symbol('T');
         public static Symbol False = new Symbol('F');
@@ -37,18 +38,20 @@ namespace TermSAT.Formulas
         public static bool IsNegation(char c) => c == Negation.Value;
         public static bool IsImplication(char c) => c == Implication.Value;
         public static bool IsVariable(char c) => c == Variable.Value;
+        public static bool IsNand(char c) => c == Nand.Value;
         public static bool IsFalse(char c) => c == False.Value;
         public static bool IsTrue(char c) => c == True.Value;
 
 
         public static bool IsNegation(string c) => c.StartsWith(Negation.Value);
         public static bool IsImplication(string c) => c.StartsWith(Implication.Value);
+        public static bool IsNand(string c) => c.StartsWith(Nand.Value);
         public static bool IsVariable(string c) => c.StartsWith(Variable.Value);
         public static bool IsTrue(string c) => c.StartsWith(True.Value);
         public static bool IsFalse(string c) => c.StartsWith(False.Value);
         public static bool IsConstant(string c) => IsTrue(c) || IsFalse(c);
 
-        public static bool IsSymbol(char c) => IsTrue(c) || IsFalse(c) || IsVariable(c) || IsNegation(c) || IsImplication(c);
+        public static bool IsSymbol(char c) => IsTrue(c) || IsFalse(c) || IsVariable(c) || IsNand(c) || IsNegation(c) || IsImplication(c);
     }
 }
 

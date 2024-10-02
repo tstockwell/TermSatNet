@@ -1,0 +1,45 @@
+
+
+For our purposes we define System S as follows:
+ * a set of variables (a, b, c, ...).
+ * two logical operators, negation (~) and implication (->).
+ * A set of axioms that consist of all substitution instances of any tautological formula of 3 variables or less.
+ * Three production rules:
+ 	* if a formula of form P is a theorem then any formula of the form Q->P is a theorem.
+ 	* if a formula of form P->(Q->R) is a theorem then the formula with form (P->Q)->(P->R) is a theorem
+ 	* if a formula of form ~P->~Q is a theorem then the formula with form Q->P is a theorem.
+ 	
+== Soundness Theorem ==
+System S is sound.
+
+== Completeness Theorem ==
+System S is complete.
+
+== Axiom Implication Theorem ==
+For any formula of the form P->Q, if P->Q is a tautology and if P is an axiom then Q is an axiom or contains a subformula that is an axiom.
+not true - (c->(b->(a->T)))->(d->(c->(b->(a->T))))
+
+
+== Axiom Subsumption Theorem ==
+Any theorem, T, of System S is either an axiom of System S or contains a subformula that is an axiom of System S.
+
+
+== Proof ==
+By induction on the number of steps required to prove T.
+
+If proof requires 1 step then T is an axiom of S.   
+
+If proof requires N steps, where 1 < N, then we consider what production rule is used to produce T...
+	Let T' be the production immediately prior to T.
+	By the induction principle we assume that T' is an axiom or contains a subformula that is an axiom.  
+
+	If T was produced by an application of production rule 1 then T has the form Q->T' and thus T contains the axiom that was contained in T'.
+	
+	
+	If T was produced by an application of production rule 2 then T' has the form P->(Q->R) and T has the form (P->Q)->(P->R).
+	There are several possibles to consider:
+		* either P, Q, or R contains an axiom.  In this case T will contain the same axiom.
+		* Neither P, Q, nor R contains an axiom but Q->R is an axiom.  Since (Q->R)->((P->Q)->(P->R)) is a tautology then by the Implication Theorem (P->Q)->(P->R) is also an axiom and thus T will be an axiom.
+		* T' has no subformulas that are axioms but T' itself is an axiom.  Since (P->(Q->R))->((P->Q)->(P->R)) is a tautology then by the Implication Theorem (P->Q)->(P->R) is also an axiom and thus T will be an axiom.
+
+    

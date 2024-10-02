@@ -55,7 +55,7 @@ namespace TermSAT.RuleDatabase
             Trace.WriteLine("Total number of non-canonical formulas  is " + Database.CountNonCanonicalFormulas());
 
             var allTruthTables = Database.GetAllTruthTables();
-            Trace.WriteLine("Have found formlas for " + allTruthTables.Count + " of " + TruthTable.MAX_TRUTH_TABLES + " truth tables");
+            Trace.WriteLine("Have found formulas for " + allTruthTables.Count + " of " + TruthTable.MAX_TRUTH_TABLES + " truth tables");
             Trace.WriteLine("The length of the longest canonical formula is " + Database.GetLengthOfLongestCanonicalFormula());
             Trace.WriteLine("");
 
@@ -92,7 +92,7 @@ namespace TermSAT.RuleDatabase
             if (Options.ShowNonCanonicalFormulas)
             {
                 Trace.WriteLine("");
-                Trace.WriteLine("Non-Canonical forumas by length");
+                Trace.WriteLine("Non-Canonical formulas by length");
                 Trace.WriteLine("-------------------");
                 Database.GetAllNonCanonicalFormulas().ForEach(f => 
                 {

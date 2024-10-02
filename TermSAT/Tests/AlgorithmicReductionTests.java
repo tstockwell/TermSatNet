@@ -32,9 +32,13 @@ import com.googlecode.termsat.core.solver.Solver;
  * Tests to replace reduction rules by reduction algorithms
  * 
  */
-public class AlgorithmicReductionTests extends TestCase {
+[TestClass]
+public class AlgorithmicReductionTests 
+{
 
-	public void testAlgorithmicReductions() throws Exception {
-		
+    [TestMethod]
+	public void BasicReductionTests() 
+	{
+		Assert.Aqual	
 	}
 }

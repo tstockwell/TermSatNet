@@ -69,11 +69,24 @@ namespace TermSAT.Formulas
          */
         abstract public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions);
 
+        /**
+         * Creates a new formula by replacing all occurrences of the 'target' formula with the 'replacement' formula.
+         */
+        abstract public Formula ReplaceAll(Formula target, Formula replacement);
+
     }
 
     public partial class Constant : Formula
     {
         override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions) => this;
+        override public Formula ReplaceAll(Formula target, Formula replacement)
+        {
+            if (target.Equals(this))
+            {
+                return replacement;
+            }
+            return this;
+        }
     }
 
     public partial class Variable
@@ -84,6 +97,14 @@ namespace TermSAT.Formulas
                 f= this;
             return f;
         }
+        override public Formula ReplaceAll(Formula target, Formula replacement)
+        {
+            if (target.Equals(this))
+            {
+                return replacement;
+            }
+            return this;
+        }
     }
 
     public partial class Negation
@@ -91,10 +112,27 @@ namespace TermSAT.Formulas
         override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
         {
             Formula child = this.Child;
-            Formula f = child.CreateSubstitutionInstance(substitutions);
-            if (f == child)
+            Formula f = Child.CreateSubstitutionInstance(substitutions);
+            if (Child.Equals(f))
+            {
                 return this;
+            }
             return Negation.NewNegation(f);
+        }
+        override public Formula ReplaceAll(Formula target, Formula replacement)
+        {
+            if (target.Equals(this))
+            {
+                return replacement;
+            }
+
+            var newChild = Child.ReplaceAll(target, replacement);
+            if (!newChild.Equals(Child))
+            {
+                return Negation.NewNegation(newChild);
+            }
+
+            return this;
         }
     }
 
@@ -108,7 +146,53 @@ namespace TermSAT.Formulas
                 return Implication.NewImplication(newAntecedent, newConsequent);
             return this;
         }
+        override public Formula ReplaceAll(Formula target, Formula replacement)
+        {
+            if (target.Equals(this))
+            {
+                return replacement;
+            }
+
+            var newAntecedent = Antecedent.ReplaceAll(target, replacement);
+            var newConsequent = Consequent.ReplaceAll(target, replacement);
+            if (!newAntecedent.Equals(Antecedent) || !newConsequent.Equals(Consequent))
+            {
+                return Implication.NewImplication(newAntecedent, newConsequent);
+            }
+
+            return this;
+        }
+
     }
 
+
+    public partial class Nand
+    {
+        override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        {
+            var newAntecedent = Antecedent.CreateSubstitutionInstance(substitutions);
+            var newConsequent = Subsequent.CreateSubstitutionInstance(substitutions);
+            if (!newAntecedent.Equals(Antecedent) || !newConsequent.Equals(Subsequent))
+                return Nand.NewNand(newAntecedent, newConsequent);
+            return this;
+        }
+        override public Formula ReplaceAll(Formula target, Formula replacement)
+        {
+            if (target.Equals(this))
+            {
+                return replacement;
+            }
+
+            var newAntecedent = Antecedent.ReplaceAll(target, replacement);
+            var newConsequent = Subsequent.ReplaceAll(target, replacement);
+            if (!newAntecedent.Equals(Antecedent) || !newConsequent.Equals(Subsequent))
+            {
+                return Nand.NewNand(newAntecedent, newConsequent);
+            }
+
+            return this;
+        }
+
+    }
 
 }

@@ -18,6 +18,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TermSAT.Common;
 using TermSAT.Formulas;
 
@@ -47,10 +48,10 @@ namespace TermSAT.RuleDatabase
 
         public const int VARIABLE_COUNT= 4;
 	    public const int MAX_TRUTH_VALUES= 1 << VARIABLE_COUNT;
-	    public const int MAX_TRUTH_TABLES= 1 << MAX_TRUTH_VALUES;
+	    public const long MAX_TRUTH_TABLES= 1 << MAX_TRUTH_VALUES;
 
         static WeakCache<string, TruthTable> __cache = new WeakCache<string, TruthTable>();
-        static WeakCache<Formula, TruthTable> __formulaCache = new WeakCache<Formula, TruthTable>();
+        static ConditionalWeakTable<Formula, TruthTable> __formulaCache = new ConditionalWeakTable<Formula, TruthTable>();
 
         private BitArray values = new BitArray(MAX_TRUTH_VALUES);
 
@@ -68,7 +69,7 @@ namespace TermSAT.RuleDatabase
         }
 
         public static TruthTable NewTruthTable(Formula formula) { 
-            __formulaCache.GetValue(formula, out TruthTable t, () => new TruthTable(formula));
+            var t = __formulaCache.GetValue(formula, _ => new TruthTable(_));
             return t;
         }
 
@@ -100,4 +101,10 @@ namespace TermSAT.RuleDatabase
 
     }
 
+
+    public static class TruthTableExtensions
+    {
+        public static TruthTable GetTruthTable(this Formula formula) =>
+            TruthTable.NewTruthTable(formula);
+    }
 }

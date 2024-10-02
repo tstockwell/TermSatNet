@@ -1,0 +1,25 @@
+
+
+Prove that only tautological instances <= in length to twice the length of the longest canonical forumla + 1 ineed be considered.
+
+Prove that rule set, when applied depth first to antecendents, will reduce any substitution instance of tautology with 3 or fewer variables.
+    * Need list of tautologies 
+    
+Prove that the only way to reduce T->A to T is to reduce A to T.
+
+
+-------------------------
+
+Create reduction rule set
+
+-----------------------
+
+Use Knuth-Bendix algorithm to prove that rule set is confluent.
+
+-----------------------
+
+Define System S.
+
+-----------------------
+
+Use induction of # of steps in proof to show that all theorems are reducable.

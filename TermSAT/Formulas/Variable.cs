@@ -38,10 +38,18 @@ namespace TermSAT.Formulas
         public static Variable NewVariable(int i)
         {
             if (i < 1)
+            {
                 throw new TermSatException("Variable numbers must be greater than 0");
-            if (!__cache.TryGetValue(i, out Variable v))
-                __cache.Add(i, v= new Variable(i));
-            return v;
+            }
+
+            lock(__cache)
+            {
+                if (!__cache.TryGetValue(i, out Variable v))
+                {
+                    __cache.Add(i, v= new Variable(i));
+                }
+                return v;
+            }
         }
 
         private Variable(int number) : base(1)

@@ -13,9 +13,15 @@ namespace TermSAT.Formulas
 
         public static Implication NewImplication(Formula antecedent, Formula consequent)
         {
-            var implications = __implications.GetValue(antecedent, (a) => new ConditionalWeakTable<Formula, Implication>());
-            var i= implications.GetValue(consequent, (a) => new Implication(antecedent, consequent));
-            return i;
+            lock(__implications)
+            {
+                var implications = __implications.GetValue(antecedent, (a) => new ConditionalWeakTable<Formula, Implication>());
+                lock (implications)
+                {
+                    var implication = implications.GetValue(consequent, (a) => new Implication(antecedent, consequent));
+                    return implication;
+                }
+            }
         }
 
         public static implicit operator Implication(string formulaText) =>

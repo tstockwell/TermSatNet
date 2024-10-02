@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2037
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34518.117
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TermSAT", "TermSAT\TermSAT.csproj", "{054F8D54-81BB-4C17-8662-9B622D56449F}"
 EndProject
@@ -12,7 +12,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuleGenerator", "Scripts\Ru
 		{054F8D54-81BB-4C17-8662-9B622D56449F} = {054F8D54-81BB-4C17-8662-9B622D56449F}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReMarck", "ReMarck\ReMarck.csproj", "{F963EAF6-727D-4C86-B262-464A14A2C7E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReMarck", "ReMarck\ReMarck.csproj", "{F963EAF6-727D-4C86-B262-464A14A2C7E5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{71E6E5C3-3E70-4A51-89A5-FF72A3A3064B}"
+	ProjectSection(SolutionItems) = preProject
+		doc\ordering.wiki = doc\ordering.wiki
+		doc\outline.wiki = doc\outline.wiki
+		doc\sat.wiki = doc\sat.wiki
+		doc\summary.wiki = doc\summary.wiki
+		doc\systemp.wiki = doc\systemp.wiki
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E509A742-D024-441A-811F-BF42E42A658C}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

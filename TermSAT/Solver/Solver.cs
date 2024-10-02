@@ -15,6 +15,7 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+using System.Runtime.CompilerServices;
 using TermSAT.Formulas;
 
 namespace TermSAT.Solver
@@ -29,7 +30,6 @@ namespace TermSAT.Solver
      */
     public class Solver
     {
-
         public static Solver FAUX_SOLVER = new FauxSolver();
 
 //    public static void main(string[] args) {
@@ -159,7 +159,8 @@ private class FormulaReference extends SoftReference<Formula> {
         return reducedFormula;
     }
 
-    private synchronized Formula checkCache(Formula formula)
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    private Formula checkCache(Formula formula)
     {
         cleanCache();
         RefEntry entry = _reductionCache.get(formula.hashCode());
@@ -173,7 +174,8 @@ private class FormulaReference extends SoftReference<Formula> {
         return entry.reduction;
     }
 
-    private synchronized void addToCache(Formula formula, Formula reduction)
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    private void addToCache(Formula formula, Formula reduction)
     {
         RefEntry entry = new RefEntry();
         entry.reduction = reduction;
@@ -181,7 +183,9 @@ private class FormulaReference extends SoftReference<Formula> {
         _reductionCache.put(formula.hashCode(), entry);
         cleanCache();
     }
-    private synchronized void cleanCache()
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    private void cleanCache()
     {
         // clean up expired references
         FormulaReference ref;

@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using TermSAT.Formulas;
 
 namespace TermSAT.RuleDatabase
@@ -34,6 +35,11 @@ namespace TermSAT.RuleDatabase
         public int Length { get; set; }
         public string TruthValue { get; set; }
         public bool IsCanonical { get; set; }
+
+        /// <summary>
+        /// Set to an internal scheme name: basic, ordering, distributive 
+        /// </summary>
+        public string IsSubsumedByScheme {  get; set; }
     }
 
 
@@ -58,14 +64,15 @@ namespace TermSAT.RuleDatabase
             modelBuilder.Entity<FormulaRecord>().Property(f => f.Text).IsRequired();
             modelBuilder.Entity<FormulaRecord>().Property(f => f.Length).IsRequired();
             modelBuilder.Entity<FormulaRecord>().Property(f => f.TruthValue).IsRequired();
+            modelBuilder.Entity<FormulaRecord>().Property(f => f.IsCanonical).HasDefaultValue(false);
+            modelBuilder.Entity<FormulaRecord>().Property(f => f.IsSubsumedByScheme).HasDefaultValue(false);
 
             modelBuilder.Entity<FormulaRecord>().HasKey(f => f.Id);
             modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Text);
             modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Length);
             modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.TruthValue);
             modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsCanonical);
-
-            modelBuilder.Entity<FormulaRecord>().Property(f => f.IsCanonical).HasDefaultValue(false);
+            modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsSubsumedByScheme);
 
             modelBuilder.Entity<FormulaRecord>(f => f.ToTable("FormulaRecords"));
         }
@@ -140,7 +147,7 @@ namespace TermSAT.RuleDatabase
         {
             using (var ctx = GetDatabaseContext())
             {
-                ctx.Database.ExecuteSqlCommand("DELETE FROM FormulaRecords");
+                ctx.Database.ExecuteSqlRaw("DELETE FROM FormulaRecords");
             }
         }
 
@@ -150,7 +157,6 @@ namespace TermSAT.RuleDatabase
             {
                 var record = ctx.FormulaRecords.AsNoTracking()
                     .OrderByDescending(f => f.Id)
-
                     .FirstOrDefault();
 
                 var formula = record != null ? Formula.Parse(record.Text) : null;
@@ -168,6 +174,16 @@ namespace TermSAT.RuleDatabase
                     .ToList();
                 var formulas = records.Select(r => Formula.Parse(r.Text)).ToList();
                 return formulas;
+            }
+        }
+        public List<FormulaRecord> GetAllFormulaRecords()
+        {
+            using (var ctx = GetDatabaseContext())
+            {
+                var records = ctx.FormulaRecords.AsNoTracking()
+                    .OrderBy(f => f.Id)
+                    .ToList();
+                return records;
             }
         }
 
@@ -202,11 +218,11 @@ namespace TermSAT.RuleDatabase
         }
 
         /**
-         * Formulas longer than this length are guaranteed to be reducable with rules,
+         * Formulas longer than this length are guaranteed to be reducible with rules,
          * generated from previous formulas. 
          * Therefore processing can stop when formulas get this long.
          */
-        public int LengthOfLongestPossibleNonReducableFormula()
+        public int LengthOfLongestPossibleNonReducibleFormula()
         {
             int maxLength = GetLengthOfLongestCanonicalFormula();
             if (maxLength <= 0) // we don't know the length of longest formula yet
@@ -245,6 +261,24 @@ namespace TermSAT.RuleDatabase
                 ctx.DetachAllEntities();
             }
         }
+        public async Task IsSubsumedBySchemeAsync(Formula formula, string value)
+        {
+            using (var ctx = GetDatabaseContext())
+            {
+                var record = await ctx.FormulaRecords
+                    .Where(f => f.Text.Equals(formula.ToString()))
+                    .FirstOrDefaultAsync();
+                if (record == null)
+                {
+                    throw new Exception($"formula not found in database:{formula}");
+                }
+
+                record.IsSubsumedByScheme = value;
+
+                await ctx.SaveChangesAsync();
+                ctx.DetachAllEntities();
+            }
+        }
 
         public List<Formula> GetAllNonCanonicalFormulas(int maxLength)
         {
@@ -252,6 +286,7 @@ namespace TermSAT.RuleDatabase
             {
                 var records = ctx.FormulaRecords.AsNoTracking()
                     .Where(f => f.Length <= maxLength && f.IsCanonical == false)
+                    .OrderBy(f => f.Id)
                     .ToList();
                 var formulas = records.Select(r => r.Text.ToFormula()).ToList();
                 return formulas;
@@ -263,8 +298,7 @@ namespace TermSAT.RuleDatabase
             {
                 var records = ctx.FormulaRecords.AsNoTracking()
                     .Where(f => f.IsCanonical == false)
-                    .OrderBy(f => f.Length)
-                    .ThenBy(f => f.Text)
+                    .OrderBy(f => f.Id)
                     .ToList();
                 var formulas = records.Select(r => r.Text.ToFormula()).ToList();
                 return formulas;
@@ -276,8 +310,7 @@ namespace TermSAT.RuleDatabase
             {
                 var records = ctx.FormulaRecords.AsNoTracking()
                     .Where(f => f.IsCanonical == true)
-                    .OrderBy(f => f.Length)
-                    .ThenBy(f => f.Text)
+                    .OrderBy(f => f.Id)
                     .ToList();
                 var formulas = records.Select(r => r.Text.ToFormula()).ToList();
                 return formulas;

@@ -100,7 +100,7 @@ namespace TermSAT.Formulas
         ///     ...constants are simpler than any other formula, T is simpler than F.
         ///     ...variables are simpler than negation or implication
         ///     ...negation is simpler than implication
-        ///     ...implications with simpler antecendents are simpler other implications.
+        ///     ...implications with simpler antecedents are simpler than other implications.
         ///     
         /// </summary>
         public int CompareTo(Formula other)
@@ -108,7 +108,7 @@ namespace TermSAT.Formulas
             if (other == this)
                 return 0;
 
-            // shorter formulas are simpler than longer forumlas
+            // shorter formulas are simpler than longer formulas
             if (Length < other.Length)
                 return -1;
             if (other.Length < Length)
@@ -157,24 +157,50 @@ namespace TermSAT.Formulas
                 return 1;
             }
 
-            // at this point both formulas must be Implications
-            // implications with simpler antecendents come first
-            var impThis = this as Implication;
-            var impOther = other as Implication;
+            if (this is Nand nandThis)
             {
-                var aThis = impThis.Antecedent;
-                var aOther = impOther.Antecedent;
-                var c = aThis.CompareTo(aOther);
-                if (c != 0)
-                    return c;
+                if (other is Nand impOther) 
+                {
+                    // nands with simpler antecedents come first
+                    {
+                        var aThis = nandThis.Antecedent;
+                        var aOther = impOther.Antecedent;
+                        var c = aThis.CompareTo(aOther);
+                        if (c != 0)
+                            return c;
+                    }
+
+                    var cThis = nandThis.Subsequent;
+                    var cOther = impOther.Subsequent;
+                    var i = cThis.CompareTo(cOther);
+                    return i;
+                }
+
+                return -1; // nand comes before implication
             }
 
-            var cThis = impThis.Consequent;
-            var cOther = impOther.Consequent;
-            var i = cThis.CompareTo(cOther);
-            return i;
+            {
+                // at this point both formulas must be Implications
+                // implications with simpler antecedents come first
+                var impThis = this as Implication;
+                var impOther = other as Implication;
+                {
+                    var aThis = impThis.Antecedent;
+                    var aOther = impOther.Antecedent;
+                    var c = aThis.CompareTo(aOther);
+                    if (c != 0)
+                        return c;
+                }
+
+                var cThis = impThis.Consequent;
+                var cOther = impOther.Consequent;
+                var i = cThis.CompareTo(cOther);
+                return i;
+            }
         }
 
+        /// Implement IEquatable<Formula>.Equals
+        /// Formulas are singletons, ie formula references are equal when they reference the same object.
         public bool Equals(Formula other)
         {
             return base.Equals(other);

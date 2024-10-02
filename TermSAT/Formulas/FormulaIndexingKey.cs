@@ -89,6 +89,12 @@ namespace TermSAT.Formulas
         override public string GetIndexingSymbol() => symbol;
     }
 
+    public partial class Nand
+    {
+        static string symbol = Symbol.Nand.ToString();
+        override public string GetIndexingSymbol() => symbol;
+    }
+
 
 }
 

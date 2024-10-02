@@ -1,9 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using TermMark.System;
 using ReMarck.System;
 
 namespace TermMark.Tests

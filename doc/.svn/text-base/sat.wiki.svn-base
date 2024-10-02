@@ -1,0 +1,141 @@
+= TermSAT, a Deterministic, Polynomial-time, Algorithm For Propositional Theorem Proving =
+
+Author: Ted Stockwell [emorning@yahoo.com]
+
+== Abstract ==
+
+This document describes TermSAT, a deterministic, polynomial-time, algorithm that can recognize tautological propositional formulas in polynomial time.  
+The algorithm itself is quite simple, it consists of a (large) set of reduction rules that denote valid substitutions that, when applied to a given propositional formula, produce a shortened formula that is equivalent to the original. 
+The algorithm repeatedly scans a formula for instances of these reduction rules and makes appropriate substitutions, each time reducing the length of the formula.  
+If a formula cannot be reduced to the single symbol 'T' then the formula is not tautological.
+The majority of this document is devoted to proving that the given set of reduction rules is complete and that they work in polynomial time.
+
+== Overview ==
+
+The insight that led to the development of TermSAT is very simple, it comes from considering the nature of a basic system of propositional logic named System L.  System L has a small set of axioms and one inference rule: modus ponens.
+Modus ponens states that if P is a theorem and P->Q is also a theorem then Q is also a theorem.
+Modus ponens alone is sufficient for the development of a complete propositional logic system.
+That is, all tautological formulas can be derived from a small set of axioms using only modus ponens. 
+
+Now suppose that we could invent a rewrite system for reducing proposition formulas to their shortest form.
+A rewrite system in this context is simply of set of equivalent formula pairs, an antecedent and a consequent, where the antecedent formula is longer than the consequent.
+The rewrite system reduces a formula by continuously replacing subterms that match the form of an antecedent rule with the equivalent consequent form.
+This system uses the character 'T' to represent tautological formula and the character 'F' for contradictory formulas.
+Finally, when reducing a formula that has the form P->Q the system always first tries to reduce P as much a possible, then reduces Q as much as possible then finally reduces the resulting formula. 
+Because there are a finite set of rules in this imagined rewrite system it is easy to show that such a system reduces a formula in polynomial time.
+
+Now consider such a system with regard to modus ponens; because the system always reduces the left hand side of a formula as much as possible before reducing the right hand side, it's easy to see that such a system will reduce all tautological formulas.
+That is, given two formulas P and P->Q we assume that the system reduces both P and P->Q to T..
+Also, since we choose to always apply rewrite rules to the left side of a formula before applying them to the formula itself we also know that the system will first reduce P->Q to T->Q and must then reduce T->Q to T.
+The only way for the system to reduce T->Q to T is if the system reduces Q to T.
+Thus, we know that if P is a theorem (and thus can be reduced to T) and P->Q is a theorem (and thus can be reduced to T) that the system can also reduce Q to T. Therefore, because of modus ponens, if the imagined system of rewrite rules is able to reduce the axioms of a logical system then we know that it can reduce all tautological formulas.
+
+TermSAT was developed by writing computer programs that exhaustively examine all possible propositional formulas with three or less variables and extracts the rules for reducing them (we show that it is not necessary to consider formulas longer than 65 symbols).
+Since all the axioms of a basic propositional system can be represented by formula forms with three or less variables, these basic rules are sufficient for reducing the axioms of a propositional logic system (though the order in which the rules are applied is important at this point).
+The TermSAT rule base was then expanded, using the knuth-bendix method, into a confluent set of rules that may safely be applied in any order.
+The result is a set of rewrite rules that can be used exactly as our imagined rewrite system, and therefore we know that TermSAT can recognize all tautological propositional formula in polynomial time.          
+
+
+== System L, a Propositional Calculus ==
+
+A propositional calculus is a formal system in which formulas of a formal language may be interpreted as representing propositions [1]. 
+A system of inference rules and axioms allows certain formulas to be derived, called theorems; which may be interpreted as true propositions. 
+There are many possible formal systems of propositional calculus, depending on the set of symbols used in formulas, the set of starting axioms, and the inference rules.  In this section we describe a particular propositional system, a system that will eventually lend itself to the automatic derivation of reduction rules, we will refer this particular system as system L.
+
+For our purposes we define L as the minimal propositional system discovered by Jan Lukasiewicz [2].  This system uses:
+ * a set of variables (a, b, c, ...).
+ * two logical operators, negation (~) and implication (->).
+ * A set of axioms that is all substitution instances of the following formulas:
+ 	 * P->(Q->P)
+ 	 * (P->(Q->R))->((P->Q)->(P->R))
+ 	 * (~P->~Q)->(Q->P)
+ * One inference rule, modus ponens; if P is a theorem and and P->Q then Q is also a theorem.
+ 
+Note that the axioms in this system are substitution instances of tautologies with no more than three variables. 
+For our purposes we extend the set of axioms in L to include all substitution instances of any tautological formula of three variables or less.  So for instance, all substitution instances of this formula...
+	P->P
+...are also axioms in our system.
+We take this step of generalizing the set of axioms because it will eventually make it more straightforward to automatically deduce all the possible reduction rules for the system.  
+
+We also extend L by adding two additional symbols, T and F.
+These symbols represent the values true and false.
+We add these symbols so that we can create an algorithm that can reduce tautological formulas to a single symbol, T, and all contradictory formulas to a single symbol, F. 
+
+== A Theorem Proving Algorithm For System L ==
+
+The set of valid theorems of L will be the set of tautological formulas in L [?].   
+A theorem proving algorithm is a process that can recognize these tautological formulas.  
+
+The process of designing a theorem proving algorithm for the previously described calculus starts by noting that the calculus has only one inference rule, modus ponens.  
+If our goal is to design an algorithm that recognizes all theorems in system L then modus ponens shows us how we should design such an alorithm.  We should design such an algortithm such that if the algorithm recognizes all theorems that are instances of some forms P and P->Q, then the algorithm will be guaranteed to also recognize Q.  If such an algorithm can recognize all the axioms in L then it is trivial to show that such an algorithm can recognize all theorems in L.
+
+== Theorem 1 ==
+Let A be an algorithm that can recognize all the axioms in system L.
+Further, let A be an algorithm that is guaranteed to be able to recognize formula Q if it can also recognize formulas P and P->Q.
+Then A is an algorithm that can recognize all theorems in L.
+
+== Proof ==
+TBC
+
+In this document we will develop a theorem proving algorithm that works as follows:
+    
+  * The algorithm will apply production rules to formulas, where each rule produces a shorter formula that is logically equivalent to the original.  
+  * The algorithm will repeatedly apply production rules until there is no equivalent shorter formula.  
+  * The algorithm will always reduce the antecedent of an implication before reducing the consequent.
+  * Finally, we will then show that there is a fixed set of reduction rules that are guaranteed to reduce all axioms in system L to T when the rules are applied as described above.
+  
+An algorithm as described above will, by definition, be able to recognize all the axioms in system L.
+Also, given theorems P and P->Q, if the proposed algorithm recognizes P and P->Q then it will be guaranteed to be able to recognize Q.
+
+== Theorem 2 == 
+Given theorems P and P->Q, if the proposed algorithm recognizes P and P->Q then it will be guaranteed to be able to recognize Q.
+
+== Proof == 
+
+Since the proposed algorithm always fully reduces the antecedent of an implication before reducing the consequent, our proposed algorithm would also reduce P->Q to T->Q before finally reducing it to T.  Finally, our proposed algorithm must therefore be able to reduce Q to T, otherwise it would not be able to reduce T->Q to T.   Since the algorithm always reduces the antecedent of an implication before reducing the consequent, if the algorithm can recognize the theorems P and P-Q then it must be be to also recognize Q.
+    
+  * We will design our algorithm to always reduce the antecedent of an implication before reducing the consequent.
+    
+
+One way to design such a algorithm that meets the criteria required to satisfy Theorem 1 would be to design an algorithm that repeatedly applies production rules to formulas, where each rule produces a shorter formula that is equivalent to the original.  The algorithm would repeatedly apply production rules until there is no equivalent shorter formula.  Tautological formulas would eventually be reduced to T.  Further we would design the algorithm such that it would always reduce the antecedent in an implication before reducing the consequence.  
+
+
+Our goal is to design an algorithm such that we can take advantage of modus ponens in order to prove Further, note that if we could design an algorithm that worked by systematically reducing formulas and always reduced the left side with the following properties 
+The algorithm describes in this document was designed to have the following properties:
+  * it would repeatedly reduce a formula by using rules that describe valid substitutions, where each valid substitution reduces the length of the formula.
+  * if a formula is a tautology then the formula will be reduced to the single symbol, T.
+  * it would provably recognize any axiom in our calculus.
+  * it would be designed to always reduce the left side of an implication 
+  as much as possible before reducing the right side of the implication.
+  
+Theorem 1.
+An algorithm with the properties described above will be able to recognize any theorem in the calculus.  
+
+Proof.
+Suppose we have two formulas that belong to the set of axioms in our system, P, and P->Q.  Our proposed algorithm would reduce both P and P->Q to T.  Since the proposed algorithm always fully reduces the left side of an implication before reducing the right side, our proposed algorithm would also reduce P->Q to T->Q before finally reducing it to T.  Finally, our proposed algorithm must therefore be able to reduce Q to T, otherwise it would not be able to reduce T->Q to T.   
+
+ 
+ 	 
+ 	 
+
+
+There are
+
+Let , where ?, O, ?, ? are defined as follows:
+
+The alpha set ?, is a finite set of symbols that is large enough to supply the needs of a given discussion, for example: 
+ 
+Of the three connectives for conjunction, disjunction, and implication (, , and ), one can be taken as primitive and the other two can be defined in terms of it and negation (). Indeed, all of the logical connectives can be defined in terms of a sole sufficient operator. The biconditional () can of course be defined in terms of conjunction and implication, with  defined as .
+Adopting negation and implication as the two primitive operations of a propositional calculus is tantamount to having the omega set  partition as follows:
+
+An axiom system discovered by Jan Lukasiewicz formulates a propositional calculus in this language as follows. The axioms are all substitution instances of:
+
+The rule of inference is modus ponens (i.e. from p and , infer q). Then  is defined as , and  is defined as . 
+  
+
+The algorithm solves propositional formulas written in reverse polish notation that use only two operators, negation 
+*~aa ==> a
+
+
+[1] http://en.wikipedia.org/wiki/Propositional_calculus
+[2] http://en.wikipedia.org/wiki/Jan_%C5%81ukasiewicz

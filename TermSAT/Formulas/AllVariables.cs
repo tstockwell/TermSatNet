@@ -132,6 +132,42 @@ namespace TermSAT.Formulas
         }
     }
 
+    public partial class Nand
+    {
+        private static readonly ConditionalWeakTable<Nand, IList<Variable>> __varListCache = new ConditionalWeakTable<Nand, IList<Variable>>();
+
+        public override IList<Variable> AllVariables
+        {
+            get
+            {
+                IList<Variable> variables;
+                if (__varListCache.TryGetValue(this, out variables))
+                    return variables;
+
+
+                lock (__varListCache)
+                {
+                    // if a variable list is already cached for this formula then return it.
+                    if (__varListCache.TryGetValue(this, out variables))
+                        return variables;
+
+                    // create a new list
+                    var vars = new HashSet<Variable>();
+                    vars.UnionWith(Antecedent.AllVariables);
+                    vars.UnionWith(Subsequent.AllVariables);
+                    var sortedVars = new List<Variable>();
+                    sortedVars.AddRange(vars);
+                    sortedVars.Sort();
+
+                    variables = sortedVars;
+                    __varListCache.Add(this, variables);
+                }
+
+                return variables;
+            }
+        }
+    }
+
 
 }
 

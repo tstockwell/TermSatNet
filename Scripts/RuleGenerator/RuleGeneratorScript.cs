@@ -20,7 +20,7 @@ namespace RuleGeneratorScript
 
             var database = new FormulaDatabase(DATABASE_PATH);
             database.Clear();
-            new RuleGenerator(database, new FormulaGenerator(database)).Run();
+            new RuleGenerator(database, new FormulaGenerator(database, TruthTable.VARIABLE_COUNT)).Run();
         }
 
 

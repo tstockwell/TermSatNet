@@ -1,0 +1,26 @@
+This document describes a method of ordering of formulas.
+The purpose of this ordering is to provide a method of determining the 
+'complexity' of a formula.  
+The ultimate purpose of such an ordering is to provide the basic for 
+creating a confluent set of reduction rules for reducing proposition formulas.
+Such an ordering is a neccesary condition for for producing such a set of rules.
+
+Formulas are represented in a textual form...
+The normal form uses Polish notation and...
+...the symbols 'T' and 'F' for TRUE and FALSE.
+...the symbol '-' for the negation operator, followed by a formula. 
+...the symbol '*' for the implication operator, followed by the consequent and then the antecedent. 
+...a number greater than 0 followed by the symbol '.' for representing variables.
+
+Some examples for formulas...
+T
+T
+*1.T
+*-1.3.
+-*1.4.
+***1.3.-*3.F4.
+
+Here is the ordering...
+...formulas that are shorter than a given formula are less complex than the formula. 
+...formulas that are the same length are ordered lexically 
+	

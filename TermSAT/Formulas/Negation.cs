@@ -13,8 +13,11 @@ namespace TermSAT.Formulas
         public Formula Child { get; }
 
         public static Negation NewNegation(Formula child) { 
-            var n= __negations.GetValue(child, c => new Negation(child));
-            return n;
+            lock( __negations )
+            {
+                var n = __negations.GetValue(child, c => new Negation(child));
+                return n;
+            }
         }
 
         public static implicit operator Negation(string formulaText) => formulaText.ToNegation();
