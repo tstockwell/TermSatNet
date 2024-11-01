@@ -132,7 +132,7 @@ namespace TermSAT.Tests
                 {
                     Implication formula1 = "***.1.2.3.4";
                     Implication formula2 = Implication.NewImplication(formula1, formula1);
-                    var formula2Subformulas= formula2.GetDFSOrdering();
+                    var formula2Subformulas= formula2.AsFlatTerm();
 
                     Implication rule1 = "*.1.2";
                     InstanceRecognizer recognizer = new InstanceRecognizer() { rule1 };
@@ -143,7 +143,7 @@ namespace TermSAT.Tests
                     Assert.AreEqual(match.Substitutions[Variable.TWO], formula1);
 
                     var substitution = match.Generalization.CreateSubstitutionInstance(match.Substitutions);
-                    var substitutionSubformulas = substitution.GetDFSOrdering();
+                    var substitutionSubformulas = substitution.AsFlatTerm();
 
                     if (!formula2.Equals(substitution))
                     {

@@ -74,6 +74,10 @@ namespace TermSAT.Formulas
          */
         abstract public Formula ReplaceAll(Formula target, Formula replacement);
 
+        /**
+         * Creates a new formula by replacing the formula at the given position 
+         */
+        abstract public Formula ReplaceAt(int targetPosition, Formula replacement);
     }
 
     public partial class Constant : Formula
@@ -82,6 +86,14 @@ namespace TermSAT.Formulas
         override public Formula ReplaceAll(Formula target, Formula replacement)
         {
             if (target.Equals(this))
+            {
+                return replacement;
+            }
+            return this;
+        }
+        override public Formula ReplaceAt(int targetPosition, Formula replacement)
+        {
+            if (0 == targetPosition)
             {
                 return replacement;
             }
@@ -100,6 +112,14 @@ namespace TermSAT.Formulas
         override public Formula ReplaceAll(Formula target, Formula replacement)
         {
             if (target.Equals(this))
+            {
+                return replacement;
+            }
+            return this;
+        }
+        override public Formula ReplaceAt(int targetPosition, Formula replacement)
+        {
+            if (targetPosition <= 0)
             {
                 return replacement;
             }
@@ -134,6 +154,23 @@ namespace TermSAT.Formulas
 
             return this;
         }
+        override public Formula ReplaceAt(int targetPosition, Formula replacement)
+        {
+            if (targetPosition <= 0)
+            {
+                return replacement;
+            }
+            else
+            {
+                var newChild = Child.ReplaceAt(targetPosition - 1, replacement);
+                if (!newChild.Equals(Child))
+                {
+                    return Negation.NewNegation(newChild);
+                }
+            }
+
+            return this;
+        }
     }
 
     public partial class Implication
@@ -158,6 +195,27 @@ namespace TermSAT.Formulas
             if (!newAntecedent.Equals(Antecedent) || !newConsequent.Equals(Consequent))
             {
                 return Implication.NewImplication(newAntecedent, newConsequent);
+            }
+
+            return this;
+        }
+        override public Formula ReplaceAt(int targetPosition, Formula replacement)
+        {
+            if (targetPosition < Antecedent.Length)
+            {
+                var newAntecedent = Antecedent.ReplaceAt(targetPosition, replacement);
+                if (!newAntecedent.Equals(Antecedent))
+                {
+                    return Implication.NewImplication(newAntecedent, Consequent);
+                }
+            }
+            else
+            {
+                var newConsequent = Consequent.ReplaceAt(targetPosition - Antecedent.Length - 1, replacement);
+                if (!newConsequent.Equals(Antecedent))
+                {
+                    return Implication.NewImplication(Antecedent, newConsequent);
+                }
             }
 
             return this;
@@ -188,6 +246,35 @@ namespace TermSAT.Formulas
             if (!newAntecedent.Equals(Antecedent) || !newConsequent.Equals(Subsequent))
             {
                 return Nand.NewNand(newAntecedent, newConsequent);
+            }
+
+            return this;
+        }
+        override public Formula ReplaceAt(int targetPosition, Formula replacement)
+        {
+            if (targetPosition < 0)
+            {
+                return this;
+            }
+            else if (targetPosition == 0)
+            {
+                return replacement;
+            }
+            else if (targetPosition <= Antecedent.Length)
+            {
+                var newAntecedent = Antecedent.ReplaceAt(targetPosition - 1, replacement);
+                if (!newAntecedent.Equals(Antecedent))
+                {
+                    return Nand.NewNand(newAntecedent, Subsequent);
+                }
+            }
+            else
+            {
+                var newConsequent = Subsequent.ReplaceAt(targetPosition - Antecedent.Length - 1, replacement);
+                if (!newConsequent.Equals(Subsequent))
+                {
+                    return Nand.NewNand(Antecedent, newConsequent);
+                }
             }
 
             return this;

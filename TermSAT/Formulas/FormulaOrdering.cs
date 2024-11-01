@@ -1,30 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using TermSAT.Common;
 
 namespace TermSAT.Formulas
 {
-
-    // Expresses a reduction to a formula as a change to the formula's dfs odering
-    public class ReplacementReduction
-    {
-        public ReplacementReduction(Formula formula)
-        {
-            Formula = formula;
-        }
-
-        public Formula Formula { get; internal set; }
-
-        /// <summary>
-        /// An enumeration of the indexes of subformulas within the formula to be reduced 
-        /// and their replacements
-        /// </summary>
-        public IDictionary<int, Formula> Replacements { get; internal set; }
-
-        public Formula ReducedFormula { get => Formula.GetDFSOrdering().ToFormula(Replacements); }
-    }
 
 
     /// <summary>
@@ -40,7 +19,7 @@ namespace TermSAT.Formulas
 
     public static class FormulaSequenceExtensions
     {
-        public static FlatTerm GetDFSOrdering(this Formula formula) => FlatTerm.GetFlatTerm(formula);
+        public static FlatTerm AsFlatTerm(this Formula formula) => FlatTerm.GetFlatTerm(formula);
 
         /**
          * Creates a new formula from a DFS ordering and some changes
@@ -94,6 +73,7 @@ namespace TermSAT.Formulas
     public partial class Formula
     {
         abstract public Formula GetFormulaAtPosition(int index);
+        abstract public int PositionOf(Formula subterm);
     }
 
     public partial class Constant
@@ -104,6 +84,14 @@ namespace TermSAT.Formulas
                 throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
             return this;
         }
+        override public int PositionOf(Formula subterm)
+        {
+            if (this.Equals(subterm))
+            {
+                return 0;
+            }
+            return -1;
+        }
     }
 
     public partial class Variable
@@ -113,6 +101,14 @@ namespace TermSAT.Formulas
             if (index != 0)
                 throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
             return this;
+        }
+        override public int PositionOf(Formula subterm)
+        {
+            if (this.Equals(subterm))
+            {
+                return 0;
+            }
+            return -1;
         }
     }
 
@@ -125,6 +121,20 @@ namespace TermSAT.Formulas
             if (index == 0)
                 return this;
             return Child.GetFormulaAtPosition(index - 1);
+        }
+        override public int PositionOf(Formula subterm)
+        {
+            if (this.Equals(subterm))
+            {
+                return 0;
+            }
+
+            int childPosition = Child.PositionOf(subterm);
+            if (0 <= childPosition)
+            {
+                return childPosition + 1;
+            }
+            return -1;
         }
     }
 
@@ -141,6 +151,27 @@ namespace TermSAT.Formulas
                 return Antecedent.GetFormulaAtPosition(index - 1);
             return Consequent.GetFormulaAtPosition(index - a - 1);
         }
+        override public int PositionOf(Formula subterm)
+        {
+            if (this.Equals(subterm))
+            {
+                return 0;
+            }
+
+            int antecedentPosition = Antecedent.PositionOf(subterm);
+            if (0 <= antecedentPosition)
+            {
+                return antecedentPosition + 1;
+            }
+
+            int consequentPosition = Consequent.PositionOf(subterm);
+            if (0 <= consequentPosition)
+            {
+                return consequentPosition + Antecedent.Length + 1;
+            }
+
+            return -1;
+        }
     }
 
     public partial class Nand
@@ -148,13 +179,47 @@ namespace TermSAT.Formulas
         override public Formula GetFormulaAtPosition(int index)
         {
             if (index < 0)
-                throw new TermSatException("Invalid symbol position:" + index + "in formula " + ToString());
+            {
+                throw new TermSatException("invalid formula index:" + index + "in formula " + ToString());
+            }
             if (index == 0)
+            {
                 return this;
+            }
+            if (!(index < Length))
+            {
+                throw new TermSatException($"index of {index} exceeds formula length of {Length} in formula {this}");
+            }
             int a = Antecedent.Length;
             if (index <= a)
                 return Antecedent.GetFormulaAtPosition(index - 1);
             return Subsequent.GetFormulaAtPosition(index - a - 1);
+        }
+        override public int PositionOf(Formula subterm)
+        {
+            if (this.Equals(subterm))
+            {
+                return 0;
+            }
+
+            if (this.Length <= subterm.Length)
+            {
+                return -1;
+            }
+
+            int antecedentPosition = Antecedent.PositionOf(subterm);
+            if (0 <= antecedentPosition)
+            {
+                return antecedentPosition + 1;
+            }
+
+            int consequentPosition = Subsequent.PositionOf(subterm);
+            if (0 <= consequentPosition)
+            {
+                return consequentPosition + Antecedent.Length + 1;
+            }
+
+            return -1;
         }
     }
 

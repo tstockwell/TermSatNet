@@ -18,6 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{71E6E5C3-3E7
 	ProjectSection(SolutionItems) = preProject
 		doc\ordering.wiki = doc\ordering.wiki
 		doc\outline.wiki = doc\outline.wiki
+		doc\proofs.md = doc\proofs.md
 		doc\sat.wiki = doc\sat.wiki
 		doc\summary.wiki = doc\summary.wiki
 		doc\systemp.wiki = doc\systemp.wiki

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
@@ -58,24 +59,33 @@ public class Scripts
             //    continue;
             //}
 
-            Formula reducedFormula = formula.NandReduction();
-
-            if (reducedFormula.Equals(canonicalFormula))
+            try
             {
-                await formulaDatabase.IsSubsumedBySchemeAsync(formula, "yes");
-                Trace.WriteLine($"nand reduction reduces {formula} to canonical form: {canonicalFormula}");
+                Formula reducedFormula = formula.NandReduction();
+
+                if (reducedFormula.Equals(canonicalFormula))
+                {
+                    await formulaDatabase.IsSubsumedBySchemeAsync(formula, "yes");
+                    Trace.WriteLine($"nand reduction reduces {formula} to canonical form: {canonicalFormula}");
+                }
+                else
+                {
+                    isEquivalent = false;
+                    await formulaDatabase.IsSubsumedBySchemeAsync(formula, "");
+                    Trace.WriteLine("nand reduction does not reduce this formula to its canonical form...");
+                    Trace.WriteLine("=== non-canonical form ===");
+                    Trace.WriteLine(formula.ToString());
+                    Trace.WriteLine("=== canonical form ===");
+                    Trace.WriteLine(canonicalFormula.ToString());
+
+                    //break;
+                }
+
             }
-            else 
+            catch (Exception ex)
             {
-                isEquivalent = false;
-                await formulaDatabase.IsSubsumedBySchemeAsync(formula, "");
-                Trace.WriteLine("nand reduction does not reduce this formula to its canonical form...");
-                Trace.WriteLine("=== non-canonical form ===");
-                Trace.WriteLine(formula.ToString());
-                Trace.WriteLine("=== canonical form ===");
-                Trace.WriteLine(canonicalFormula.ToString());
-
-                //break;
+                await formulaDatabase.IsSubsumedBySchemeAsync(formula, "error");
+                Trace.WriteLine($"error: {formula}");
             }
         }
 

@@ -1,25 +1,51 @@
+# Formula Ordering
+
 This document describes a method of ordering of formulas.
 The purpose of this ordering is to provide a method of determining the 'complexity' of a formula.  
 The ultimate purpose of such an ordering is to provide the basis for 
 creating a confluent set of reduction rules for reducing proposition formulas.
-Such an ordering is a necessary condition for for producing such a set of rules.
+Such an ordering is a necessary condition for producing such a set of rules. 
+One consequence of imposing an ordering on formulas is that there is one, 
+and only one, 'canonical' way to represent a given formula.
+
+## Formula Syntax
 
 Formulas are represented in a textual form...
 The normal form uses Polish notation and...
 ...the symbols 'T' and 'F' for TRUE and FALSE.
 ...the symbol '-' for the negation operator, followed by a formula. 
-...the symbol '*' for the implication operator, followed by the consequent and then the antecedent. 
-...a number greater than 0 followed by the symbol '.' for representing variables.
+...the symbol '|' for the nand operator, followed by the antecedent and then the subsequent. 
+...the symbol '*' for the implication operator, followed by the antecedent and then consequent. 
+...by the symbol '.' followed by an integer number greater than 0 for representing variables.
 
-Some examples for formulas...
+Some examples of formulas...
+F
 T
-T
-*1.T
-*-1.3.
--*1.4.
-***1.3.-*3.F4.
+*T.1
+*-.1.3
+-*.1.4
+*.4**.1.3-*F.3
+
+## Ordering
+
 
 Here is the ordering...
-...formulas that are shorter than a given formula are less complex than the formula. 
-...formulas that are the same length are ordered lexically 
+1) formulas that are shorter are less complex than longer formulas. 
+2) formulas that are the same length are order by the complexity of thier antecedent.
+	That is, formulas with less complex antecendents come before those with more complex antecedents
+3) otherwise, formulas are ordered lexically using the following symbol order:
+	- F
+	- T
+	- variables
+	- negation
+	- nand
+	- implication
+
+Examples..
+Rule 1: .2 comes before *.1T 
+Rule 2: *T.1 comes before *.1T 
+Rule 3: |F.1 comes before |T.1 
+Rule 3: *.2|1.3 comes before *.2*1.3 
+
+	
 	

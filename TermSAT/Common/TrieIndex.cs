@@ -23,7 +23,7 @@ namespace TermSAT.Common
      * that uses strings as keys, was not suitable for TermSAT's purposes.
      * This trie is designed to work with any generic structure that is a list of items.
      * 
-     * This trie implementation includes a vistor API that allows clients to traverse 
+     * This trie implementation includes a visitor API that allows clients to traverse 
      * the trie structure.  Actually, this aspect of the trie is more important to TermSAT 
      * than the ability to use it as a Dictionary.
      *  

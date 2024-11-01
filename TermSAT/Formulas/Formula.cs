@@ -98,8 +98,9 @@ namespace TermSAT.Formulas
         ///     The following rules apply when comparing formulas of the same length.
         ///     Note: variables always have a length == 1
         ///     ...constants are simpler than any other formula, T is simpler than F.
-        ///     ...variables are simpler than negation or implication
-        ///     ...negation is simpler than implication
+        ///     ...variables are simpler than any operator
+        ///     ...negation is simpler than nand
+        ///     ...nand is simpler than implication
         ///     ...implications with simpler antecedents are simpler than other implications.
         ///     
         /// </summary>

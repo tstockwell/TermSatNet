@@ -84,5 +84,17 @@ namespace TermSAT.Common
             }
             return bits;
         }
+
+        public static IEnumerable<T> ConcatAll<T>(this IEnumerable<T> startingStream, params IEnumerable<T>[] otherStreams)
+        {
+            IEnumerable<T> mergedeStream = startingStream;
+
+            foreach (var stream in otherStreams)
+            {
+                mergedeStream = mergedeStream.Concat(stream);
+            }
+
+            return mergedeStream;
+        }
     }
 }
