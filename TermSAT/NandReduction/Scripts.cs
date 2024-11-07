@@ -1,14 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using TermSAT.Formulas;
 using TermSAT.RuleDatabase;
-using TermSAT.SchemeReducer;
 
-namespace TermSAT.Nand;
+namespace TermSAT.NandReduction;
 
 public class Scripts
 {

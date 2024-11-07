@@ -1,10 +1,11 @@
 ﻿
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using TermSAT.Formulas;
 
-namespace TermSAT.Nand;
+namespace TermSAT.NandReduction;
 
 /// <summary>
 /// Proofs are used by the Nand Reduction Algorithm to detect 'wildcards'.
@@ -21,6 +22,7 @@ public class Proof
 {
     private List<Reduction> _reductions = new();
     private Proof ParentProof {  get; }
+    private IImmutableList<int> _mapping = null;
 
     public Proof()
     {
@@ -67,24 +69,17 @@ public class Proof
     /// </summary>
     public virtual bool AddReduction(Reduction reduction)
     {
+
         // ignore
-        if (reduction.RuleDescriptor == Reduction.RULE_NO_CHANGE)
+        if (reduction.RuleDescriptor == Reduction.FORMULA_IS_CANONICAL)
         {
             return true;
         }
 
         // detect infinite loops
-        if (_reductions.Where(r => r.StartingFormula.Equals(reduction.StartingFormula)).Any())
+        var pp = this;
+        while(pp != null)
         {
-            return false;
-        }
-        var pp = ParentProof;
-        while(true)
-        {
-            if (pp == null)
-            {
-                break;
-            }
             if (pp.Reductions.Where(r => r.StartingFormula.Equals(reduction.StartingFormula)).Any())
             {
                 return false;
@@ -102,34 +97,72 @@ public class Proof
 #endif
 
         _reductions.Add(reduction);
+        _mapping = null;
+
+#if DEBUG
+        var mapping = ReductionMapping.ToImmutableList();
+        if (0 < mapping.Count && ReducedFormula.Length !=  mapping.Count)
+        {
+            throw new TermSatException("A reduction mapping's size should be the same as the formula from which it maps");
+        }
+        foreach (var t in mapping)
+        {
+            if (t < -1)
+            {
+                throw new TermSatException($"A negative value, other than -1, is a valid reduction mapping value");
+            }
+            if (-1 < t)
+            {
+                if (StartingFormula.Length <= t)
+                {
+                    throw new TermSatException($"A reduction mapping value must be within range of the starting formula");
+                }
+            }
+        }
+#endif
+
 
         return true;
     }
 
     /// <summary>
     /// Returns a mapping that maps from the ReducedFormula of the last reduction to the 
-    /// StartingFormula of the first reduction
+    /// StartingNand of the first reduction
     /// </summary>
-    public virtual IEnumerable<int> ReductionMapping
+    public virtual IImmutableList<int> ReductionMapping
     {
         get
         {
-            if (Reductions.Count <= 0)
+            if (_mapping == null)
             {
-                return Enumerable.Empty<int>();
-            }
+                _mapping = ImmutableList<int>.Empty;
 
-            int count =  Reductions.Max(r => r.StartingFormula.Length);
-            int[] map = Enumerable.Range(0, count).ToArray();
-            for (int i = 0; i < ReducedFormula.Length; i++)
-            {
-                var x = i;
-                for (int r = Reductions.Count; 0 <= map[i] && 0 < r--;)
+                if (_reductions != null && 0 < _reductions.Count)
                 {
-                    map[i] = Reductions[r].Mapping.ElementAt(map[i]);
+                    List<int> map = Enumerable.Range(0, ReducedFormula.Length).ToList();
+                    for (int r = _reductions.Count; 0 < r--;)
+                    {
+                        var reduction = _reductions[r];
+                        while (map.Count < reduction.ReducedFormula.Length)
+                        {
+                            map.Add(map.Count);
+                        }
+                        while (map.Count < reduction.StartingFormula.Length)
+                        {
+                            map.Add(map.Count);
+                        }
+                        for (int i = 0; i < reduction.ReducedFormula.Length; i++)
+                        {
+                            if (0 <= map[i])
+                            {
+                                map[i] = reduction.Mapping[map[i]];
+                            }
+                        }
+                    }
+                    _mapping = map.Take(ReducedFormula.Length).ToImmutableList();
                 }
             }
-            return map.Take(ReducedFormula.Length);
+            return _mapping;
         }
         //get
         //{

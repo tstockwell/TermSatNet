@@ -79,6 +79,8 @@ namespace TermSAT.Formulas
 
         public int Length => Formula.Length;
 
+        public override string ToString() => Formula.ToString();
+
         public IEnumerator<Formula> GetEnumerator() => new FormulaDFSEnumerator(Formula);
 
         IEnumerator IEnumerable.GetEnumerator() => new FormulaDFSEnumerator(Formula);

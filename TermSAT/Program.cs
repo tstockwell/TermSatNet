@@ -2,7 +2,7 @@
 using System.CommandLine;
 using TermSAT.RuleDatabase;
 using System.Diagnostics;
-using TermSAT.Nand;
+using TermSAT.NandReduction;
 
 namespace TermSAT
 {
@@ -45,7 +45,7 @@ namespace TermSAT
                 Trace.Listeners.Add(new TextWriterTraceListener("nand-subsumed-rules.log"));
 
                 var database = new FormulaDatabase("nand-rules-3.db");
-                await Nand.Scripts.DiscoverRulesSubsumedBySchemeAsync(database);
+                await NandReduction.Scripts.DiscoverRulesSubsumedBySchemeAsync(database);
             });
             rootCommand.AddCommand(schemeEquivalenceTest);
         }

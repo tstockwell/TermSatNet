@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using TermSAT.Formulas;
 using TermSAT.RuleDatabase;
 
-namespace TermSAT.Nand
+namespace TermSAT.NandReduction
 {
     /**
      * Like TermSAT.RuleDatabase.FormulaConstructor but for a NAND-based propositional system.

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TermSAT.Formulas;
-using TermSAT.Nand;
-using static System.Net.Mime.MediaTypeNames;
+﻿using TermSAT.Formulas;
+using TermSAT.NandReduction;
 
 namespace TermSAT.SchemeReducer;
 

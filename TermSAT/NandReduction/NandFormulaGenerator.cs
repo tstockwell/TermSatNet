@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using TermSAT.Formulas;
 using TermSAT.RuleDatabase;
 
-namespace TermSAT.Nand
+namespace TermSAT.NandReduction
 {
 
     /**

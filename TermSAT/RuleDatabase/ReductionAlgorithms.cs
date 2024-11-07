@@ -47,7 +47,7 @@ namespace TermSAT.RuleDatabase
         /// <summary>
         /// While developing TermSAT, the RuleGenerator program was used to generate reduction rules 
         /// for all formulas of three variables or less.  Then it was discovered that all these 
-        /// reduction rules could be StartingFormula by a simple algorithm that TermSAT calls the 
+        /// reduction rules could be StartingNand by a simple algorithm that TermSAT calls the 
         /// 'single replacement' algorithm.
         /// 
         /// Basically the algorithm is this...  

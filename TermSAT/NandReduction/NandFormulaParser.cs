@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using TermSAT.Formulas;
 
-namespace TermSAT.Nand
+namespace TermSAT.NandReduction
 {
     public static class NandFormulaParser
     {
