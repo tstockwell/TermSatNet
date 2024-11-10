@@ -100,7 +100,7 @@ public class Proof
         _mapping = null;
 
 #if DEBUG
-        var mapping = ReductionMapping.ToImmutableList();
+        var mapping = Mapping.ToImmutableList();
         if (0 < mapping.Count && ReducedFormula.Length !=  mapping.Count)
         {
             throw new TermSatException("A reduction mapping's size should be the same as the formula from which it maps");
@@ -129,7 +129,7 @@ public class Proof
     /// Returns a mapping that maps from the ReducedFormula of the last reduction to the 
     /// StartingNand of the first reduction
     /// </summary>
-    public virtual IImmutableList<int> ReductionMapping
+    public virtual IImmutableList<int> Mapping
     {
         get
         {
@@ -164,24 +164,36 @@ public class Proof
             }
             return _mapping;
         }
-        //get
-        //{
-        //    int[] map = Enumerable.Range(0, ReducedFormula.Length).ToArray();
-        //    if (0 < Reductions.Count)
-        //    {
-        //        for (int i = 0; i < ReducedFormula.Length; i++)
-        //        {
-        //            var m = map[i];
-        //            for (int r = Reductions.Count; 0 <= m && 0 < r--;)
-        //            {
-        //                map[i] = Reductions[r].Mapping.ElementAt(m);
-        //            }
-        //        }
-        //    }
-        //    return map;
-        //}
 
     }
+
+#if DEBUG
+    /// <summary>
+    /// The ReducedFormula mapped to StartingFormula, as a string, where elements that map to -1 displayed using '#'
+    /// This field is currently just used for debugging, but its super handy.
+    /// </summary>
+    public string MappedFormula
+    {
+        get
+        {
+            var starting = StartingFormula.AsFlatTerm();
+            string[] mapped = new string[ReducedFormula.Length];
+            for (int i = 0; i < mapped.Length; i++)
+            {
+                mapped[i] = "#";
+                var m = Mapping[i];
+                if (-1 < m)
+                {
+                    mapped[i] = starting[m].GetIndexingSymbol();
+                }
+            }
+            return string.Join("", mapped);
+        }
+    }
+#endif
+
+
+
 }
 
 public static class ProofExtensions

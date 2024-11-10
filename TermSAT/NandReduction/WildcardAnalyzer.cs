@@ -60,7 +60,7 @@ public class WildcardAnalyzer : Proof
     public int ReductionPosition { get; private set; } = -2;
     public bool FoundReductionTarget() => 0 <= ReductionPosition;
 
-    //public IEnumerable<int> ReductionMapping 
+    //public IEnumerable<int> Mapping 
     //{
     //    get 
     //    {
@@ -86,23 +86,27 @@ public class WildcardAnalyzer : Proof
             // todo: using strings is fragile, at least get off your lazy ass and create constants.
             if (reduction.RuleDescriptor == "|.1F => T" || reduction.RuleDescriptor == "|F.1 => T")
             {
+                // discover the position at which the reduction occurred
                 var reductionPosition = -1;
-                int i = 0;
                 var reducedFlatTerm = reduction.ReducedFormula.AsFlatTerm();
                 var startingFlatTerm = reduction.StartingFormula.AsFlatTerm();
-                foreach (var term in reducedFlatTerm) 
                 {
-                    if (term.Equals(Constant.TRUE))
+                    int i = 0;
+                    foreach (var term in reducedFlatTerm)
                     {
-                        var startingTerm = startingFlatTerm[i];
-                        if (!term.Equals(startingTerm))
+                        if (term.Equals(Constant.TRUE))
                         {
-                            reductionPosition = i;
-                            break;
+                            var startingTerm = startingFlatTerm[i];
+                            if (!term.Equals(startingTerm))
+                            {
+                                reductionPosition = i;
+                                break;
+                            }
                         }
+                        i++;
                     }
-                    i++;
                 }
+
                 if (0 <= reductionPosition)
                 {
                     var ruleTarget = startingFlatTerm[reductionPosition];
@@ -113,7 +117,7 @@ public class WildcardAnalyzer : Proof
 
                         if (0 < Reductions.Count)
                         {
-                            ReductionPosition = ReductionMapping[ReductionPosition];
+                            ReductionPosition = Mapping[ReductionPosition];
                         }
 
                         if (0 <= ReductionPosition)
@@ -168,7 +172,7 @@ public class WildcardAnalyzer : Proof
                     {
                         if (0 < Reductions.Count)
                         {
-                            ReductionPosition = ReductionMapping.ElementAt(reductionPosition + subtermPosition);
+                            ReductionPosition = Mapping.ElementAt(reductionPosition + subtermPosition);
                             //ReductionPosition = ReductionProof.GetPositionAtStartOfProof(reductionPosition + subtermPosition);
                         }
                         else
@@ -176,13 +180,17 @@ public class WildcardAnalyzer : Proof
                             ReductionPosition = subtermPosition;
                         }
 #if DEBUG
-                        if (!(0 <= ReductionPosition && ReductionPosition < StartingNand.Length))
+                        if (ReductionPosition != -1)
                         {
-                            throw new AssertFailedException("0 <= ReductionPosition && ReductionPosition < StartingFormula.Length");
-                        }
-                        if (!(Subterm.Equals(StartingNand.GetFormulaAtPosition(ReductionPosition))))
-                        {
-                            throw new AssertFailedException($"an instance of the subterm {Subterm} was not found at position {ReductionPosition}");
+                            if (!(0 <= ReductionPosition && ReductionPosition < StartingNand.Length))
+                            {
+                                // probably indicates that the mapping is wrong or doesnt map enough variable instances
+                                throw new AssertFailedException("invalid reduction mapping found");
+                            }
+                            if (!(Subterm.Equals(StartingNand.GetFormulaAtPosition(ReductionPosition))))
+                            {
+                                throw new AssertFailedException($"an instance of the subterm {Subterm} was not found at position {ReductionPosition}");
+                            }
                         }
 #endif
                     }

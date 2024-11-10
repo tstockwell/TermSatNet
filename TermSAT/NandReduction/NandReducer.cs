@@ -15,80 +15,33 @@ public static class NandReducer
     /// Reduces formulas composed of constants, variables, and nand operators to their canonical form.  
     /// Repeatedly discovers reducible sub-formulas and reduces them.
     /// Reductions are added to the given Proof.
+    /// The reduction process stops if a reduction cannot be added to the proof (cuz infinite loop or sumpin) 
+    /// of cuz no more reductions can be made.
     /// Returns a canonical formula.
     /// </summary>
     public static Formula NandReduction(this Formula startingFormula, Proof proof)
     {
         // if given formula is not a nand then it must be a variable or constant and is not reducible.
-        if (!(startingFormula is Formulas.Nand startingNand))
+        if (!(startingFormula is Nand))
         {
             return startingFormula;
         }
 
+        // Repeatedly call SingleNandReduction until no more reductions
         Formula reducedFormula = startingFormula;
-
-        //{ // first, reduce both the antecedent and sequent 
-        //    {
-        //        var childProof = new Proof(proof);
-        //        var reducedAntecedent = startingNand.Antecedent.NandReduction(childProof);
-        //        if (!reducedAntecedent.Equals(startingNand.Antecedent))
-        //        {
-        //            // lift the reductions in the child proof up to the parent proof.  
-        //            // the child proof will eventually be abandoned.
-        //            foreach (var r in childProof.Reductions)
-        //            {
-        //                var reduced = Formulas.Nand.NewNand(r.ReducedFormula, startingNand.Subsequent);
-        //                var mapping = SystemExtensions.ConcatAll(
-        //                    new[] { 0 },
-        //                    r.Mapping.Select(i => i + 1),
-        //                    Enumerable.Range(r.StartingFormula.Length + 1, startingNand.Subsequent.Length)
-        //                ).ToImmutableList();
-        //                var parentReduction = new Reduction(reducedFormula, reduced, r.RuleDescriptor, mapping);
-        //                if (!proof.AddReduction(parentReduction)) 
-        //                { 
-        //                    break; 
-        //                }
-        //                reducedFormula = startingNand= reduced;
-        //            }
-        //        }
-        //    }
-        //    {
-        //        var childProof = new Proof(proof);
-        //        var reducedSubsequent = startingNand.Subsequent.NandReduction(childProof);
-        //        if (!reducedSubsequent.Equals(startingNand.Subsequent))
-        //        {
-        //            // lift the reductions in the child proof up to the parent proof.  
-        //            foreach (var r in childProof.Reductions)
-        //            {
-        //                var reduced = Formulas.Nand.NewNand(startingNand.Antecedent, r.ReducedFormula);
-        //                var mapping = SystemExtensions.ConcatAll(
-        //                    Enumerable.Range(0, startingNand.Antecedent.Length + 1),
-        //                    r.Mapping.Select(i => i + startingNand.Antecedent.Length)
-        //                ).ToImmutableList();
-        //                var parentReduction = new Reduction(reducedFormula, reduced, r.RuleDescriptor, mapping);
-        //                if (!proof.AddReduction(parentReduction))
-        //                {
-        //                    break;
-        //                }
-        //                reducedFormula = reduced;
-        //            }
-        //        }
-        //    }
-        //}
-
-        // now render the two canonical parts together
-        // note: just calling NandReduction will result in an infinite loop.
-        // Repeatedly calling SingleNandReduction here avoids that problem.
+        while (true)
         {
-            while (true)
+            var result = reducedFormula.SingleNandReduction(proof);
+
+            if (result.ReducedFormula.CompareTo(reducedFormula) < 0)
             {
-                var result = reducedFormula.SingleNandReduction(proof);
-                if (result.RuleDescriptor == Reduction.FORMULA_IS_CANONICAL || !proof.AddReduction(result))
+                if (proof.AddReduction(result))
                 {
-                    break;
+                    reducedFormula = result.ReducedFormula;
+                    continue;
                 }
-                reducedFormula = result.ReducedFormula;
             }
+            break;
         }
 
         return reducedFormula;

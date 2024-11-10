@@ -68,9 +68,39 @@ namespace TermSAT.NandReduction
         /// However, if for some reduction, ReducedFormula == StartingFormula and the reduction is incomplete 
         /// then it can only be considered valid in the context in which it was created and cannot be globally cached.
         /// </summary>
-        public IImmutableList<Reduction> IncompleteProofs { get; } 
+        public IImmutableList<Reduction> IncompleteProofs { get; }
 
-        public Reduction(Formula startingFormula, Formula reducedFormula, string ruleDescriptor, IImmutableList<int> mapping, IImmutableList<Reduction> incompleteProofs= null)
+        /// <summary>
+        /// The child proof used to reduce the result of an expansive rule (for instance, |a|bc -> |T||a|Tb|a|Tc -> *).  
+        /// Null otherwise;
+        /// </summary>
+        public Proof ChildProof { get; }
+
+#if DEBUG
+        /// <summary>
+        /// The ReducedFormula mapped to StartingFormula, as a string, where elements that map to -1 displayed using '#'
+        /// This field is currently just used for debugging, but its super handy.
+        /// </summary>
+        public string MappedFormula { 
+            get
+            {
+                var starting = StartingFormula.AsFlatTerm();
+                string[] mapped = new string[ReducedFormula.Length];
+                for (int i = 0; i < mapped.Length; i++)
+                {
+                    mapped[i] = "#";
+                    var m = Mapping[i];
+                    if (-1 < m)
+                    {
+                        mapped[i] = starting[m].GetIndexingSymbol();
+                    }
+                }
+                return string.Join("",mapped);
+            }
+        }
+#endif
+
+        public Reduction(Formula startingFormula, Formula reducedFormula, string ruleDescriptor, IImmutableList<int> mapping, IImmutableList<Reduction> incompleteProofs= null, Proof childProof = null)
         {
             StartingFormula=startingFormula;
             ReducedFormula=reducedFormula;
@@ -82,6 +112,7 @@ namespace TermSAT.NandReduction
             {
                 IncompleteProofs = ImmutableList<Reduction>.Empty;
             }
+            ChildProof = childProof;
 
             Validate();
         }
@@ -108,16 +139,17 @@ namespace TermSAT.NandReduction
                     throw new TermSatException("A reduction mapping must provide a mapping for every symbol in the reduced formula");
                 }
 
-                //for (int i = 0; i < ReducedFormula.Length; i++)
-                //{
-                //    var reducedTerm = ReducedFormula.GetFormulaAtPosition(i);
-                //    var startingPosition = Mapping.Skip(i).First();
-                //    if (0 <= startingPosition)
-                //    {
-                //        var startingTerm = StartingNand.GetFormulaAtPosition(startingPosition);
-                //        Debug.Assert(reducedTerm.Equals(startingTerm), $"Mapped terms do not match");
-                //    }
-                //}
+                for (int i = 0; i < ReducedFormula.Length; i++)
+                {
+                    var reducedTerm = ReducedFormula.GetFormulaAtPosition(i);
+                    var startingPosition = Mapping[i];
+                    if (0 <= startingPosition)
+                    {
+                        var startingTerm = StartingFormula.GetFormulaAtPosition(startingPosition);
+                        //Debug.Assert(reducedTerm.Equals(startingTerm), $"Mapped terms do not match");
+                        Debug.Assert(reducedTerm.GetIndexingSymbol().Equals(startingTerm.GetIndexingSymbol()), $"Mapped terms do not match");
+                    }
+                }
             }
 
             if ("|T|T.1 => .1" == RuleDescriptor)

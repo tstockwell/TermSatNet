@@ -16,7 +16,7 @@ public static class NandReducerConstantEliminationRules
                 // |TT => F, and |TF => T
                 var descriptor = constantConsequent.Equals(Constant.TRUE) ? "|TT => F" : "|TF => T";
                 var reducedFormula = constantConsequent.Equals(Constant.TRUE) ? Constant.FALSE : Constant.TRUE;
-                var mapping = new int[] { 0 }.ToImmutableList();
+                var mapping = new int[] { -1 }.ToImmutableList();
                 var reduction = new Reduction(startingNand, reducedFormula, descriptor, mapping);
                 return reduction;
             }
@@ -35,7 +35,7 @@ public static class NandReducerConstantEliminationRules
         if (startingNand.Antecedent == Constant.FALSE)
         {
             // |F.1 => T
-            var mapping = new int[] { 0 }.ToImmutableList();
+            var mapping = new int[] { -1 }.ToImmutableList();
             var reduction = new Reduction(startingNand, Constant.TRUE, "|F.1 => T", mapping);
             return reduction;
         }
@@ -43,16 +43,18 @@ public static class NandReducerConstantEliminationRules
         {
             // |.1T => |T.1
             var reducedFormula = Nand.NewNand(Constant.TRUE, startingNand.Antecedent);
-            var mapping = new int[] { 0, startingNand.Antecedent.Length + 1 }.AsEnumerable()
-                .Concat(Enumerable.Range(1, startingNand.Antecedent.Length)
-            ).ToImmutableList();
+            var mapping = Enumerable.Empty<int>()
+                .Append(-1)
+                .Append(startingNand.Antecedent.Length + 1)
+                .Concat(Enumerable.Range(1, startingNand.Antecedent.Length))
+                .ToImmutableList();
             var reduction = new Reduction(startingNand, reducedFormula, "|.1T => |T.1", mapping);
             return reduction;
         }
         if (startingNand.Subsequent == Constant.FALSE)
         {
             // |.1F => T
-            var mapping = new int[] { 0 }.ToImmutableList();
+            var mapping = new int[] { -1 }.ToImmutableList();
             var reduction = new Reduction(startingNand, Constant.TRUE, "|.1F => T", mapping);
             return reduction;
         }

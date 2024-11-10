@@ -135,3 +135,8 @@ test .1 => F in antecedent
 therefore replace .1 in subsequent with T...
 => |.1|T.2 
 
+# Applying Reduction rules
+Must 
+
+// |.1||.2|T.3|.3|T.2 => ||.2.3||.1.2|.1.3
+
