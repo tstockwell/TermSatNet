@@ -182,7 +182,7 @@ namespace TermSAT.RuleDatabase
             //  (in other words, if the result of applying the associated reduction rule will 
             //  result in a new formula of the same length as the formula being checked) 
             // then 
-            //  the formula to be checked is only reducable if the reduced formula is simpler
+            //  the formula to be checked is only reducible if the reduced formula is simpler
             //
             // This check is required because the reduction rules that reduce all the shortest 
             // formulas for a truth table to a single formula are conditional, they are only 

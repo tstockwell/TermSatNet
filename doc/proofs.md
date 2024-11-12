@@ -54,6 +54,10 @@ that is 'less than' the starting formula in the formula ordering.
 
 In TermSAT a reduction is specified as two formulas, a starting formula and reduced formula, 
 and an enumeration of positions, for each term in the reduced formula
+
+## The 'Reductive Logic System'
+The 'Reductive Logic System' (or system R) is the name for the logic system for which NandSAT was built.  
+The difference between system R and other logic systems is most logic systems have a limited # of deductive rules.  
 	
 ## Nand Reduction 
 Nand reduction is just a set of abstract reductions, executed in the following order....
@@ -139,4 +143,7 @@ therefore replace .1 in subsequent with T...
 Must 
 
 // |.1||.2|T.3|.3|T.2 => ||.2.3||.1.2|.1.3
+
+## Trie idea for competitive solver
+NandSAT's native reduction algorithm gebarety
 

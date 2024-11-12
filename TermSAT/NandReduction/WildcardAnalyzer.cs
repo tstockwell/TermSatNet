@@ -10,9 +10,13 @@ namespace TermSAT.NandReduction;
 /// Wildcards are subterms of a non-canonical formula that may be replaced with anything, without effecting the truth value of the formula.
 /// Wildcards are discovered by observing proofs and identifying those terms that are removed 
 /// from the formula by rules like |F.1 => T, |.1F => T, or terms that are replaced with a constant during wildcard analysis.
-/// Note that in these rules .1 represents a formula that can be anything, the resulting truth value will always be T.  
+/// Note that in these rules .1 represents a formula that can be anything, the resulting truth value will not change.  
 /// Such terms may be replaced with anything and the formula will still reduce to the same canonical formula.
-/// Therefore the result of replacing such terms has the same truth value as the original formula.
+///
+/// NandSat takes advantage of wildcards by testing formulas for wildcards by...
+///     - replacing all instances of a term in a formulas antecedent/subsequent with a constant test value (that is, T or F), and 
+///     - if reducing the result identifies all matching terms in the formula's subsequent/antecedent as wildcards then 
+///     - replace all matching terms in the formulas subsequent/antecedent with the opposite of the test value (F or T).  
 /// 
 /// This class will detect...
 /// - reductions by the rules |F.1 => T and |.1F => T. that remove a given subterm from the starting formula.
@@ -23,6 +27,13 @@ namespace TermSAT.NandReduction;
 /// Create an instance of this class before reducing a formula.
 /// Then pass a ref to the OnReduction method as the proofTracer to the NandReducer.NandReduction method.
 /// 
+/// Note: Once upon a time NandSat took advantage of wildcards by testing formulas for wildcards by...
+///     - replacing all instances of a term in a formulas antecedent with a constant test value (that is, T or F), and 
+///     - if reducing the result identifies a wildcard then 
+///     - replacing all matching terms in the formulas subsequent the opposite of the test value.  
+/// It was thought at the time that just finding the first such wildcard was sufficient.  
+/// It was also though that there was a performance advantage in stopping a reduction after the first wildcard was found.  
+/// But it turns out that its necessary for all matching instances of the test term to be wildcards.
 /// 
 /// </summary>
 public class WildcardAnalyzer : Proof

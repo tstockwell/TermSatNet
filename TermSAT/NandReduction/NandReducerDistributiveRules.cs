@@ -238,6 +238,9 @@ public static class NandReducerDistributiveRules
         // NOTE:
         // |.3||.1|T.2|.2|T.1 => ||.1.2||.1.3|.2.3 is another equivalent rule, so...
         // todo: explore the possibility of replacing 'expansion rules' with un-ordered distributive reduction rules
+        // |T||.1|T.2|.3|T.1 => ||.1.2||T.1|T.3
+
+
         {
             if (startingNand.Subsequent is Nand nandSub
                 && nandSub.Subsequent is Nand nandSubSub
@@ -254,8 +257,7 @@ public static class NandReducerDistributiveRules
                     Nand.NewNand(nandSubSubSub.Subsequent, nandSubSub.Antecedent),
                     Nand.NewNand(
                         Nand.NewNand(startingNand.Antecedent, nandSubSubSub.Subsequent),
-                        Nand.NewNand(startingNand.Antecedent, nandSubAntSub.Subsequent)))
-                    .NandReduction(childProof);
+                        Nand.NewNand(startingNand.Antecedent, nandSubAntSub.Subsequent)));
 
                 var mapping =
                     Enumerable.Repeat(-1, 2) // ||

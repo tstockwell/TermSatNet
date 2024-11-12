@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 using TermSAT.Formulas;
 using TermSAT.NandReduction;
 using TermSAT.RuleDatabase;
@@ -11,103 +12,80 @@ namespace TermSAT.Tests
         [TestMethod]
         public void CurrentNandReductionTests()
         {
-            // ||T.2|T|.1.3 => |.1|T|.3|T.2
-            // Should reduce using commutative rule // |.2|T|.1.3 => |.1|T|.2.3.  
-            // proof...
-            //  => |.1|T||T.2.3 |b|T|ac => |a|T|bc
-            //  => |.1|T|.3|T.2 |ba => |ab
-
-
-
-            // |.3||.1|T.2|.2|.1.T => ||.1.2||.1.3|.2.3
-            // => |T||.3|T|.1|T.2|.3|T|.2|.1T |a|bc -> |T||a|Tb|a|Tc  a= .3 b= |.1|T.2 c= |.2|.1T
-            // => |T||.3|T|.1|T.2|.2|T|.3|.1T 
-            // => |T| |.1|T|.3|T.2 |.2|T|.3|.1T 
+            // |||T.1|.2.3||.1.2|.1.3 => |T||.1.2|.1.3
+            //      test .1->F in antecedent
+            //      => |||TF|.2.3||.1.2|.1.3
+            //      => ||T|.2.3||.1.2|.1.3
+            //          test .2->T in antecedent
+            //          => ||T|T.3||.1.2|.1.3
+            //          => |.3||.1.2|.1.3
+            //          => |.3||.1.2|.1T .3->T in subsequent
+            //          => |.3||F.2|.1T .1->F in antecedent 
+            //          => |.3|T|.1T .2 is wildcard
+            //          => |.3.1 
+            //          => |.1.3
+            //      => ||T|.2.3||.1F|.1.3   .2 ->F in subsequent
+            //      => ||T|.2.3|T|.1.3      .1 is wildcard
+            //      => ||T|.1.3|T|.2.3      
+            //      => |.1|T|.2.3
+            // => |||T.1|.2.3||T.2|.1.3     !!!!  .1->T in subsequent is not a valid reduction WTF !!!!!!
+            // BUT... start by testing the subsequent first and it works, WTF!!!
+            // |||T.1|.2.3||.1.2|.1.3 => |T||.1.2|.1.3
+            //      test .1->F in subsequent
+            //      => |||T.1|.2.3||F.2|F.3 
+            //      => |||T.1|.2.3||F.2T
+            //      => |||T.1|.2.3|TT
+            //      => |||T.1|.2.3F
+            //      => T .1 is wildcard
+            // => |||TT|.2.3||.1.2|.1.3 .1->T in antecedent
+            // => ||F|.2.3||.1.2|.1.3 
+            // => |T||.1.2|.1.3 
             {
-                var nonCanonicalformula = (Formulas.Nand)Formula.Parse("|.3||.1|T.2|.2|T.1");
-                var canonicalFormula = Formula.Parse("||.1.2||.1.3|.2.3"); // verified canonical
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
-                var proof = new Proof();
-                var reducedFormula = NandReducer.NandReduction(nonCanonicalformula, proof);
-                Assert.AreEqual(canonicalFormula, reducedFormula);
-            }
+                {
 
+                }
+                {
+                    var reductionSteps = new[] 
+                    {
+                        "|||TF|.2.3||.1.2|.1.3",
+                        "||T|.2.3||.1.2|.1.3",
+                        "||T|.2.3||.1F|.1.3",
+                        "||T|.2.3|T|.1.3",
+                        "|.1|T|.2.3"
+                    };
+                    var reductionFormulas = reductionSteps.Select(s => Formula.Parse(s)).ToArray();
+                    var truthTables = reductionFormulas.Select(f => TruthTable.NewTruthTable(f).ToString()).Distinct().ToArray();
+                    Assert.IsTrue(truthTables.Length == 1);
+                }
+                {
+                    var reductionSteps = new[]
+                    {
+                        "|||T.1|.2.3||.1.2|.1.3",
+                        "|||TT|.2.3||.1.2|.1.3",
+                    };
+                    var reductionFormulas = reductionSteps.Select(s => Formula.Parse(s)).ToArray();
+                    var truthTables = reductionFormulas.Select(f => TruthTable.NewTruthTable(f).ToString()).Distinct().ToArray();
+                    Assert.IsTrue(truthTables.Length == 1);
+                }
 
-            //// |T||.1|T.2|.2|T.1 
-            ////  => ||.1.2|T.1|.2|T.1 |T||a||Tb|c -> ||ab|Tac 
-            ////  => ||.1.2|T.1|.2|TF
-            ////  => ||.1.2|T.1|.2T
-            ////  => ||.1.2|T.1|T.2
-            //// |T||a||Tb|c -> ||ab|Tac 
-            //// |T|a|bc -> |||Tab||Tac 
-            ////
-            //// |T|a||Tb|Tc -> ||ab|ac 
-            // //  => |||.1|T.2|T.2||.1|T.2|T|T.1  cuz |T|a|bc -> ||a|Tb|a|Tc where a= |.1|T.2, b= .2, c= |T.1
-            ////  => |||.1|T.2|T.2||.1|T.2|T|T.1  cuz |T|a|bc -> ||a|Tb|a|Tc 
-            ////  => |||.1|TF|T.2||.1|T.2|T|T.1  
-            ////  => |||.1T|T.2||.1|T.2|T|T.1  
-            ////  => |||T.1|T.2||.1|T.2|T|T.1  
-            ////  => |||T.1|T.2||.1|T.2.1  
-            ////  => |||T.1|T.2|.1|.1|T.2
-            ////  => |||T.1|T.2|.1|T|T.2
-            ////  => |||T.1|T.2|.1.2
-            ////  => ||.1.2||T.1|T.2
-            //{
-            //    var nonCanonicalformula = (Formulas.Nand)Formula.Parse("|T||.1|T.2|.2|T.1"); // id=456
-            //    var canonicalFormula = Formula.Parse("||.1.2||T.1|T.2");
-
-
-
-            // |.1||.2|T.3|.3|T.2 should be reducible via wildcard analysis
-            //  test .1->F in antecedent
-            //      => |F||.2|T.3|.3|.1.2 wildcard
-            //      => T
-            //  wildcard in subsequent: .1->T 
-            //  => |.1||.2|T.3|.3|T.2 
-            // error... |||T.1|.2.3||.1.2|.3|T.2 is not a valid reduction for |||.1.2|.3|T.2||.2.3|.1|T.2 (3407)
-            // |||T.1|.2.3||.1.2|.3|T.2 (3407) ->* |T||.1.2|.1.3) 
-            // |||.1.2|.3|T.2||.2.3|.1|T.2 (6071) ->* |T||.1.3) 
-            // Here's basically what the NRA is (currently) doing... 
-            //  test |T.2 -> F in antecedent
-            //      => |||.1.2|.3F||.2.3|.1|T.2
-            //      => |||.1.2T||.2.3|.1|T.2
-            //      => ||T|.1.2||.2.3|.1|T.2
-            //      test .1 -> T in antecedent
-            //          => ||T|T.2||.2.3|.1|T.2
-            //          => |.2||.2.3|.1|T.2, cuz |T|T.1 => .1
-            //          => |.2||T.3|.1|TT, cuz .2 is wildcard in seq when .2 -> F
-            //          => |.2||T.3|.1F,  <- wildcard
-            //      => ||T|.1.2||.2.3|F|T.2, <- wildcard
-            // => |||.1.2|.3|T.2||.2.3|.1T, cuz |T.2 is sub wildcard 
-            // => |||.1.2|.3|T.2||.2.3|T.1
-            // => |||.1.2|.3|T.2||T.1|.2.3
-            // The problem is that the NRA finds that |T.2 is a wildcard when its not.  
-            // This happens because NRA fails to consider that |T.2 was modified while testing .1 -> T.
-            // How to fix?...
-            // 1)   This formula is not reducible via wildcard analysis, it requires a hard-coded ordering rule.
-            //      The ordering rule is not yet implemented.
-            //      If this rule were already implemented then this problem would go away because the NRA wouldn't even get
-            //      as far as attempting wildcard analysis on this formula.
-            //      But that's kinda cheating, it doesnt fix the problem but just avoids it.
-            //      I guess what I would want is for the call to NandReduction to fail gracefully, by returning an un-reduced formula.
-            // 2)   Extend the NRA proof trace to track all reductions in a 'context', a context that is maintained
-            //      across sub-reductions.
-            //      And disallow reductions that modify a subterm that is the subject of a parent context.
-            //      This would cause NandReduction to fail gracefully.
-            //      But it's a lot of work, and its complicated.
-            //
-            // Instead, I took a less labor-intensive fix as a shortcut.
-            // This shortcut is NOT THE SAME as extending the NRA to track 'context's but its far less labor intensive.
-            // The shortcut is to skip common terms that contain any other common terms as a subterm.
-            // Using this scheme, |T.2 would be skipped as a common term because it contains another comment term, .2, within it.
-            {
-                var nonCanonicalformula = (Formulas.Nand)Formula.Parse("|||.1.2|.3|T.2||.2.3|.1|T.2");
-                var canonicalFormula = Formula.Parse("|.1.3");
+                var nonCanonicalformula = (Nand)Formula.Parse("|||T.1|.2.3||.1.2|.1.3");
+                var canonicalFormula = Formula.Parse("|T||.1.2|.1.3");
                 Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
                 Proof proof = new();
                 var reducedFormula = NandReducer.NandReduction(nonCanonicalformula, proof);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
+
+            // |T||.1|T.2|.3|T.1 => ||.1.2||T.1|T.3
+            {
+                var nonCanonicalformula = (Nand)Formula.Parse("|T||.1|T.2|.3|T.1");
+                var canonicalFormula = Formula.Parse("||.1.2||T.1|T.3");
+                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Proof proof = new();
+                var reducedFormula = NandReducer.NandReduction(nonCanonicalformula, proof);
+                Assert.AreEqual(canonicalFormula, reducedFormula);
+            }
+
         }
         [TestMethod]
         public void BasicNandReductionTests()
@@ -339,17 +317,27 @@ namespace TermSAT.Tests
                 // 5478    |||.1.2|.1.3|.3|T||T.1|T.2  19  EAEA    0    94  |T||.1.2|.1.3
                 // Note: you cant tell from the above, but IsSubsumedBySchema == '', and it shouldn't be blank
                 // Note: weirdly, |T||T.1|T.2 is canonical
-                // setting .1 => F in antecedent => |||F.2|F.3|.3|T||T.1|T.2
-                //                             => ||TT|.3|T||T.1|T.2
-                //                             => |F|.3|T||T.1|T.2
-                //                             => T
+                // |||.1.2|.1.3|.3|T||T.1|T.2
+                //      test .1 => F in antecedent
+                //      => |||F.2|F.3|.3|T||T.1|T.2
+                //      => ||TT|.3|T||T.1|T.2
+                //      => |F|.3|T||T.1|T.2 ;.1 is a wildcard
+                //      => T
                 // yields result that is independent of .1, therefore set .1 => T in subsequent...
-                // |||.1.2|.1.3|.3|T||T.1|T.2 => |||.1.2|.1.3|.3|T||TT|T.2
-                //                            => |||.1.2|.1.3|.3|T|F|T.2
-                //                            => |||.1.2|.1.3|.3|TT
+                // => |||.1.2|.1.3|.3|T||TT|T.2
+                // => |||.1.2|.1.3|.3|T|F|T.2
+                // => |||.1.2|.1.3|.3|TT
                 //                            => |||.1.2|.1.3|.3F
                 //                            => |||.1.2|.1.3T
                 //                            => |T||.1.2|.1.3
+                //
+                // error: |||.1.2|T.3|.3|T||T.1|T.2 is not a valid reduction for |||.1.2|.1.3|.3|T||T.1|T.2
+                // test .1->F in subsequent
+                // => |||.1.2|.1.3|.3|T||TF|T.2
+                // => |||.1.2|.1.3|.3|T|T|T.2
+                // => |||.1.2|.1.3|.3|T.2
+                //      test => |||.1.2|.1.3|.3|T.2 ;wildcard .2->F 
+
                 var nonCanonicalformula = (Formulas.Nand)Formula.Parse("|||.1.2|.1.3|.3|T||T.1|T.2");
                 var canonicalFormula = Formula.Parse("|T||.1.2|.1.3");
                 Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
@@ -749,6 +737,70 @@ namespace TermSAT.Tests
                 var canonicalFormula = Formula.Parse("|.1|.2.3");
                 Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
                 var proof = new Proof();
+                var reducedFormula = NandReducer.NandReduction(nonCanonicalformula, proof);
+                Assert.AreEqual(canonicalFormula, reducedFormula);
+            }
+            // |.3||.1|T.2|.2|.1.T => ||.1.2||.1.3|.2.3
+            // => |T||.3|T|.1|T.2|.3|T|.2|.1T |a|bc -> |T||a|Tb|a|Tc  a= .3 b= |.1|T.2 c= |.2|.1T
+            // => |T||.3|T|.1|T.2|.2|T|.3|.1T 
+            // => |T| |.1|T|.3|T.2 |.2|T|.3|.1T 
+            {
+                var nonCanonicalformula = (Formulas.Nand)Formula.Parse("|.3||.1|T.2|.2|T.1");
+                var canonicalFormula = Formula.Parse("||.1.2||.1.3|.2.3"); // verified canonical
+                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                var proof = new Proof();
+                var reducedFormula = NandReducer.NandReduction(nonCanonicalformula, proof);
+                Assert.AreEqual(canonicalFormula, reducedFormula);
+            }
+
+
+            // |.1||.2|T.3|.3|T.2 should be reducible via wildcard analysis
+            //  test .1->F in antecedent
+            //      => |F||.2|T.3|.3|.1.2 wildcard
+            //      => T
+            //  wildcard in subsequent: .1->T 
+            //  => |.1||.2|T.3|.3|T.2 
+            // error... |||T.1|.2.3||.1.2|.3|T.2 is not a valid reduction for |||.1.2|.3|T.2||.2.3|.1|T.2 (3407)
+            // |||T.1|.2.3||.1.2|.3|T.2 (3407) ->* |T||.1.2|.1.3) 
+            // |||.1.2|.3|T.2||.2.3|.1|T.2 (6071) ->* |T||.1.3) 
+            // Here's basically what the NRA is (currently) doing... 
+            //  test |T.2 -> F in antecedent
+            //      => |||.1.2|.3F||.2.3|.1|T.2
+            //      => |||.1.2T||.2.3|.1|T.2
+            //      => ||T|.1.2||.2.3|.1|T.2
+            //      test .1 -> T in antecedent
+            //          => ||T|T.2||.2.3|.1|T.2
+            //          => |.2||.2.3|.1|T.2, cuz |T|T.1 => .1
+            //          => |.2||T.3|.1|TT, cuz .2 is wildcard in seq when .2 -> F
+            //          => |.2||T.3|.1F,  <- wildcard
+            //      => ||T|.1.2||.2.3|F|T.2, <- wildcard
+            // => |||.1.2|.3|T.2||.2.3|.1T, cuz |T.2 is sub wildcard 
+            // => |||.1.2|.3|T.2||.2.3|T.1
+            // => |||.1.2|.3|T.2||T.1|.2.3
+            // The problem is that the NRA finds that |T.2 is a wildcard when its not.  
+            // This happens because NRA fails to consider that |T.2 was modified while testing .1 -> T.
+            // How to fix?...
+            // 1)   This formula is not reducible via wildcard analysis, it requires a hard-coded ordering rule.
+            //      The ordering rule is not yet implemented.
+            //      If this rule were already implemented then this problem would go away because the NRA wouldn't even get
+            //      as far as attempting wildcard analysis on this formula.
+            //      But that's kinda cheating, it doesnt fix the problem but just avoids it.
+            //      I guess what I would want is for the call to NandReduction to fail gracefully, by returning an un-reduced formula.
+            // 2)   Extend the NRA proof trace to track all reductions in a 'context', a context that is maintained
+            //      across sub-reductions.
+            //      And disallow reductions that modify a subterm that is the subject of a parent context.
+            //      This would cause NandReduction to fail gracefully.
+            //      But it's a lot of work, and its complicated.
+            //
+            // Instead, I took a less labor-intensive fix as a shortcut.
+            // This shortcut is NOT THE SAME as extending the NRA to track 'context's but its far less labor intensive.
+            // The shortcut is to skip common terms that contain any other common terms as a subterm.
+            // Using this scheme, |T.2 would be skipped as a common term because it contains another comment term, .2, within it.
+            {
+                var nonCanonicalformula = (Formulas.Nand)Formula.Parse("|||.1.2|.3|T.2||.2.3|.1|T.2");
+                var canonicalFormula = Formula.Parse("|.1.3");
+                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Proof proof = new();
                 var reducedFormula = NandReducer.NandReduction(nonCanonicalformula, proof);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
