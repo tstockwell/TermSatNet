@@ -59,7 +59,7 @@ namespace TermSAT.Formulas
         public void Add(Formula formula) => Add(formula.GetIndexingKey(), formula);
 
         /**
-         * Returns a list of formulas in this InstanceRecogniser that are generalizations of 
+         * Returns a list of formulas in this InstanceRecognizer that are generalizations of 
          * the given formula.
          * @param maxMatchCount maximum # of matches to find
          */

@@ -44,14 +44,14 @@ public static class SchemeReducer
 
         if (formula is Formulas.Nand nand)
         {
-            return NandReducer.NandReduction(nand);
+            return NandReducer.Reduce(nand);
         }
 
         //if (formula is Implication)
         //{
         //    Implication implication = (Implication)formula;
-        //    var reducedAntecent = implication.Antecedent.NandReduction();
-        //    var reducedConsequent = implication.Subsequent.NandReduction();
+        //    var reducedAntecent = implication.Antecedent.Reduce();
+        //    var reducedConsequent = implication.Subsequent.Reduce();
             
         //    if (reducedAntecent == Constant.TRUE)
         //    {

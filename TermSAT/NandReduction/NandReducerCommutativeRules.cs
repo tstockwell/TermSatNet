@@ -12,12 +12,15 @@ public static class NandReducerCommutativeRules
     /// <summary>
     /// 'Commutative' rules are rules where the length doesn't change, just the symbols are rearranged.  
     /// </summary>
-    public static Reduction ReduceCommutativeFormulas(this Nand startingNand, Proof proof)
+    public static bool TryReduceCommutativeFormulas(this Nand startingNand, out Reduction result)
     {
 
         // |.2.1 => |.1.2 
         // A pure ordering rule, because the length doesn't change, just the symbols are rearranged.
         // swap .1 <-> .2
+        // This rule will be subsumed by wildcard analysis when 'instance swapping' is implemented.
+        // Wildcard analysis does this by noting that .1 and .2 are wildcards for each other, so they
+        // can be swapped for each other.
         {
             if (startingNand.Subsequent.CompareTo(startingNand.Antecedent) < 0)
             {
@@ -26,14 +29,17 @@ public static class NandReducerCommutativeRules
                     .Concat(Enumerable.Range(startingNand.Antecedent.Length + 1, startingNand.Subsequent.Length))
                     .Concat(Enumerable.Range(1, startingNand.Antecedent.Length))
                     .ToImmutableList();
-                var result = new Reduction(startingNand, reducedFormula, "|.2.1 => |.1.2", mapping);
-                return result;
+                result = new Reduction(startingNand, reducedFormula, "|.2.1 => |.1.2", mapping);
+                return true;
             }
         }
 
         // |.2|T|.1.3 => |.1|T|.2.3.  
         // A pure ordering rule, because the length doesn't change, just the symbols are rearranged.
         // swap .1 <-> .2
+        // NOTE!!!!!!: This rule could be subsumed by wildcard analysis if wildcard analysis is extended to discover 
+        // when two terms are wildcards for each other and swapping them reduces the formula.
+        // PPS: We can easily see that 1. and .2 are swappable because they can both be swapped with the T.
         {
             if (startingNand.Subsequent is Formulas.Nand nand
                 && nand.Antecedent == Constant.TRUE
@@ -56,11 +62,23 @@ public static class NandReducerCommutativeRules
                         .Concat(Enumerable.Range(1, startingNand.Antecedent.Length)) //.2
                         .Concat(Enumerable.Range(startingNand.Antecedent.Length + nandSubNand.Antecedent.Length + 4, nandSubNand.Subsequent.Length)) //.3
                         .ToImmutableList();
-                    var result = new Reduction(startingNand, reducedFormula, "|.2|T|.1.3 => |.1|T|.2.3", mapping);
-                    return result;
+                    result = new Reduction(startingNand, reducedFormula, "|.2|T|.1.3 => |.1|T|.2.3", mapping);
+                    return true;
                 }
             }
         }
+
+        // The remainder of the 'commutative' rules appear to be discoverable via an algorithm 
+        // similar to the wildcard analysis algorithm, or maybe as an extension to the wildcard 
+        // algorithm.
+        // Instead of searching for common pairs of terms where one can be replaced, the
+        // 'wormhole algorithm' instead looks for terms in antecedents that can be swapped
+        // with constants in the associated subsequent. 
+        // The wormhole algorithm searches for these terms in the same way that the wildcard
+        // algorithm does, but, for test values of F, looks for reduced formulas where all Ts 
+        // have been removed.
+        // These constant wildcards can be swapped with 
+        // 
 
         // five operators
         // ||.1|.2.3|.2|T.1 => ||.1|T.2|.2|.1.3 swap T,.3
@@ -73,6 +91,7 @@ public static class NandReducerCommutativeRules
         // NOT reducible via wildcard analysis (verified)
         // Basically the .3 and the T trade places
         // An example of a 'T-slider' rule.
+        // NOTE: Can be subsumed by wildcard analysis after extending for 'swappable terms'.
         {
             if (startingNand.Antecedent is Formulas.Nand nandAnt
                 && nandAnt.Subsequent is Formulas.Nand nandAntSub
@@ -97,23 +116,6 @@ public static class NandReducerCommutativeRules
                             nandAntSub.Subsequent)));
                 if (reducedFormula.CompareTo(startingNand) < 0)
                 {
-                    //var mapping1_1 = Enumerable.Range(2, nandAnt.Antecedent.Length);
-                    //var mapping2_1 = Enumerable.Range(nandAnt.Antecedent.Length + 2, nandAntSub.Antecedent.Length);
-                    //var mapping3 = Enumerable.Range(nandAnt.Length + nandSub.Antecedent.Length + 4, nandAntSub.Subsequent.Length);
-                    //var mapping2_2 = Enumerable.Range(nandAnt.Length + 2, nandAntSub.Antecedent.Length);
-                    //var mappingT = Enumerable.Range(nandAnt.Length + nandSub.Antecedent.Length + 3, 1);
-                    //var mapping1_2 = Enumerable.Range(nandAnt.Length + nandSub.Antecedent.Length + 4, nandAnt.Antecedent.Length);
-                    //var mapping = SystemExtensions.ConcatAll(
-                    //    Enumerable.Repeat(-1,1),                                // |
-                    //    Enumerable.Repeat(0, nandAnt.Antecedent.Length + 2),    // |.1|
-                    //    mappingT,                                               // T
-                    //    mapping2_1,                                             // .2
-                    //    Enumerable.Repeat(nandAnt.Length + 1, 1),               // |
-                    //    mapping2_2,                                             // .2
-                    //    Enumerable.Repeat(nandAnt.Length + nandSub.Antecedent.Length + 2, 1),               // |
-                    //    mapping1_2,                                             // .1
-                    //    mapping3                                                // .3
-                    //).ToImmutableList();
                     var mapping =
                         Enumerable.Repeat(-1, 2) // ||
                         .Concat(Enumerable.Range(2, nandAnt.Antecedent.Length)) // .1
@@ -129,15 +131,16 @@ public static class NandReducerCommutativeRules
                         .ToImmutableList();
 
 
-                    var result = new Reduction(startingNand, reducedFormula, "||.1|.2.3|.2|T.1 => ||.1|T.2|.2|.1.3", mapping);
-                    return result;
+                    result = new Reduction(startingNand, reducedFormula, "||.1|.2.3|.2|T.1 => ||.1|T.2|.2|.1.3", mapping);
+                    return true;
                 }
             }
         }
 
-        // ||.1|.2.3|.3|T.1 => ||.1|T.3|.3|.1.2
+        // ||.1|.2.3|.3|T.1 => ||.1|T.3|.3|.1.2, swap .2 <-> T
         // A pure ordering rule, its simply a reordering of the symbols in the formula
         // An example of a 'T-slider' rule.
+        // NOTE: Can be subsumed by wildcard analysis after extending for 'swappable terms'.
         {
             if (startingNand.Antecedent is Formulas.Nand nandAnt
                 && nandAnt.Subsequent is Formulas.Nand nandAntSub
@@ -177,12 +180,13 @@ public static class NandReducerCommutativeRules
                         .Concat(Enumerable.Range(nandAnt.Antecedent.Length + 3, nandAntSub.Antecedent.Length)) // .2
                         .ToImmutableList();
 
-                    var result = new Reduction(startingNand, reducedFormula, "||.1|.2.3|.3|T.1 => ||.1|T.3|.3|.1.2", mapping);
-                    return result;
+                    result = new Reduction(startingNand, reducedFormula, "||.1|.2.3|.3|T.1 => ||.1|T.3|.3|.1.2", mapping);
+                    return true;
                 }
             }
         }
 
-        return Reduction.NoChange(startingNand);
+        result = null;
+        return false;
     }
 }

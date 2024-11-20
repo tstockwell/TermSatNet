@@ -1,106 +1,144 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using TermSAT.Formulas;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TermSAT.NandReduction;
 
 /// <summary>
-/// Proofs are used by the Nand Reduction Algorithm to detect 'wildcards'.
-/// Proofs are also super useful for testing and debugging.
-/// 
-/// A proof shows how to transform one formula to an equivalent, less complex, formula.
 /// A proof is a list of reductions from a starting formula to a reduced formula that 
 /// proves that the starting and reduced formulas are equivalent.
 /// 
-/// Also, a proof provides a map of the terms in the reduced formula to the terms in the starting formula.
+/// NandSAT basically works by building a set of proofs, for every term in a formula, to the terms canonical form.
+/// These proofs are called 'reduction proofs'.
+/// Reduction proofs are built from the bottom up.
+/// Initially a formula will have a reduction proof that has no reductions.
+/// If a formula can no longer be reduced then it 
+/// then it has been proved to be canonical and 
+/// the last reduction in a proof will have RuleDescription == CANONICAL.
+/// When a reduction proofs ReducedFormula is canonical then the proof is complete and no longer updated.
 /// 
 /// </summary>
 public class Proof 
 {
-    private List<Reduction> _reductions = new();
-    private Proof ParentProof {  get; }
+    private static readonly ConditionalWeakTable<Formula, Proof> __cache = new ConditionalWeakTable<Formula, Proof>();
+
+    public static Proof GetReductionProof(Formula startingFormula)
+    {
+        if (!__cache.TryGetValue(startingFormula, out var result))
+        {
+            result = new Proof(startingFormula);
+            __cache.Add(startingFormula, result);
+        }
+        return result;
+    }
+
+    protected Proof(Formula startingFormula)
+    {
+        StartingFormula = startingFormula;
+    }
+
+
+    //public Formula ReducedFormula
+    //{
+    //    get
+    //    {
+    //        if (0 < _reductions.Count)
+    //        {
+    //            return _reductions.Last().ReducedFormula;
+    //        }
+    //        return null;
+    //    }
+    //}
+
+    public Formula StartingFormula { get; }
+
+
+    //    private List<Reduction> _reductions = new();
     private IImmutableList<int> _mapping = null;
 
-    public Proof()
-    {
-    }
+    //public IReadOnlyList<Reduction> Reductions => _reductions;
+    public Reduction NextReduction { get; private set; } = null;
 
-    /// <summary>
-    /// Create a child proof.
-    /// The given ref to the parent is only used to check for infinite loops
-    /// </summary>
-    /// <param name="proof"></param>
-    public Proof(Proof proof)
-    {
-        ParentProof = proof;
-    }
-
-    public IReadOnlyList<Reduction> Reductions => _reductions;
-
-    public Formula ReducedFormula
-    {
+    Formula _reducedFormula= null;
+    Formula _canonicalFormula = null;
+    public Formula ReducedFormula 
+    { 
         get
         {
-            if (0 < _reductions.Count)
+            if (_canonicalFormula != null)
             {
-                return _reductions.Last().ReducedFormula;
+                return _canonicalFormula;
             }
-            return null;
+            if (NextReduction == null)
+            {
+                return StartingFormula;
+            }
+            if (_reducedFormula == null)
+            {
+                _reducedFormula = NextReduction.ReducedFormula;
+            }
+            while(true)
+            {
+                var nextProof = Proof.GetReductionProof(_reducedFormula);
+                if (nextProof.NextReduction == null)
+                {
+                    break;
+                }
+                _reducedFormula = nextProof.NextReduction.ReducedFormula;
+                if (nextProof.IsComplete())
+                {
+                    _canonicalFormula = _reducedFormula;
+                    break;
+                }
+            }
+            return _reducedFormula;
         }
     }
 
-    public Formula StartingFormula
-    {
-        get
-        {
-            if (0 < _reductions.Count)
-            {
-                return _reductions.First().StartingFormula;
-            }
-            return null;
-        }
-    }
 
     /// <summary>
     /// Returns false if the reduction already exists in the proof.  
     /// </summary>
-    public virtual bool AddReduction(Reduction reduction)
+    public virtual bool SetNextReduction(Reduction reduction)
     {
 
-        // ignore
-        if (reduction.RuleDescriptor == Reduction.FORMULA_IS_CANONICAL)
-        {
-            return true;
-        }
-
-        // detect infinite loops
-        var pp = this;
-        while(pp != null)
-        {
-            if (pp.Reductions.Where(r => r.StartingFormula.Equals(reduction.StartingFormula)).Any())
-            {
-                return false;
-            }
-            pp = pp.ParentProof;
-        }
-
-
 #if DEBUG
-        // A reduction's starting formula should match the previous reductions' reduced formula
-        if (0 < _reductions.Count && !ReducedFormula.Equals(reduction.StartingFormula))
+        var currentReduced = (ReducedFormula == null) ? StartingFormula : ReducedFormula;
+        if (!reduction.StartingFormula.Equals(currentReduced))
         {
-            throw new TermSatException("A reduction's starting formula should match the previous reductions' reduced formula");
+            throw new TermSatException("A reduction's starting formula should match the current reduced formula");
         }
 #endif
 
-        _reductions.Add(reduction);
+        var todoProof = this;
+        while (todoProof != null)
+        {
+            if (todoProof.NextReduction == null)
+            {
+                todoProof.NextReduction = reduction;
+                break;
+            }
+            if (todoProof.NextReduction.RuleDescriptor.Equals(Reduction.PROOF_IS_COMPLETE))
+            {
+                break;
+            }
+            todoProof = Proof.GetReductionProof(todoProof.ReducedFormula);
+        }
+
         _mapping = null;
 
 #if DEBUG
         var mapping = Mapping.ToImmutableList();
+        if (mapping.Count <= 0)
+        {
+            throw new TermSatException("A reduction mapping's size should be the same as the formula from which it maps");
+        }
         if (0 < mapping.Count && ReducedFormula.Length !=  mapping.Count)
         {
             throw new TermSatException("A reduction mapping's size should be the same as the formula from which it maps");
@@ -126,6 +164,23 @@ public class Proof
     }
 
     /// <summary>
+    /// Returns an enumeration of reductions from StartingFormula to StartingFormula's canonical formula.
+    /// </summary>
+    public IEnumerable<Reduction> Reductions
+    {
+        get
+        {
+            var todo = this;
+            while (todo.NextReduction != null && !todo.NextReduction.RuleDescriptor.Equals(Reduction.PROOF_IS_COMPLETE))
+            {
+                yield return todo.NextReduction;
+                todo = Proof.GetReductionProof(todo.NextReduction.ReducedFormula);
+            }
+            yield break;
+        }
+    }
+
+    /// <summary>
     /// Returns a mapping that maps from the ReducedFormula of the last reduction to the 
     /// StartingNand of the first reduction
     /// </summary>
@@ -133,36 +188,35 @@ public class Proof
     {
         get
         {
-            if (_mapping == null)
-            {
-                _mapping = ImmutableList<int>.Empty;
 
-                if (_reductions != null && 0 < _reductions.Count)
+            // default mapping, for a canonical formula
+            List<int> map = Enumerable.Range(0, Math.Max(ReducedFormula.Length, StartingFormula.Length)).ToList();
+            IImmutableList<int> result = map.ToImmutableList();
+
+            if (Reductions.Any())
+            {
+                foreach (var reduction in Reductions.Reverse())
                 {
-                    List<int> map = Enumerable.Range(0, ReducedFormula.Length).ToList();
-                    for (int r = _reductions.Count; 0 < r--;)
+                    while (map.Count < reduction.ReducedFormula.Length)
                     {
-                        var reduction = _reductions[r];
-                        while (map.Count < reduction.ReducedFormula.Length)
+                        map.Add(map.Count);
+                    }
+                    while (map.Count < reduction.StartingFormula.Length)
+                    {
+                        map.Add(map.Count);
+                    }
+                    for (int i = 0; i < reduction.ReducedFormula.Length; i++)
+                    {
+                        if (0 <= map[i])
                         {
-                            map.Add(map.Count);
-                        }
-                        while (map.Count < reduction.StartingFormula.Length)
-                        {
-                            map.Add(map.Count);
-                        }
-                        for (int i = 0; i < reduction.ReducedFormula.Length; i++)
-                        {
-                            if (0 <= map[i])
-                            {
-                                map[i] = reduction.Mapping[map[i]];
-                            }
+                            map[i] = reduction.Mapping[map[i]];
                         }
                     }
-                    _mapping = map.Take(ReducedFormula.Length).ToImmutableList();
                 }
+                result = map.GetRange(0, ReducedFormula.Length).ToImmutableList();
             }
-            return _mapping;
+
+            return result;
         }
 
     }
@@ -198,23 +252,35 @@ public class Proof
 
 public static class ProofExtensions
 {
-    public static int GetPositionAtStartOfProof(this Proof proof, int currentPosition) 
-    { 
-        if (currentPosition < 0 || proof.Reductions.Count <= 0 || proof.ReducedFormula.Length <= currentPosition)
+    public static bool IsComplete(this Proof proof)
+    {
+        var nextProof = proof;
+        while(nextProof.NextReduction != null)
         {
-            return -1;  // the term at position currentPosition in ReducedFormula is not found in the starting formula
+            if (nextProof.NextReduction.RuleDescriptor.Equals(Reduction.PROOF_IS_COMPLETE))
+            {
+                return true;
+            }
+            nextProof = Proof.GetReductionProof(nextProof.ReducedFormula);
         }
-
-
-        int startingPosition = currentPosition;
-
-        for (int i = proof.Reductions.Count; 0 <= --i;)
-        {
-            var reduction = proof.Reductions[i];
-            var reducedPosition = reduction.Mapping.Skip(startingPosition).First();
-            startingPosition = reducedPosition;
-        }
-
-        return startingPosition;
+        return false;
     }
+
+
+    public static void AddCompletionMarker(this Proof proof, Formula defaultStartingFormula)
+    {
+#if DEBUG
+        if (defaultStartingFormula == null)
+        {
+            throw new ArgumentNullException(nameof(defaultStartingFormula));
+        }
+#endif
+        var startingFormula = proof.ReducedFormula;
+        if (startingFormula == null) 
+        { 
+            startingFormula = defaultStartingFormula;
+        }
+        proof.SetNextReduction(Reduction.CreateCompletionMarker(startingFormula));
+    }
+
 }

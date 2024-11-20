@@ -25,7 +25,7 @@ namespace TermSAT.NandReduction;
 /// be non-negative.
 /// 
 /// Create an instance of this class before reducing a formula.
-/// Then pass a ref to the OnReduction method as the proofTracer to the NandReducer.NandReduction method.
+/// Then pass a ref to the OnReduction method as the proofTracer to the NandReducer.Reduce method.
 /// 
 /// Note: Once upon a time NandSat took advantage of wildcards by testing formulas for wildcards by...
 ///     - replacing all instances of a term in a formulas antecedent with a constant test value (that is, T or F), and 
@@ -50,8 +50,8 @@ public class WildcardAnalyzer : Proof
 
     public Constant TestValue {  get; }
 
-    public WildcardAnalyzer(Formulas.Nand startingFormula, Formula subterm, Constant testValue, Proof parentProof)
-        : base(parentProof)
+    public WildcardAnalyzer(Formulas.Nand startingFormula, Formula subterm, Constant testValue)
+        :base(startingFormula)
     {
         this.Subterm=subterm;
         this.StartingNand=startingFormula;
@@ -90,7 +90,7 @@ public class WildcardAnalyzer : Proof
     /// wildcard in the reduction.  
     /// </summary>
     /// <param name="reduction"></param>
-    override public bool AddReduction(Reduction reduction)
+    override public bool SetNextReduction(Reduction reduction)
     {
         if (ReductionPosition < -1)
         {
@@ -126,7 +126,7 @@ public class WildcardAnalyzer : Proof
                     {
                         ReductionPosition = reductionPosition + subtermPosition;
 
-                        if (0 < Reductions.Count)
+                        if (Reductions.Any())
                         {
                             ReductionPosition = Mapping[ReductionPosition];
                         }
@@ -134,7 +134,7 @@ public class WildcardAnalyzer : Proof
                         if (0 <= ReductionPosition)
                         {
 
-                            var ok = base.AddReduction(reduction);
+                            var ok = base.SetNextReduction(reduction);
 
 #if DEBUG
                             if (ok)
@@ -181,7 +181,7 @@ public class WildcardAnalyzer : Proof
                     int subtermPosition = ruleTarget.PositionOf(Subterm);
                     if (0 <= subtermPosition)
                     {
-                        if (0 < Reductions.Count)
+                        if (Reductions.Any())
                         {
                             ReductionPosition = Mapping.ElementAt(reductionPosition + subtermPosition);
                             //ReductionPosition = ReductionProof.GetPositionAtStartOfProof(reductionPosition + subtermPosition);
@@ -209,6 +209,6 @@ public class WildcardAnalyzer : Proof
             }
         }
 
-        return base.AddReduction(reduction);
+        return base.SetNextReduction(reduction);
     }
 }

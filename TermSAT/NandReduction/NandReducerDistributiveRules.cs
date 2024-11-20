@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using TermSAT.Common;
 using TermSAT.Formulas;
@@ -12,78 +11,31 @@ public static class NandReducerDistributiveRules
 
 
     /// <summary>
-    // The distributive rules...
-    //  |a|bc -> |T||a|Tb|a|Tc -> * and
-    //  ||ab|ac -> |T|a||Tb|Tc -> *
-    //  ?? ||bc||ab|ac -> |a||b|Tc|c|Tb -> *
-
-    //
-    // One day I just came upon the rules '|a|bc -> |T||a|Tb|a|Tc -> *' and '|T|a|bc -> ||a|Tb|a|Tc -> *' .  
-    // And they're exceptionally powerful. 
-    // And I have not the first clue why exactly.  
-    // One thing about these rules is that the right side is more complex than the left side, 
-    // so they're like an anti-reduction, or expansion rule.  
-    // But they're capable of reducing a large, infinite, slice of the 'ordering' reduction rules that NandSAT requires.
-    // That's not conjecture, NandSAT testing confirms that this rule can replace many reduction rules.
-    //
-    // For instance, the rule |a|bc -> |T||a|Tb|a|Tc will reduce |T||T.1||T.2|T.3 to ||.2|T.1|.3|T.1
-    // and reduce |.1||T.2|T.3 => |T||.1.2|.1.3.
-    // Also note that the rule |a|bc -> |T||a|Tb|a|Tc will reduce |T||a|Tb|a|Tc to |a|bc (proof below).
-    // Note that these rules transform a formula with a single instance of .1 to a *simpler* formula with two instances of .1.  
-    // In these rules the starting formulas are non-canonical formulas that are not reducible via wildcard analysis.   
-    //
-    // ||ab|ac -> |T|a||Tb|Tc -> * is a similar rule, but opposite.
-    // This rule can, for instance, reduce ||.1.2|.1|T.3 to |T|.1|.3|T.2 (which also contains no wildcards);
-    // I see this rule as a compliment to |a|bc -> |T||a|Tb|a|Tc -> *.  
-    // The |a|bc -> |T||a|Tb|a|Tc rule 'splits' a variable instance by repeating it.
-    // The ||ab|ac -> |T|a||Tb|Tc -> * rule 'joins' two variables instances.
-    //
-    // I suspect that these two rules illustrate some sort of distributive property of nandSAT formulas.
-    //
-    // PS...
-    //  |T||a|Tb|a|Tc cannot be reduced using wildcard analysis,
-    //  |a|bc and |T||a|Tb|a|Tc are equivalent formulas, |a|bc is the canonical form of |T||a|Tb|a|Tc.
-    //  However, |T||a|Tb|a|Tc *can* be reduced using the rule |a|bc => |T||a|Tb|a|Tc => *
-    //  Proof...
-    //      |T||a|Tb|a|Tc
-    //      => |T|T|||.1|T.2|T.1||.1|T.2|T|T.3, reduce subsequent 1st.  |a|bc -> |T||a|Tb|a|Tc 
-    //      => |T|T|||T.1|.1|T.2||.1|T.2|T|T.3, |.2.1 -> |.1.2
-    //      => |T|T|||T.1|F|T.2||.1|T.2|T|T.3 , wildcard: .1->F: 
-    //      => |T|T|||T.1T||.1|T.2|T|T.3 
-    //      => |T|T|.1||.1|T.2|T|T.3
-    //      => |T|T|.1||.1|T.2.3
-    //      => |T|T|.1|.3|.1|T.2
-    //      => |T|T|.1|.3|T|T.2
-    //      => |T|T|.1|.3.2}
-    //      => |T|T|.1|.2.3}
-    //      => |.1|.2.3}
-    //
-    // PS...
-    //  It's also necessary to implement rules that reduce 'negated' formulas.
-    //  That is, formulas that start with "|T".  
-    //  So, we need the rule |T|a|bc -> ||a|Tb|a|Tc in addition to |a|bc -> |T||a|Tb|a|Tc.
-    //  And |T||ab|ac -> |a||Tb|Tc in addition to ||ab|ac -> |T|a||Tb|Tc.
-    //
-    // PS...
-    //  It's also necessary to implement rules that reduce 'unordered' formulas.
-    //  That is, in addition to ||ab|ac -> |T|a||Tb|Tc we need...
-    //      ||ab|ca -> |T|a||Tb|Tc, and...  
-    //      ||ba|ac -> |T|a||Tb|Tc 
-    //      ||ba|ca -> |T|a||Tb|Tc 
-    //  And in addition to |a|bc -> |T||a|Tb|a|Tc we need ||bca -> |T||a|Tb|a|Tc.  
-    //
-    // PS...
-    // NandSAT formulas are NOT associative, just like in 'normal' propositional calculus.  
-    // However, unlike 'normal' propositional calculus, NandSAT formulas are NOT commutative.  
-    // Because NandSAT formulas are ordered, the order of arguments matters.  
+    /// Distributive rules.
+    /// Rules that seem to join or expand term instances.
     /// 
+    /// 
+    /// 
+    /// |T|a|bc <- ||a|Tb|a|Tc    ;TT=54    ;this is just a special case of wildcard swapping, T <-> a
+    /// ||a|Tb|a|Tc    
+    /// => |T|a||T|Tb|T|Tc    
+    /// => |T|a|bc
+    /// 
+    /// |T||ab|ac <- |a||Tb|Tc ;this is just an example of wildcard swapping, T <-> a
+    /// 
+    /// ||bc||ab|ac <- |T||b|ac|c|ab ;TT=EB
+    /// ||bc||ab|ac <- |T||b|ac|c|ab ;TT=EB
+    ///  
     /// </summary>
-    public static Reduction ReduceDistributiveFormulas(this Nand startingNand, Proof proof)
+    public static Reduction ReduceDistributiveFormulas(this Nand startingNand, out Reduction result)
     {
+
         List<Reduction> incompleteProofs = new List<Reduction>();
 
+        // The current logic reduces to these reduction rules...
+
+
         // |a|bc -> |T||a|Tb|a|Tc -> * 
-        // |a|bc -> -||a-b|a-c -> * 
         {
             if (startingNand.Subsequent is Nand nandSub
                 && startingNand.Antecedent is Formula nandAnt)
@@ -102,7 +54,13 @@ public static class NandReducerDistributiveRules
                                 Constant.TRUE,
                                 nandSub.Subsequent))));
 
-                var childProof = new Proof(proof); 
+                var reducedFormula = reductionTemplate.NandReduction();
+                if (reducedFormula.CompareTo(startingNand) < 0)
+                {
+                    var reductionProof = Proof.GetReductionProof(reductionTemplate);
+                    result = new Reduction(startingNand, reducedFormula, "|a|bc -> |T||a|Tb|a|Tc -> *", reductionProof.Mapping);
+                    return result;
+                }
 
                 var mapping = SystemExtensions.ConcatAll(
                     Enumerable.Repeat(-1, nandAnt.Length + 6),                           // |T||a|T
@@ -111,13 +69,13 @@ public static class NandReducerDistributiveRules
                     Enumerable.Range(nandAnt.Length + nandSub.Antecedent.Length + 2, nandSub.Subsequent.Length)      // c
                 ).ToImmutableList();
 
-                var firstReduction = new Reduction(startingNand, reductionTemplate, "|a|bc -> |T||a|Tb|a|Tc", mapping, incompleteProofs.ToImmutableList(), childProof);
+                result = new Reduction(startingNand, reductionTemplate, "|a|bc -> |T||a|Tb|a|Tc", mapping, null, childProof);
                 if (childProof.AddReduction(firstReduction))
                 {
                     var reducedFormula = reductionTemplate.NandReduction(childProof);
                     if (reducedFormula.CompareTo(startingNand) < 0)
                     {
-                        var result = new Reduction(startingNand, reducedFormula, "|a|bc -> |T||a|Tb|a|Tc -> *", childProof.Mapping, incompleteProofs.ToImmutableList(), childProof);
+                        var result = new Reduction(startingNand, reducedFormula, "|a|bc -> |T||a|Tb|a|Tc -> *", childProof.Mapping, null, childProof);
                         return result;
                     }
                 }
@@ -163,13 +121,13 @@ public static class NandReducerDistributiveRules
                     Enumerable.Range(nandSub.Antecedent.Length + nandSubSub.Antecedent.Length + 4, nandSubSub.Subsequent.Length)      // c
                 ).ToImmutableList();
 
-                var firstReduction = new Reduction(startingNand, reductionTemplate, "|T|a|bc -> ||a|Tb|a|Tc", mapping, incompleteProofs.ToImmutableList(), childProof);
+                var firstReduction = new Reduction(startingNand, reductionTemplate, "|T|a|bc -> ||a|Tb|a|Tc", mapping, null, childProof);
                 if (childProof.AddReduction(firstReduction))
                 {
                     var reducedFormula = reductionTemplate.NandReduction(childProof);
                     if (reducedFormula.CompareTo(startingNand) < 0)
                     {
-                        var result = new Reduction(startingNand, reducedFormula, "|T|a|bc -> ||a|Tb|a|Tc -> *", childProof.Mapping, incompleteProofs.ToImmutableList(), childProof);
+                        var result = new Reduction(startingNand, reducedFormula, "|T|a|bc -> ||a|Tb|a|Tc -> *", childProof.Mapping, null, childProof);
                         return result;
                     }
                 }
@@ -208,7 +166,7 @@ public static class NandReducerDistributiveRules
                     Enumerable.Range(startingNand.Antecedent.Length + nandAnt.Antecedent.Length + 2, nandSub.Subsequent.Length)   // c
                 ).ToImmutableList();
 
-                var firstReduction = new Reduction(startingNand, reductionTemplate, "||ab|ac -> |T|a||Tb|Tc", mapping, incompleteProofs.ToImmutableList(), childProof);
+                var firstReduction = new Reduction(startingNand, reductionTemplate, "||ab|ac -> |T|a||Tb|Tc", mapping, null, childProof);
                 if (childProof.AddReduction(firstReduction))
                 {
                     var reducedFormula = reductionTemplate.NandReduction(childProof);
@@ -225,7 +183,38 @@ public static class NandReducerDistributiveRules
             }
         }
 
-        // |c||a|Tb|b|aT => ||ab||ac|bc
+        // truth value AB
+        // Distributive rule is subsumed by wildcard reduction
+        // |a||b|Tc|c|Tb => ||bc||ab|ac
+        // => |T||b|ac|c|ab => ;swap wildcard a
+        // => |T||b|Tc|c|ab   ;wildcard substitution a, **canonical**
+
+        // Distributive rule should be 
+        // |.1||.2|T.3|.3|T.2 => ||.2.3||.1.2|.1.3
+        // |a||b|Tc|c|ab => ||bc||ab|ac
+        // => |T||b|ac|c|ab     ;swap wildcard a
+        // => |T||b|Tc|c|ab     ;substitute wildcard a,  **canonical**
+        // => ||bc||Tc|ab     ;|T||b|Tc|c|ab => 
+        // => ||bc||ab|ac       ;distribution
+
+        // truth value B1
+        // |T||.1|T.2|.3|T.1 => ||.1.2||T.1|T.3
+        // ||.1.2||T.1|T.3
+        //  => |T|||.1.2.1||.1.2.3      ;swap T <-> |.1.2
+        //  => |T||.1|.1.2|.3|.1.2      ;reorder   !!!!!!! THIS IS A CRITICAL TERM!!!!!!!
+        //  => |T||.1|T.2|.3|.1.2    ;wildcard .1
+        //  => |T||.1|T.2|.3|.1T    ;wildcard .2
+        //  => |T||.1|T.2|.3|T.1    ; |T||a|Tb|c|Ta -> ||ab||Ta|Tc
+        //  => ||.1.2||.1||.1.2.2|.3||.1.2.1        ;swap T <-> |.1.2
+        //  => ||.1.2||.1|.2|T.1|.3|.1|T.2        ;reorder
+        //  => ||.1.2||.1|.2|TT|.3|.1|T.2        
+        //  => ||.1.2||.1|.2F|.3|.1|T.2        
+        //  => ||.1.2||.1T|.3|.1|T.2        
+        //  => ||.1.2||.1T|.3|F|T.2        
+        //  => ||.1.2||.1T|.3T
+        //  => ||.1.2||T.1|T.3
+        // NOTE: ||.1.2||T.1|T.3 and |T||.1|T.2|.3|T.1 are a critical pair.  
+        // They can both be derived from |T||.1|.1.2|.3|.1.2 using different rules
 
 
         // expansion rule: ||bc||ab|ac => |a||b|Tc|c|Tb 
@@ -271,7 +260,7 @@ public static class NandReducerDistributiveRules
                     .Concat(Enumerable.Range(startingNand.Antecedent.Length + nandSubAnt.Antecedent.Length + nandSubAntSub.Subsequent.Length + 6, nandSub.Antecedent.Length)) // .3
                     .ToImmutableList();
 
-                var firstReduction = new Reduction(startingNand, reductionTemplate, "|.1||.2|T.3|.3|T.2 => ||.2.3||.1.2|.1.3", mapping, incompleteProofs.ToImmutableList(), childProof);
+                var firstReduction = new Reduction(startingNand, reductionTemplate, "|.1||.2|T.3|.3|T.2 => ||.2.3||.1.2|.1.3", mapping, null, childProof);
                 if (childProof.AddReduction(firstReduction))
                 {
                     var reducedFormula = reductionTemplate.NandReduction(childProof);

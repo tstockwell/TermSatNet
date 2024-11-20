@@ -63,7 +63,7 @@ public static class NandReducerWildcardRules
     // ```
     /// 
     /// </summary>
-    public static Reduction ReduceWildcards(this Nand startingNand, Proof proof)
+    public static bool TryReduceWildcards(this Nand startingNand, out Reduction result)
     {
         IEnumerable<Formula> commonTerms =
             startingNand.Antecedent.AsFlatTerm().Distinct().Where(f => !(f is Constant))
@@ -81,41 +81,31 @@ public static class NandReducerWildcardRules
             {
                 var replacedSubsequent = startingNand.Subsequent.ReplaceAll(subterm, Constant.TRUE);
                 var replaced = Nand.NewNand(startingNand.Antecedent, replacedSubsequent);
-                var targetFinder = new WildcardAnalyzer(replaced, subterm, Constant.TRUE, proof);
-                var reduction = replaced.NandReduction(targetFinder);
+                //var targetFinder = new WildcardAnalyzer(replaced, subterm, Constant.TRUE, proof);
+                var reduction = replaced.Reduce();
 
-                // if (subAntecedent == Constant.FALSE)
-                //if (!reductionTerms.Any() && !reduction.AllSubterms.Contains(Subterm))
-                if (reduction.CompareTo(replaced) < 0 && targetFinder.FoundReductionTarget())
+                if (reduction.CompareTo(replaced) < 0 && reduction.PositionOf(subterm) < 0)
                 {
-#if DEBUG
-                    if (startingNand.Antecedent.Length < targetFinder.ReductionPosition)
-                    {
-                        throw new Exception("the reduction target should be in the antecedent");
-                    }
-#endif
-                    Debug.Assert(subterm.Equals(replaced.GetFormulaAtPosition(targetFinder.ReductionPosition)), "an instance of the subterm should have been found");
-                    var replaced2 = replaced.ReplaceAt(targetFinder.ReductionPosition, Constant.FALSE);
+                    var replaced2 = replaced.ReplaceAll(subterm, Constant.FALSE);
+                    Debug.Assert(!replaced2.Equals(replaced));
 
-                    if (!replaced2.Equals(replaced))
+                    if (replaced2 is Nand nandReplaced2 && nandReplaced2.Subsequent.Equals(replaced.Subsequent))
                     {
-                        if (replaced2 is Nand nandReplaced2 && nandReplaced2.Subsequent.Equals(replaced.Subsequent))
-                        {
-                            var reducedFormula = Nand.NewNand(nandReplaced2.Antecedent, startingNand.Subsequent);
-                            var reductionMapping = SystemExtensions.ConcatAll(
-                                Enumerable.Range(0, targetFinder.ReductionPosition),  // everything left of the replacement target
-                                Enumerable.Range(-1, 1), // T
-                                                         // everything right of the replacement target
-                                Enumerable.Range(targetFinder.ReductionPosition + subterm.Length, reducedFormula.Length - targetFinder.ReductionPosition - 1)
-                            ).ToImmutableList();
+                        var reducedFormula = Nand.NewNand(nandReplaced2.Antecedent, startingNand.Subsequent);
+                        //var reductionMapping = SystemExtensions.ConcatAll(
+                        //    Enumerable.Range(0, targetFinder.ReductionPosition),  // everything left of the replacement target
+                        //    Enumerable.Range(-1, 1), // T
+                        //                                // everything right of the replacement target
+                        //    Enumerable.Range(targetFinder.ReductionPosition + subterm.Length, reducedFormula.Length - targetFinder.ReductionPosition - 1)
+                        //).ToImmutableList();
+                        var reductionMapping = Enumerable.Repeat(-1, reducedFormula.Length).ToImmutableList();   
 
-                            var result = new Reduction(
-                                startingNand,
-                                reducedFormula,
-                                $"wildcard in antecedent: {subterm}->F",
-                                reductionMapping);
-                            return result;
-                        }
+                        result = new Reduction(
+                            startingNand,
+                            reducedFormula,
+                            $"wildcard in antecedent: {subterm}->F",
+                            reductionMapping);
+                        return true;
                     }
                 }
             }
@@ -123,34 +113,33 @@ public static class NandReducerWildcardRules
             {
                 var replacedSubsequent = startingNand.Subsequent.ReplaceAll(subterm, Constant.FALSE);
                 var replaced = Nand.NewNand(startingNand.Antecedent, replacedSubsequent);
-                var targetFinder = new WildcardAnalyzer(replaced, subterm, Constant.FALSE, proof);
-                var reduction = replaced.NandReduction(targetFinder);
+                //var targetFinder = new WildcardAnalyzer(replaced, subterm, Constant.FALSE, proof);
+                var reduction = replaced.Reduce();
 
                 // if (subAntecedent == Constant.FALSE)
-                if (reduction.CompareTo(replaced) < 0 && targetFinder.FoundReductionTarget())
+                if (reduction.CompareTo(replaced) < 0 && reduction.PositionOf(subterm) < 0)
                 {
-                    Debug.Assert(targetFinder.ReductionPosition <= startingNand.Antecedent.Length, "the reduction target should be in the antecedent");
-                    Debug.Assert(subterm.Equals(replaced.GetFormulaAtPosition(targetFinder.ReductionPosition)), "an instance of the subterm should have been found");
-                    var replaced2 = replaced.ReplaceAt(targetFinder.ReductionPosition, Constant.TRUE);
+                    var replaced2 = replaced.ReplaceAll(subterm, Constant.TRUE);
 
                     if (!replaced2.Equals(replaced))
                     {
                         if (replaced2 is Nand nandReplaced2 && nandReplaced2.Subsequent.Equals(replaced.Subsequent))
                         {
                             var reducedFormula = Nand.NewNand(nandReplaced2.Antecedent, startingNand.Subsequent);
-                            var reductionMapping = SystemExtensions.ConcatAll(
-                                Enumerable.Range(0, targetFinder.ReductionPosition),  // everything left of the replacement target
-                                Enumerable.Range(-1, 1), // T
-                                                         // everything right of the replacement target
-                                Enumerable.Range(targetFinder.ReductionPosition + subterm.Length, reducedFormula.Length - targetFinder.ReductionPosition - 1)
-                            ).ToImmutableList();
+                            //var reductionMapping = SystemExtensions.ConcatAll(
+                            //    Enumerable.Range(0, targetFinder.ReductionPosition),  // everything left of the replacement target
+                            //    Enumerable.Range(-1, 1), // T
+                            //                             // everything right of the replacement target
+                            //    Enumerable.Range(targetFinder.ReductionPosition + subterm.Length, reducedFormula.Length - targetFinder.ReductionPosition - 1)
+                            //).ToImmutableList();
+                            var reductionMapping = Enumerable.Repeat(-1, reducedFormula.Length).ToImmutableList();
 
-                            var result = new Reduction(
+                            result = new Reduction(
                                 startingNand,
                                 reducedFormula,
                                 $"wildcard in antecedent: {subterm}->T",
                                 reductionMapping);
-                            return result;
+                            return true;
                         }
                     }
                 }
@@ -159,23 +148,13 @@ public static class NandReducerWildcardRules
             {
                 var replacedAntecedent = startingNand.Antecedent.ReplaceAll(subterm, Constant.TRUE);
                 var replaced = Nand.NewNand(replacedAntecedent, startingNand.Subsequent);
-                var targetFinder = new WildcardAnalyzer(replaced, subterm, Constant.TRUE, proof);
-                var reduction = replaced.NandReduction(targetFinder);
+                //var targetFinder = new WildcardAnalyzer(replaced, subterm, Constant.TRUE, proof);
+                var reduction = replaced.Reduce();
 
                 // if (subAntecedent == Constant.FALSE)
-                if (reduction.CompareTo(replaced) < 0 && targetFinder.FoundReductionTarget())
+                if (reduction.CompareTo(replaced) < 0 && reduction.PositionOf(subterm) < 0)
                 {
-#if DEBUG
-                    if (!(replacedAntecedent.Length + 1 <= targetFinder.ReductionPosition))
-                    {
-                        throw new Exception("the reduction target should be in the subsequent");
-                    }
-                    if (!(subterm.Equals(replaced.GetFormulaAtPosition(targetFinder.ReductionPosition))))
-                    {
-                        throw new Exception($"an instance of {subterm} should have been found in {replaced} at position {targetFinder.ReductionPosition}");
-                    }
-#endif
-                    var replaced2 = replaced.ReplaceAt(targetFinder.ReductionPosition, Constant.FALSE);
+                    var replaced2 = replaced.ReplaceAll(subterm, Constant.FALSE);
 
                     if (!replaced2.Equals(replaced))
                     {
@@ -183,19 +162,20 @@ public static class NandReducerWildcardRules
                         Debug.Assert(nandReplaced2.Antecedent.Equals(replaced.Antecedent));
 
                         var reducedFormula = Nand.NewNand(startingNand.Antecedent, nandReplaced2.Subsequent);
-                        var reductionMapping = 
-                            Enumerable.Range(0, targetFinder.ReductionPosition)  // everything left of the replacement target
-                            .Append(-1) // T
-                            // everything right of the replacement target
-                            .Concat(Enumerable.Range(targetFinder.ReductionPosition + subterm.Length, reducedFormula.Length - targetFinder.ReductionPosition - 1))
-                            .ToImmutableList();
+                        //var reductionMapping = 
+                        //    Enumerable.Range(0, targetFinder.ReductionPosition)  // everything left of the replacement target
+                        //    .Append(-1) // T
+                        //    // everything right of the replacement target
+                        //    .Concat(Enumerable.Range(targetFinder.ReductionPosition + subterm.Length, reducedFormula.Length - targetFinder.ReductionPosition - 1))
+                        //    .ToImmutableList();
+                        var reductionMapping = Enumerable.Repeat(-1, reducedFormula.Length).ToImmutableList();
 
-                        var result= new Reduction(
+                        result = new Reduction(
                             startingNand,
                             reducedFormula,
                             $"wildcard in subsequent: {subterm}->F",
                             reductionMapping);
-                        return result;
+                        return true;
                     }
                 }
             }
@@ -203,41 +183,40 @@ public static class NandReducerWildcardRules
             {
                 var replacedAntecedent = startingNand.Antecedent.ReplaceAll(subterm, Constant.FALSE);
                 var replaced = Nand.NewNand(replacedAntecedent, startingNand.Subsequent);
-                var targetFinder = new WildcardAnalyzer(replaced, subterm, Constant.FALSE, proof);
-                var reduction = replaced.NandReduction(targetFinder);
+                //var targetFinder = new WildcardAnalyzer(replaced, subterm, Constant.FALSE, proof);
+                var reduction = replaced.Reduce();
 
-                if (reduction.CompareTo(replaced) < 0 && targetFinder.FoundReductionTarget())
+                if (reduction.CompareTo(replaced) < 0 && reduction.PositionOf(subterm) < 0)
                 {
-                    Debug.Assert(replacedAntecedent.Length < targetFinder.ReductionPosition, $"the reduction target should be in the subsequent, TargetPosition = {targetFinder.ReductionPosition}");
-                    Debug.Assert(subterm.Equals(replaced.GetFormulaAtPosition(targetFinder.ReductionPosition)), $"an instance of {subterm} should have been found in {replaced} at position {targetFinder.ReductionPosition}");
-
-                    var replaced2 = replaced.ReplaceAt(targetFinder.ReductionPosition, Constant.TRUE);
+                    var replaced2 = replaced.ReplaceAll(subterm, Constant.TRUE);
 
                     if (!replaced2.Equals(replaced))
                     {
                         if (replaced2 is Nand nandReplaced2 && nandReplaced2.Antecedent.Equals(replaced.Antecedent))
                         {
                             var reducedFormula = Nand.NewNand(startingNand.Antecedent, nandReplaced2.Subsequent);
-                            var reductionMapping = 
-                                SystemExtensions.ConcatAll(
-                                Enumerable.Range(0, targetFinder.ReductionPosition),  // everything left of the replacement target
-                                Enumerable.Range(-1, 1), // T
-                                                         // everything right of the replacement target
-                                Enumerable.Range(targetFinder.ReductionPosition + subterm.Length, reducedFormula.Length - targetFinder.ReductionPosition - 1)
-                            ).ToImmutableList();
+                            //var reductionMapping = 
+                            //    SystemExtensions.ConcatAll(
+                            //    Enumerable.Range(0, targetFinder.ReductionPosition),  // everything left of the replacement target
+                            //    Enumerable.Range(-1, 1), // T
+                            //                             // everything right of the replacement target
+                            //    Enumerable.Range(targetFinder.ReductionPosition + subterm.Length, reducedFormula.Length - targetFinder.ReductionPosition - 1)
+                            //).ToImmutableList();
+                            var reductionMapping = Enumerable.Repeat(-1, reducedFormula.Length).ToImmutableList();
 
-                            var result = new Reduction(
+                            result = new Reduction(
                                 startingNand,
                                 reducedFormula,
                                 $"wildcard in subsequent: {subterm}->T",
                                 reductionMapping);
-                            return result;
+                            return true;
                         }
                     }
                 }
             }
         }
 
-        return Reduction.NoChange(startingNand);
+        result = null;
+        return false;
     }
 }

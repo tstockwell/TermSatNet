@@ -1,16 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using TermSAT.Common;
 using TermSAT.Formulas;
 using TermSAT.RuleDatabase;
 
 namespace TermSAT.NandReduction
 {
     /// <summary>
-    /// A reduction is an atomic transform that 'reduces' a formula to a simpler, logically equivalent formula.  
+    /// A reduction is an atomic transform from one formula to a simpler, logically equivalent formula.  
+    /// A proof is a list of reductions that transform a starting formula to an equivalent, less complex, formula.
+    /// A reduction is a step in a proof.
     /// A reduction maps all the elements in the simpler formulas' flatterm to its position in the starting formula.  
     /// In this way it's possible to understand exactly how a starting formula was modified to get the resulting formula.
     /// 
@@ -25,26 +24,37 @@ namespace TermSAT.NandReduction
     /// A reduction is an asymmetric operation because there may be new subterms in the reduced formula that 
     /// do not exist in the starting formula.
     /// 
-    /// A proof is a list of reductions that transform a starting formula to an equivalent, less complex, formula.
-    /// A reduction is a step in a proof.
+    /// NandSAT provides a global dictionary of reductions for every formula that reduce every formula to a 
+    /// less complex formula based on a rule.
+    /// NandSAT basically works by building a set of reductions that reduce a given formula to it canonical form until such that, for every term in a formula, 
+    /// to the terms canonical form.
+    /// These proofs are called 'reduction proofs'.
+    /// Reduction proofs are built from the bottom up.
+    /// Initially a formula will have a reduction proof that has no reductions.
+    /// If a formula can no longer be reduced then it 
+    /// then it has been proved to be canonical and 
+    /// the last reduction in a proof will have RuleDescription == CANONICAL.
+    /// When a reduction proofs ReducedFormula is canonical then the proof is complete and no longer updated.
     /// 
-    /// When a starting formula cannot be reduced then RuleDescriptor will be set to Reduction.FORMULA_IS_CANONICAL.  
-    /// When, in the course of reducing a formula, a reduction rule is not applied, 
-    ///     because doing would result in an infinite loop
-    /// Then 
+    /// 
     /// </summary>
     public class Reduction 
     {
-        public static string FORMULA_IS_CANONICAL = "STATUS:FORMULA_IS_CANONICAL";
-        public static string PROOF_IS_INCOMPLETE = "PROOF_IS_INCOMPLETE";
-        public static Reduction NoChange(Formula startingFormula, IImmutableList<Reduction> incompleteProofs= null) =>
-            new(startingFormula, startingFormula, Reduction.FORMULA_IS_CANONICAL, null /*Enumerable.Range(0, startingFormula.Length).ToList()*/, incompleteProofs);
+        public static string PROOF_IS_COMPLETE = "PROOF_IS_COMPLETE";
+        //public static string PROOF_IS_INCOMPLETE = "PROOF_IS_INCOMPLETE";
+        public static Reduction CreateCompletionMarker(Formula startingFormula, IImmutableList<Reduction> incompleteProofs= null) =>
+            new Reduction(
+                startingFormula, 
+                startingFormula, 
+                Reduction.PROOF_IS_COMPLETE, 
+                Enumerable.Range(0, startingFormula.Length).ToImmutableList(), 
+                incompleteProofs);
 
         public Formula StartingFormula {  get; }
         public Formula ReducedFormula { get; }
 
         /// <summary>
-        /// Set to Reduction.FORMULA_IS_CANONICAL when StartingNand is canonical.
+        /// Set to Reduction.PROOF_IS_COMPLETE when StartingNand is canonical.
         /// todo: maybe instead of using a string to identify reduction types use objects instead.  
         /// </summary>
         public string RuleDescriptor { get; }
@@ -54,6 +64,7 @@ namespace TermSAT.NandReduction
         /// Used during wildcard analysis to associate terms in ReducedFormula with terms in StartingNand .
         /// </summary>
         public IImmutableList<int> Mapping { get; }
+
 
         /// <summary>
         /// When, in the course of constructing a reduction, a dependent/child reduction would result in an infinite loop, 
@@ -67,6 +78,8 @@ namespace TermSAT.NandReduction
         ///         even if it's imcomplete.
         /// However, if for some reduction, ReducedFormula == StartingFormula and the reduction is incomplete 
         /// then it can only be considered valid in the context in which it was created and cannot be globally cached.
+        /// 
+        /// Currently only used for debugging purposes
         /// </summary>
         public IImmutableList<Reduction> IncompleteProofs { get; }
 
@@ -125,7 +138,7 @@ namespace TermSAT.NandReduction
         void Validate() 
         {
 #if DEBUG
-            if (!RuleDescriptor.Equals(FORMULA_IS_CANONICAL))
+            if (!RuleDescriptor.Equals(PROOF_IS_COMPLETE))
             {
                 var reducedTT = ReducedFormula.GetTruthTable().ToString();
                 var startingTT = StartingFormula.GetTruthTable().ToString();

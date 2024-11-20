@@ -67,10 +67,12 @@ namespace TermSAT.Formulas
 
         /// <summary>
         /// Provide implicit cast from strings to Formulas.
+        /// 
         /// I'm on the fence about whether this is a good idea or not.
         /// All formula classes have these implicit casts defined, they make writing tests *very* readable.
-        /// OTOH, I wonder if an implicit cast will be a source of hidden problems.
-        /// So, I'm going to leave them in until and unless I figure out the downside.
+        /// OTOH, I wonder if an implicit cast will become a source of hidden problems.
+        /// I'm going to leave them in and leave this warning.
+        /// Note: I think I originally wrote this code in 2019, no regrets as of 2024.
         /// </summary>
         public static implicit operator Formula(string formulaText) => FormulaParser.ToFormula(formulaText);
 
@@ -92,16 +94,6 @@ namespace TermSAT.Formulas
         ///     That is, 'simpler' formulas must come before more 'complex' formulas in the ordering.
         ///     
         ///     This method implements TermSAT's ordering.
-        ///     Here are the rules...
-        ///     ...shorter formulas are simpler than longer formulas.
-        ///     
-        ///     The following rules apply when comparing formulas of the same length.
-        ///     Note: variables always have a length == 1
-        ///     ...constants are simpler than any other formula, T is simpler than F.
-        ///     ...variables are simpler than any operator
-        ///     ...negation is simpler than nand
-        ///     ...nand is simpler than implication
-        ///     ...implications with simpler antecedents are simpler than other implications.
         ///     
         /// </summary>
         public int CompareTo(Formula other)
@@ -218,11 +210,11 @@ namespace TermSAT.Formulas
         public abstract bool Evaluate(IDictionary<Variable, bool> valuation);
 
 
-        /**
-         * Creates a new formula by replacing all the variables in this formula 
-         * that also occur in the given formula with new variables that 
-         * don't occur in the given formula
-         */
+        /// <summary>
+        /// Creates a new formula by replacing all the variables in this formula 
+        /// that also occur in the given formula with new variables that 
+        /// don't occur in the given formula
+        /// </summary>
         public Formula CreateIndependentInstance(Formula formula)
         {
             var substitutions = new Dictionary<Variable, Formula>();
@@ -250,9 +242,9 @@ namespace TermSAT.Formulas
             return independent;
         }
 
-        /**
-         * Parses out the first formula from the beginning of the given string
-         */
+        /// <summary>
+        /// Parses out the first formula from the beginning of the given string
+        /// </summary>
         public static Formula Parse(string formulaText)
         {
             return formulaText.ToFormula();

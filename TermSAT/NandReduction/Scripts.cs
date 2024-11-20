@@ -58,7 +58,7 @@ public class Scripts
 
             try
             {
-                Formula reducedFormula = formula.NandReduction();
+                Formula reducedFormula = formula.Reduce();
 
                 if (reducedFormula.Equals(canonicalFormula))
                 {

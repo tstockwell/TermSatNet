@@ -1,135 +1,158 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using TermSAT.Common;
 using TermSAT.Formulas;
 
 namespace TermSAT.NandReduction;
 
+/// <summary>
+/// 
+/// Implements the NandReducer.Reduce method, which, for a given Nand formula, returns an equivalent formula in canonical form.  
+/// A 'nand formula' is a formula that only uses nand operators, the constants T an F, and numbered variables.
+/// 
+/// This class also maintains a global collection of 'proofs' that are used to reduce formulas.  
+/// This collection is built out at runtime as formulas are reduced, causing reductions to be discovered, 
+/// causing proofs to be created and/or updated.  
+/// For every formula a global proof is maintained. 
+/// A proof specifies...
+///     - Reduction: an atomic Reduction to a simpler form of a formula based on a rule.
+///         This reduction must be populated and never changes.  
+///         If the formula is canonical then NextReduction will have a description like "formula is canonical".  
+///     - Result: the simplest known form of the formula. 
+///         Basically a slot for memoizing the last value found for ReducedFormula.
+/// When Result is also known to be canonical then we say that the proof is complete.
+/// Note that proofs of equivalent formulas form a kind of skip list to the simplest, canonical form of the formula.  
+/// 
+/// // todo: Use proofs as rules when reducing formulas.
+/// NandReducer also uses proofs as rules when reducing formulas.
+/// For example, suppose the formula |||.1.2|.3|T.2||.2.3|.1|T.2 is reduced to |.1.3.
+/// Going forward, NandReducer will attempt to use the rule |||.1.2|.3|T.2||.2.3|.1|T.2 => |.1.3 to reduce 
+/// all other formulas before attempting to discover new reductions.
+/// That is, any substitution instance of |||.1.2|.3|T.2||.2.3|.1|T.2 can be immediately reduced 
+/// using the previously built proof.
+/// Basically reusing the work we did to reduce |||.1.2|.3|T.2||.2.3|.1|T.2 to reduce another formula.
+/// NandReducer can do this efficiently, see TermSAT.Formulas.InstanceRecognizer.
+/// 
+/// </summary>
 public static class NandReducer
 {
     /// <summary>
-    /// Reduces formulas composed of constants, variables, and nand operators to their canonical form.  
-    /// Repeatedly discovers reducible sub-formulas and reduces them.
-    /// Reductions are added to the given Proof.
-    /// The reduction process stops if a reduction cannot be added to the proof (cuz infinite loop or sumpin) 
-    /// of cuz no more reductions can be made.
-    /// Returns a canonical formula.
+    /// Returns the first reduction that can be produced by all of NandReducers' internal rules (like wildcard analysis or proof-rules).
+    /// Returns false if no reduction is found, in which case the given formula is canonical.  
     /// </summary>
-    public static Formula NandReduction(this Formula startingFormula, Proof proof)
+    static bool TryFindReduction(this Formula startingFormula, out Reduction result)
     {
-        // if given formula is not a nand then it must be a variable or constant and is not reducible.
-        if (!(startingFormula is Nand))
+#if DEBUG
+        //Debug.Assert(!reductionProof.HasReduced(startingFormula), $"reductionProof has already reduced formula {startingFormula}");
+        if (startingFormula.Equals(Formula.Parse("|T||.1.3|T.2")))
         {
-            return startingFormula;
+
         }
+#endif
 
-        // Repeatedly call SingleNandReduction until no more reductions
-        Formula reducedFormula = startingFormula;
-        while (true)
-        {
-            var result = reducedFormula.SingleNandReduction(proof);
+        var lastReduction = startingFormula;
 
-            if (result.ReducedFormula.CompareTo(reducedFormula) < 0)
+        {   // get any cached value
+            var reductionProof = Proof.GetReductionProof(startingFormula);
+            if (reductionProof.ReducedFormula != null)
             {
-                if (proof.AddReduction(result))
-                {
-                    reducedFormula = result.ReducedFormula;
-                    continue;
-                }
+                lastReduction = reductionProof.ReducedFormula;
             }
-            break;
         }
 
-        return reducedFormula;
-    }
-
-    static private ConditionalWeakTable<Formula, Reduction> __reductionResults = new ConditionalWeakTable<Formula, Reduction>();
-
-    public static Reduction SingleNandReduction(this Formula startingFormula, Proof proof)
-    {
-        Reduction reductionResult = null;
         List<Reduction> incompleteProofs = new();
 
-        {   // return any cached value
-            if (__reductionResults.TryGetValue(startingFormula, out reductionResult))
-            {
-                return reductionResult;
-            }
-        }
-
         // if given formula is not a nand then it must be a variable or constant and is not reducible.
-        if (startingFormula is Formulas.Nand startingNand)
+        if (lastReduction is Nand lastNand)
         {
-            reductionResult= NandReducerDescendantRules.ReduceDescendants(startingNand, proof);
-            if (reductionResult.ReducedFormula.CompareTo(reductionResult.StartingFormula) < 0)
+            if (lastNand.TryReduceDescendants(out result)) 
             {
-                goto ReductionFound;
+                return true;
             }
-            incompleteProofs.AddRange(reductionResult.IncompleteProofs);
 
-            reductionResult= startingNand.ReduceConstants(proof);
-            if (reductionResult.ReducedFormula.CompareTo(reductionResult.StartingFormula) < 0)
+            if (lastNand.TryReduceConstants(out result))
             {
-                goto ReductionFound;
+                return true;
             }
-            incompleteProofs.AddRange(reductionResult.IncompleteProofs);
 
-            reductionResult= startingNand.ReduceWildcards(proof);
-            if (reductionResult.ReducedFormula.CompareTo(reductionResult.StartingFormula) < 0)
+            if (lastNand.TryReduceWildcards(out result))
             {
-                goto ReductionFound;
+                return true;
             }
-            incompleteProofs.AddRange(reductionResult.IncompleteProofs);
 
-            reductionResult= startingNand.ReduceDistributiveFormulas(proof);
-            if (reductionResult.ReducedFormula.CompareTo(reductionResult.StartingFormula) < 0)
+            if (lastNand.TryReduceCommutativeFormulas(out result))
             {
-                goto ReductionFound;
+                return true;
             }
-            incompleteProofs.AddRange(reductionResult.IncompleteProofs);
 
-            reductionResult= startingNand.ReduceCommutativeFormulas(proof);
-            if (reductionResult.ReducedFormula.CompareTo(reductionResult.StartingFormula) < 0)
-            {
-                goto ReductionFound;
-            }
-            incompleteProofs.AddRange(reductionResult.IncompleteProofs);
+            //if (lastNand.ReduceDistributiveFormulas(out result))
+            //{
+            //    return true;
+            //}
         }
 
-        reductionResult = Reduction.NoChange(startingFormula, incompleteProofs.ToImmutableList());
-
-        ReductionFound:
-
-        if (incompleteProofs.Any())
-        {
-            return reductionResult;
-        }
-
-        lock (__reductionResults)
-        {
-            // return any cached value or cache found reduction
-            if (__reductionResults.TryGetValue(startingFormula, out var currentCached))
-            {
-                // recursive rules (like distributive) *may* cause NO_CHANGE to be cached when 
-                // a rule is not reduced because it would cause infinite loop.
-                if (currentCached.ReducedFormula.CompareTo(reductionResult.ReducedFormula) <= 0)
-                {
-                    return currentCached;
-                }
-            }
-            __reductionResults.AddOrUpdate(startingFormula, reductionResult);
-        }
-
-        return reductionResult;
+        result = null;
+        return false;
     }
 
-    public static Formula NandReduction(this Formula startingFormula)
+    /// <summary>
+    /// Repeatedly reduces startingFormula to its canonical form.  
+    /// The reduction process stops when no more reductions can be made.
+    /// Returns a logically equivalent formula in canonical form.
+    /// </summary>
+    public static Formula Reduce(this Formula startingFormula)
     {
-        Proof proof = new Proof();
-        return NandReduction(startingFormula, proof);
+        var startingProof = Proof.GetReductionProof(startingFormula);
+        if (!startingProof.IsComplete())
+        {
+            // Repeatedly reduce formulas, depth-first, until starting formula is complete
+            Stack<Proof> todo = new Stack<Proof>();
+            todo.Push(startingProof);
+            var reducedFormula = startingProof.ReducedFormula;
+            if (reducedFormula == null) 
+            { 
+                reducedFormula = startingFormula;
+            }
+
+            while (todo.Any())
+            {
+                var todoProof = todo.Peek();
+                if (!todoProof.IsComplete())
+                {
+                    // handle an empty proof
+                    if (todoProof.NextReduction == null)
+                    {
+                        if (todoProof.StartingFormula.TryFindReduction(out var reduction))
+                        {
+                            todoProof.SetNextReduction(reduction);
+                            todo.Push(Proof.GetReductionProof(reduction.ReducedFormula));
+                            reducedFormula = reduction.ReducedFormula;
+                        }
+                        else
+                        {
+                            // the given formula is canonical
+                            todoProof.AddCompletionMarker(todoProof.StartingFormula);
+                            reducedFormula = todoProof.StartingFormula;
+                        }
+                        continue;
+                    }
+
+                    // if last formula is not yet complete then complete it first.
+                    var lastProof = Proof.GetReductionProof(todoProof.ReducedFormula);
+                    if (!lastProof.IsComplete())
+                    {
+                        todo.Push(lastProof);
+                        continue;
+                    }
+                    Debug.Assert(lastProof.ReducedFormula.CompareTo(reducedFormula) <= 0);
+                    reducedFormula = lastProof.ReducedFormula;
+
+                    // all that's missing is a completion marker, add it
+                    todoProof.AddCompletionMarker(todoProof.StartingFormula);
+                }
+                todo.Pop();
+            }
+        }
+        return startingProof.ReducedFormula;
     }
 }

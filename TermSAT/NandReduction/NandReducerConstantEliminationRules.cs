@@ -7,7 +7,7 @@ namespace TermSAT.NandReduction;
 public static class NandReducerConstantEliminationRules
 {
 
-    public static Reduction ReduceConstants(this Nand startingNand, Proof proof)
+    public static bool TryReduceConstants(this Nand startingNand, out Reduction result)
     {
         if (startingNand.Antecedent == Constant.TRUE)
         {
@@ -17,8 +17,8 @@ public static class NandReducerConstantEliminationRules
                 var descriptor = constantConsequent.Equals(Constant.TRUE) ? "|TT => F" : "|TF => T";
                 var reducedFormula = constantConsequent.Equals(Constant.TRUE) ? Constant.FALSE : Constant.TRUE;
                 var mapping = new int[] { -1 }.ToImmutableList();
-                var reduction = new Reduction(startingNand, reducedFormula, descriptor, mapping);
-                return reduction;
+                result = new Reduction(startingNand, reducedFormula, descriptor, mapping);
+                return true;
             }
             if (startingNand.Subsequent is Nand nandConsequent)
             {
@@ -27,8 +27,8 @@ public static class NandReducerConstantEliminationRules
                     // |T|T.1 => .1
                     var reducedFormula = nandConsequent.Subsequent;
                     var mapping = Enumerable.Range(4, nandConsequent.Subsequent.Length).ToImmutableList();
-                    var reduction = new Reduction(startingNand, reducedFormula, "|T|T.1 => .1", mapping);
-                    return reduction;
+                    result = new Reduction(startingNand, reducedFormula, "|T|T.1 => .1", mapping);
+                    return true;
                 }
             }
         }
@@ -36,8 +36,8 @@ public static class NandReducerConstantEliminationRules
         {
             // |F.1 => T
             var mapping = new int[] { -1 }.ToImmutableList();
-            var reduction = new Reduction(startingNand, Constant.TRUE, "|F.1 => T", mapping);
-            return reduction;
+            result = new Reduction(startingNand, Constant.TRUE, "|F.1 => T", mapping);
+            return true;
         }
         if (startingNand.Subsequent.Equals(Constant.TRUE))
         {
@@ -48,17 +48,18 @@ public static class NandReducerConstantEliminationRules
                 .Append(startingNand.Antecedent.Length + 1)
                 .Concat(Enumerable.Range(1, startingNand.Antecedent.Length))
                 .ToImmutableList();
-            var reduction = new Reduction(startingNand, reducedFormula, "|.1T => |T.1", mapping);
-            return reduction;
+            result = new Reduction(startingNand, reducedFormula, "|.1T => |T.1", mapping);
+            return true;
         }
         if (startingNand.Subsequent == Constant.FALSE)
         {
             // |.1F => T
             var mapping = new int[] { -1 }.ToImmutableList();
-            var reduction = new Reduction(startingNand, Constant.TRUE, "|.1F => T", mapping);
-            return reduction;
+            result = new Reduction(startingNand, Constant.TRUE, "|.1F => T", mapping);
+            return true;
         }
 
-        return Reduction.NoChange(startingNand);
+        result = null;
+        return false;
     }
 }

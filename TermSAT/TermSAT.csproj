@@ -16,6 +16,7 @@
     <Compile Remove="Common\ServerCommandLineInterface.cs" />
     <Compile Remove="Formulas\FormulaSequence-Array.cs" />
     <Compile Remove="NandReduction\NandReducer - Copy.cs" />
+    <Compile Remove="NandReduction\NandReducerDistributiveRules.cs" />
     <Compile Remove="RuleDatabase\TruthTables.cs" />
     <Compile Remove="Solver\CompletionGenerator.cs" />
     <Compile Remove="Solver\RuleRepository.cs" />
