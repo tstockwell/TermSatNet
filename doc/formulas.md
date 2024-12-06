@@ -1,35 +1,43 @@
-# Formula Ordering
+# Formulas
+
+All about formulas in RuleSAT.
+The most important part of this document is the section on 
+
+## Syntax
+
+Formulas are as simple as possible.  
+There is one operator, nand, aka the Sheffer stroke.
+And numbered variables.
+That's it, no negation, no constants.
+The normal form uses Polish notation and the symbol '*' for the implication operator, followed by the antecedent and then consequent. 
+Variables are represented by the '.' followed by an integer number greater than 0 for representing variables.
+
+Some examples of formulas...
+.1
+|.1|.1.1			;TRUE
+||.1|.1.1|.1|.1.1	;FALSE
+|.1.1				;NEGATION
+|.1|.1.2			;IMPLICATION 
+||.1.1|.2.2			;DISJUNCTION
+||.1.2|.1.2			;CONJUNCTION
+
+## Alternative Syntax
+
+Instead of ||.1.2|.1.2, write...
+1= |.1.2
+2= |~1~1
+where ~N is a formula number
+
+## Ordering
+
+RuleSAT formulas are ordered.
+In RuleSAT, it's very important that there is one, and only one, **canonical** way to represent a given formula.  
+Such an ordering is a necessary condition for producing a **globally confluent** set of reduction rules. 
 
 This document describes a method of ordering of formulas.
 The purpose of this ordering is to provide a method of determining the 'complexity' of a formula.  
 The ultimate purpose of such an ordering is to provide the basis for 
 creating a globally confluent set of reduction rules for reducing proposition formulas.
-
-One reason for imposing an ordering on formulas is so that there is one, and only one, 
-'canonical' way to represent a given formula.
-Such an ordering is a necessary condition for producing a confluent set of rules. 
-
-Another reason for ordering formulas is 
-
-## Formula Syntax
-
-Formulas are represented in a textual form...
-The normal form uses Polish notation and...
-...the symbols 'T' and 'F' for TRUE and FALSE.
-...the symbol '-' for the negation operator, followed by a formula. 
-...the symbol '|' for the nand operator, followed by the antecedent and then the subsequent. 
-...the symbol '*' for the implication operator, followed by the antecedent and then consequent. 
-...by the symbol '.' followed by an integer number greater than 0 for representing variables.
-
-Some examples of formulas...
-F
-T
-*T.1
-*-.1.3
--*.1.4
-*.4**.1.3-*F.3
-
-
 
 ## Ordering
 

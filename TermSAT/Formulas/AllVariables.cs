@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TermSAT.Common;
@@ -152,14 +153,13 @@ namespace TermSAT.Formulas
                         return variables;
 
                     // create a new list
-                    var vars = new HashSet<Variable>();
-                    vars.UnionWith(Antecedent.AllVariables);
-                    vars.UnionWith(Subsequent.AllVariables);
-                    var sortedVars = new List<Variable>();
-                    sortedVars.AddRange(vars);
-                    sortedVars.Sort();
+                    variables = 
+                        Antecedent.AllVariables.Concat(Subsequent.AllVariables).Select(_ => _.Number)
+                        .Distinct()
+                        .Order()
+                        .Select(_ => Variable.NewVariable(_))
+                        .ToList();
 
-                    variables = sortedVars;
                     __varListCache.Add(this, variables);
                 }
 

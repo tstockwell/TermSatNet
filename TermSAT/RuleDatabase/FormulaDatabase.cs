@@ -19,80 +19,12 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using TermSAT.Formulas;
 
 namespace TermSAT.RuleDatabase
 {
-
-    public class FormulaRecord
-    {
-        [Key]
-        public int Id { get; set; }
-        public string Text { get; set; }
-        public int Length { get; set; }
-        public string TruthValue { get; set; }
-        public bool IsCanonical { get; set; }
-
-        /// <summary>
-        /// Set to an internal scheme name: basic, ordering, distributive 
-        /// </summary>
-        public string IsSubsumedByScheme {  get; set; }
-    }
-
-
-    public class RuleDatabaseContext : DbContext
-    {
-        //
-        // Summary:
-        //     Initializes a new instance of the Microsoft.EntityFrameworkCore.DbContext class
-        //     using the specified options. The Microsoft.EntityFrameworkCore.DbContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)
-        //     method will still be called to allow further configuration of the options.
-        //
-        // Parameters:
-        //   options:
-        //     The options for this context.
-        public RuleDatabaseContext(DbContextOptions options) : base(options)
-        {
-        }
-        public DbSet<FormulaRecord> FormulaRecords { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<FormulaRecord>().Property(f => f.Text).IsRequired();
-            modelBuilder.Entity<FormulaRecord>().Property(f => f.Length).IsRequired();
-            modelBuilder.Entity<FormulaRecord>().Property(f => f.TruthValue).IsRequired();
-            modelBuilder.Entity<FormulaRecord>().Property(f => f.IsCanonical).HasDefaultValue(false);
-            modelBuilder.Entity<FormulaRecord>().Property(f => f.IsSubsumedByScheme).HasDefaultValue(false);
-
-            modelBuilder.Entity<FormulaRecord>().HasKey(f => f.Id);
-            modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Text);
-            modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Length);
-            modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.TruthValue);
-            modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsCanonical);
-            modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsSubsumedByScheme);
-
-            modelBuilder.Entity<FormulaRecord>(f => f.ToTable("FormulaRecords"));
-        }
-
-        /// <summary>
-        /// I think that ef still tracks after an add/ssavechanges.
-        /// So, periodically detach any entries.
-        /// </summary>
-        public void DetachAllEntities()
-        {
-            var changedEntriesCopy = this.ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Added ||
-                            e.State == EntityState.Modified ||
-                            e.State == EntityState.Deleted)
-                .ToList();
-
-            foreach (var entry in changedEntriesCopy)
-                entry.State = EntityState.Detached;
-        }
-    }
 
 
     /**
@@ -134,7 +66,7 @@ namespace TermSAT.RuleDatabase
         }
 
 
-        private RuleDatabaseContext GetDatabaseContext()
+        public RuleDatabaseContext GetDatabaseContext()
         {
             var options = new DbContextOptionsBuilder()
                 .UseSqlite(Connection)
@@ -244,21 +176,20 @@ namespace TermSAT.RuleDatabase
             }
         }
 
-        public void AddFormula(Formula formula, bool isCanonical)
+        /// <summary>
+        /// Note, using 0 for id (a field in the primary key) causes the Sqlite driver to use the Sqlite auto increment value
+        /// </summary>
+        public void AddFormula(Formula formula, bool isCanonical) => AddFormula(0, formula, isCanonical);
+
+        public void AddFormula(int id, Formula formula, bool isCanonical)
         {
             using (var ctx = GetDatabaseContext())
             {
-                var record = new FormulaRecord
-                {
-                    Text = formula.ToString(),
-                    IsCanonical = isCanonical,
-                    Length = formula.Length,
-                    TruthValue = TruthTable.NewTruthTable(formula).ToString()
-                };
+                var record = new FormulaRecord(id, formula, isCanonical);
 
                 ctx.FormulaRecords.Add(record);
                 ctx.SaveChanges();
-                ctx.DetachAllEntities();
+                ctx.Clear();
             }
         }
         public async Task IsSubsumedBySchemeAsync(Formula formula, string value)
@@ -276,7 +207,7 @@ namespace TermSAT.RuleDatabase
                 record.IsSubsumedByScheme = value;
 
                 await ctx.SaveChangesAsync();
-                ctx.DetachAllEntities();
+                ctx.Clear();
             }
         }
 
@@ -365,20 +296,7 @@ namespace TermSAT.RuleDatabase
         {
             using (var ctx = GetDatabaseContext())
             {
-                var truthTableText = TruthTable.NewTruthTable(formula).ToString();
-
-                var record = ctx.FormulaRecords.AsNoTracking()
-                    .AsNoTracking()
-                    .Where(f => f.IsCanonical == true && f.TruthValue == truthTableText)
-                    .OrderBy(f => f.Id)
-                    .FirstOrDefault();
-
-                if (record == null)
-                    return null;
-
-                var canonicalFormula = Formula.Parse(record.Text);
-
-                return canonicalFormula;
+                return ctx.FindCanonicalFormula(TruthTable.NewTruthTable(formula));
             }
         }
 

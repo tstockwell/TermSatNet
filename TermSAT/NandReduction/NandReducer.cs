@@ -80,10 +80,15 @@ public static class NandReducer
                 return true;
             }
 
-            if (lastNand.TryReduceCommutativeFormulas(out result))
-            {
-                return true;
-            }
+            //if (lastNand.TryReduceWildcards_NoConstants(out result))
+            //{
+            //    return true;
+            //}
+
+            //if (lastNand.TryReduceCommutativeFormulas(out result))
+            //{
+            //    return true;
+            //}
 
             //if (lastNand.ReduceDistributiveFormulas(out result))
             //{

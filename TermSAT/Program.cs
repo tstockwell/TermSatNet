@@ -26,14 +26,14 @@ namespace TermSAT
         private static void AddNandRuleGeneration3Command(RootCommand rootCommand)
         {
             var schemeEquivalenceTest = new Command("nand-rule-generation-3");
-            schemeEquivalenceTest.SetHandler(() =>
+            schemeEquivalenceTest.SetHandler(async () =>
             {
                 Trace.Listeners.Add(new TextWriterTraceListener("nand-rule-generation-3-trace.log"));
 
                 var database = new FormulaDatabase("nand-rules-3.db");
-                database.Clear();
-                var generator = new NandFormulaGenerator(database,3);
-                new RuleGenerator(database, generator).Run();
+                NandReduction.Scripts.RunNandRuleGenerator(database);
+                //var generator = new NandFormulaGenerator(database,3);
+                //new RuleGenerator(database, generator).Run();
             });
             rootCommand.AddCommand(schemeEquivalenceTest);
         }

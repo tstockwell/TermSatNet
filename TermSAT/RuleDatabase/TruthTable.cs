@@ -29,9 +29,10 @@ namespace TermSAT.RuleDatabase
     /// <summary>
     /// Represents a formula's truth table.
     /// A truth table enumerates the values of a boolean formula over all possible assignments of variables.
-    /// Since the number of possibles assignments grows exponentially as the number of variables increases, it's 
-    /// not really feasible to implement truth tables for fomulas with any possible number of variables.
+    /// Since the number of possible assignments grows exponentially as the number of variables increases, it's 
+    /// not really feasible to implement truth tables for formulas with any possible number of variables.
     /// Truth tables are only used by TermSAT to generate reduction rules for formulas with just a few variables.
+    /// 
     /// This implementation uses a bit array internally and cannot support truth tables for more than 31 variables.
     /// 
     /// Truth tables are designed to make it possible for the RuleGenerator to lookup canonical formulas by truth table 
@@ -76,11 +77,11 @@ namespace TermSAT.RuleDatabase
         /// <summary>
         /// Create a bit array that represents a formula's truth table
         /// </summary>
-        public static BitArray ToBitArray(Formula formula)
+        private static BitArray ToBitArray(Formula formula)
         {
-            var truthTable = new BitArray(MAX_TRUTH_VALUES);
+            var bits = new BitArray(MAX_TRUTH_VALUES);
 
-            for (int i= 0; i < truthTable.Length; i++)
+            for (int i= 0; i < bits.Length; i++)
             {
                 BitArray a = new BitArray(new int[] { i });
 
@@ -92,9 +93,9 @@ namespace TermSAT.RuleDatabase
                 }
 
                 var formulaValue= formula.Evaluate(valuation);
-                truthTable.Set(i, formulaValue);
+                bits.Set(i, formulaValue);
             }
-            return truthTable;
+            return bits;
         }
 
         public override string ToString() => values.ToHexadecimalString();

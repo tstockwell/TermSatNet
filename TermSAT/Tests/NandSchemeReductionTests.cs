@@ -827,6 +827,9 @@ namespace TermSAT.Tests
 
         /// <summary>
         /// |T||.1|T.2|.2|T.1 => ||.1.2||T.1|T.2
+        /// 
+        /// |T||.1|T.2|.2|T.1 => ||.1.2||.1|.1.2|.2|.1.2
+        /// 
         /// This formula cannot be reduced using just the current wildcard analysis algorithm and constant elimination rules.
         /// Also the two terms in this formula are a [critical pair](https://en.wikipedia.org/wiki/Critical_pair_(term_rewriting)).
         ///     cuz...
@@ -837,15 +840,19 @@ namespace TermSAT.Tests
         /// Therefore, these two terms form a new rule.
         /// The [Knuth-Bendix](https://en.wikipedia.org/wiki/Knuth%E2%80%93Bendix_completion_algorithm) way of 
         /// extending the current system would be to add this production rule to the set of rules in our system.  
-        /// However, don't be thinking that the Knuth-Bendix procedure will ever terminate when applied to this system, it won't.
-        /// That's not proven but I have good reasons for thinking that.  
+        /// However, don't be thinking that the Knuth-Bendix procedure will produce a complete reduction system 
+        /// from the basic rules in NandSAT, it won't.
+        /// It's very highly likely that Knuth-Bendix would never terminate when applied to this system.  
+        /// That's not a proven fact, but I have good reasons for thinking it.  
         /// So, in order to create a complete reduction system (in the Knuth-Bendix sense) we'll need some reduction 
         /// method that's more powerful than simple production rules.  
-        /// Instead, the 'NandSAT Way' of extending the system has been to extend the wildcard analysis algorithm 
-        /// in a way that will implement the same functionality as the new production rule. 
-        /// I have never yet failed to be able to extend wildcard analysis to cover new formulas.  
+        /// The wildcard analysis algorithm is what NandSAT has to work with.  
+        /// I'm kinda amazed at how much wildcard analysis can do.
+        /// The 'NandSAT Way' of extending the system has been to extend the wildcard analysis algorithm 
+        /// in a way that will implement the same functionality as the a new production rule. 
+        /// I have not yet failed to be able to extend wildcard analysis to cover new formulas.  
         /// It's hoped that the 'NandSat Way' will result in a system that can be proven to be complete 
-        /// by showing that extending the number of variables in the system creates no more rules.
+        /// by showing that extending the number of variables in the system generates no more production rules.
         /// I believe that it will turn out that all production rules can be classified into a fixed set of 
         /// extensions to the wildcard analysis algorithm, that's why I'm doing this.
         /// The 'NandSAT Way' lead to the development of wildcard substitution, then wildcard swapping, 
@@ -855,14 +862,6 @@ namespace TermSAT.Tests
         /// In order to be able to implement the rule |T||.1|T.2|.2|T.1 => ||.1.2||T.1|T.2, 
         /// the system was simplified by eliminating constants.
         /// Removing constants also removes the need for wildcard substitution and wildcard swapping.
-        /// One argument against such a change to the system is that it requires formulas to be longer.  
-        /// For instance, you cant write |T.1, you have to write |.1.1.
-        /// And this means formulas require more storage and are harder to understand, **for humans***.
-        /// But that's not really true.
-        /// When storing formulas as strings** they are longer, , that's true, and in that sense they require more storage.  
-        /// BUT... it doesn't require more storage **on a computer** and it isn't harder **for a computer** to understand them.  
-        ///     > hint, in NandSAT, all terms are singletons, so repeating them in a formula takes less storage than 
-        ///         using constants to represent some of those instances.
         /// The advantage to getting rid of constants is that it removes the need for this particular production rule 
         /// while leaving everything else working the same.  That is...
         ///         |T||.1|.1.2|.2|.1.2 ; will be written as...
@@ -871,6 +870,16 @@ namespace TermSAT.Tests
         ///             => ||.1.2||.1.1|.2.2 ; using wildcard substitution |.1.2 <-> T
         /// Everything else will work the same.
         /// Problem solved.
+        /// 
+        /// One argument against such a change to the system is that it requires formulas to be longer.  
+        /// For instance, you cant write |T|.1.2, you have to write ||.1.2|.1.2.
+        /// And this means formulas require more storage and are harder to understand.
+        /// But that's not really true, it means that formulas require more storage, **when written as strings**, 
+        /// and are harder **for humans*** to read.
+        /// BUT... it doesn't require more storage **on a computer** and, it's actually easier **for a computer** to 
+        /// analyze formulas without constants.  
+        ///     > hint, in NandSAT, all terms are singletons, so repeating them in a formula takes less storage than 
+        ///         using additional constants to represent some of those instances.
         /// 
         /// Note...
         /// Elsewhere in the documentation there is a computer-based proof that the wildcard analysis algorithm can reduce 
@@ -890,7 +899,7 @@ namespace TermSAT.Tests
         ///  => ||.1.2||T.1|T.2
         /// </summary>
         [TestMethod]
-        public void ReduceFormula456()
+         public void ReduceFormula456()
         {
             var nonCanonicalformula = (Nand)Formula.Parse("|T||.1|T.2|.2|T.1"); // id=456
             var canonicalFormula = Formula.Parse("||.1.2||T.1|T.2");

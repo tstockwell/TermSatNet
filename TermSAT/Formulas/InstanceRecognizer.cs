@@ -1,20 +1,3 @@
-/*******************************************************************************
- *     termsat SAT solver
- *     Copyright (C) 2010 Ted Stockwell <emorning@yahoo.com>
- * 
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU Affero General Public License as
- *     published by the Free Software Foundation, either version 3 of the
- *     License, or (at your option) any later version.
- * 
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU Affero General Public License for more details.
- * 
- *     You should have received a copy of the GNU Affero General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using TermSAT.Common;
@@ -33,6 +16,8 @@ namespace TermSAT.Formulas
      * <a href="http://en.wikipedia.org/wiki/Substitution_(logic)">substitution instance</a>
      * of any of the formulas in the InstanceRecognizer.
      * 
+     * TermSAT provides a **global** instance recognizer to which all formulas are added.
+     * 
      * Terminology used in TermSAT... 
      * ...the result of applying a substitution to a formula, F, is called a substitution instance of formula F.
      * ...if S is the formula that is the result of applying a substitution to formula F then F is called a 
@@ -43,9 +28,6 @@ namespace TermSAT.Formulas
      * the given formulas that enables it to avoid many comparisons, thus making it 
      * much more efficient than testing all formulas individually.      
      *  
-     *  
-     * @author Ted Stockwell
-     *
      */
     public class InstanceRecognizer : TrieIndex<string, Formula>
     {

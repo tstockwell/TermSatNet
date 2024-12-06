@@ -86,16 +86,16 @@ public class Proof
             while(true)
             {
                 var nextProof = Proof.GetReductionProof(_reducedFormula);
+                if (nextProof.IsComplete())
+                {
+                    _canonicalFormula = _reducedFormula = nextProof.ReducedFormula;
+                    break;
+                }
                 if (nextProof.NextReduction == null)
                 {
                     break;
                 }
                 _reducedFormula = nextProof.NextReduction.ReducedFormula;
-                if (nextProof.IsComplete())
-                {
-                    _canonicalFormula = _reducedFormula;
-                    break;
-                }
             }
             return _reducedFormula;
         }

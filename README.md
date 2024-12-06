@@ -1,4 +1,43 @@
-# TermSatNet
+# RuleSAT
+
+RuleSAT is an open source SAT solver that works by reducing nand-based propositional formulas to their canonical form, using a database of 'reduction rules'.  
+RuleSAT is also an open source trie-structured database of reduction rules.  
+RuleSAT works by reducing nand-based propositional formulas to their canonical form using the rules in a given database.  
+RuleSAT completely reduces formulas in polynomial time as a function of the length of the starting formula.  
+You read that correctly.  
+There's more in the wiki, including a proof that RuleSAT is polynomial and that therefore P=NP. 
+
+The catch is that a RuleSAT server cannot **guarantee** that it can completely reduce formulas above its databases' **complexity rating**.  
+A databases' complexity rating is the ID of the last formula in the database, which is also the largest ID in the database.  
+A databases' **completeness rating** is the maximum number of variables in a formula for which the database is **guaranteed** 
+to be able to reduce the formula to its canonical form.
+Complexity ratings grow linearly while completeness ratings are logarithmic,   
+it's probably easier for folks to understand the concept of completeness rating.  
+
+The open source version of RuleSAT is limited to a database size that's reasonable to download from GitHub.  
+The open-source version of RuleSAT has a completeness rating of 1000 variables.  
+That doesn't mean that it's only capable of solving formulas with 1000 variables.  
+It means that the open source version is capable of solving the hardest, thorniest, most complex problems of up to 1000 variables.  
+The open source version can reliably solve many large but fundamentally simpler problems with millions of variables.  
+Developers are also able to extend the open source rule database on their own,   
+the RuleSAT project provides tools for building your own database.
+
+The commercial version of RuleSAT has a completeness rating that is magnitudes of order greater than the open source version  
+and is capable of solving the most difficult problems on the planet.
+It takes computational effort to build a large RuleSAT database, like mining bitcoins.  
+That's why there's a commercial version, as it takes some serious resources to keep growing the rule database.  
+
+
+Table of Contents
+[How RuleSAT works](how-rulesat-works.md): Overview of the RuleSAT Formula and Rule Generation System
+[Formulas](formulas.md): Details of formula syntax and ordering
+[Rules](rules.md): Details of the RuleSAT database.
+[Proof-based Reductions](wildcard-analysis.md): Optionally minimize databases using algorithmic reductions that are slightly slower.  
+[RuleSAT is O(nE2) and P=NP](complexity.md): I'm very open to constructive feedback, I'm serious about this.
+
+
+
+
 
 TermSAT is a collection of C# applications written for the purpose of discovering and enumerating 
 rewrite rules for reducing formulas in propositional logic.  

@@ -21,6 +21,7 @@ public static class NandReducerCommutativeRules
         // This rule will be subsumed by wildcard analysis when 'instance swapping' is implemented.
         // Wildcard analysis does this by noting that .1 and .2 are wildcards for each other, so they
         // can be swapped for each other.
+        // And that, swapping them actually results in a 'reduced' formula.  
         {
             if (startingNand.Subsequent.CompareTo(startingNand.Antecedent) < 0)
             {
