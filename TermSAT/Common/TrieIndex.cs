@@ -12,7 +12,7 @@ namespace TermSAT.Common
 
     /**
      * A trie, or prefix tree, is an ordered tree data structure that is used to 
-     * store a dynamic set or associative array where the keys are usually strings. 
+     * store a dynamic set or associative array where the values are usually strings. 
      * Unlike a binary search tree, no node in the tree stores the key associated 
      * with that node; instead, its position in the tree defines the key with which 
      * it is associated.
@@ -20,7 +20,7 @@ namespace TermSAT.Common
      * TermSAT uses a trie as a kind of index that's used to quickly find substitution instances
 	 * and unifications of a given formula in a large set of formulas.
      * TermSAT requires a trie that can work directly with formulas, thus an off the shelf trie, 
-     * that uses strings as keys, was not suitable for TermSAT's purposes.
+     * that uses strings as values, was not suitable for TermSAT's purposes.
      * This trie is designed to work with any generic structure that is a list of items.
      * 
      * This trie implementation includes a visitor API that allows clients to traverse 
@@ -186,11 +186,12 @@ namespace TermSAT.Common
 
         public ICollection<IEnumerable<TItem>> Keys { 
             /*
-             * The TrieMap implementation will have to be refactored to support the retrieval of keys.
-             * Currently TrieMap does not retain references to the original keys and cannot create new keys.
-             * So the only way to return keys is to refactor this implementation so that it retains references to 
-             * the orignal keys.
-             * But TermSAT doesn't currently need the keys and I don't wanna waste memory on them.
+             * The TrieMap implementation will have to be refactored to support the retrieval of values.
+             * Currently TrieMap does not retain references to the original values and cannot create new values.
+             * So the only way to return values is to refactor this implementation so that it retains references to 
+             * the original values.
+             * But TermSAT doesn't currently need the values and I can't really afford to waste memory on them cause 
+             * there's gonna be a *lot* of them.
              */
             get 
             { 
@@ -203,9 +204,9 @@ namespace TermSAT.Common
          */
         class ValueCollectorVisitor : IVisitor<HashSet<TValue>>
         {
-            HashSet<TValue> keys = new HashSet<TValue>();
+            HashSet<TValue> values = new HashSet<TValue>();
             public bool IsComplete { get { return false; } }
-            public HashSet<TValue> Result { get { return keys; } }
+            public HashSet<TValue> Result { get { return values; } }
 
             public void Leave(INode node) { /* do nothing */  }
 
@@ -213,7 +214,7 @@ namespace TermSAT.Common
             {
                 var value = node.Value;
                 if (value != null)
-                    keys.Add(value);
+                    values.Add(value);
                 return true;
             }
         };

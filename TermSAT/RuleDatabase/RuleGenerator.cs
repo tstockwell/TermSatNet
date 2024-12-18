@@ -131,7 +131,7 @@ namespace TermSAT.RuleDatabase
 
         private bool IsCanonicalFormula(Formula formula)
         {
-            var truthTable = TruthTable.NewTruthTable(formula);
+            var truthTable = TruthTable.GetTruthTable(formula);
             int length = _database.GetLengthOfCanonicalFormulas(truthTable);
 
             // if there are no canonical formulas in the database then this is the first

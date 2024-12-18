@@ -64,12 +64,12 @@ namespace TermSAT.RuleDatabase
         private TruthTable(string valueText) : this(valueText.ToBitArray()) {  }
         private TruthTable(Formula formula) : this(ToBitArray(formula)) { }
 
-        public static TruthTable NewTruthTable(string valueText) { 
+        public static TruthTable GetTruthTable(string valueText) { 
             __cache.GetValue(valueText, out TruthTable t, () => new TruthTable(valueText));
             return t;
         }
 
-        public static TruthTable NewTruthTable(Formula formula) { 
+        public static TruthTable GetTruthTable(Formula formula) { 
             var t = __formulaCache.GetValue(formula, _ => new TruthTable(_));
             return t;
         }
@@ -106,6 +106,6 @@ namespace TermSAT.RuleDatabase
     public static class TruthTableExtensions
     {
         public static TruthTable GetTruthTable(this Formula formula) =>
-            TruthTable.NewTruthTable(formula);
+            TruthTable.GetTruthTable(formula);
     }
 }

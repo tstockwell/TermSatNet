@@ -30,7 +30,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = Formula.Parse("*-.2*-.1.3");
                 var canonicalFormula = Formula.Parse("*-.1*-.2.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }

@@ -10,7 +10,6 @@ namespace TermSAT.Formulas
     /// This source module extends the Formula class with an API that represents Formulas as an array of all the 
     /// subformulas in the formula, ordered from the leftmost subformula (the formula itself) to the rightmost 
     /// subformula (the last constant or variable that appears in the formula).
-    /// TermSAT calls such an array a 'flatterm'.
     /// The name FlatTerm comes from the chapter on Term Indexing in the book 
     /// 'Handbook of Automated Reasoning',  by R Sekar, V Ramakrishnan, and Andrei Voronkov.
     /// 
@@ -21,7 +20,6 @@ namespace TermSAT.Formulas
     /// FlatTerms are useful for constructing indexes of sets of formulas.
     /// The indexes built from FlatTerms make it possible to quickly find substitution instances and unifications 
     /// of a given formula in a large set of formulas.
-    /// I expect that in the future it will be necessary to express formulas in different ordering, for indexing purposes. 
     /// 
     /// Also, FlatTerms can be easier to use that a visitor API when implementing formula reduction algorithms and such.
     /// 
@@ -42,10 +40,10 @@ namespace TermSAT.Formulas
     ///  can reconstruct the original formula from which the sequence is derived...
     ///     { *, a, *, -, b, c }
     ///     
-    ///  Thus, formula __sequences are a kind of string that represents a formula.
+    ///  Thus, flatterms are a kind of string that represents a formula.
     ///  
     ///  There are many indexing techniques used in SAT solvers that are based on various string 
-    ///  indexing and matching techniques, and formula __sequences give us a way to represent 
+    ///  indexing and matching techniques, and flatterms give us a way to represent 
     ///  formulas as strings in a convenient way.
     ///
     /// </summary>

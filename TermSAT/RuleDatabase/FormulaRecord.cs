@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using TermSAT.Formulas;
 
 namespace TermSAT.RuleDatabase;
@@ -19,14 +20,30 @@ public class FormulaRecord
     public bool IsCanonical { get; set; }
     public bool IsCompleted { get; set; }
 
+
+    [NotMapped]
+    public Formula Formula 
+    { 
+        get
+        {
+            if (_formula == null && !string.IsNullOrWhiteSpace(Text))
+            {
+                _formula = Formula.Parse(Text);
+            }
+            return _formula;
+        }
+    }
+    private Formula _formula {  get; set; }
+
     public FormulaRecord(int id, Formula formula, bool isCanonical)
     {
         Id = id;
         Text = formula.ToString();
         Length = formula.Length;
         VarCount = formula.AllVariables.Count;
-        TruthValue = TruthTable.NewTruthTable(formula).ToString();
+        TruthValue = TruthTable.GetTruthTable(formula).ToString();
         IsCanonical = isCanonical;
+        _formula = formula;
     }
     private FormulaRecord()
     {

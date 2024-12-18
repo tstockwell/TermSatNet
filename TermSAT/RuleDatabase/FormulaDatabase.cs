@@ -15,7 +15,6 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -26,126 +25,71 @@ using TermSAT.Formulas;
 namespace TermSAT.RuleDatabase
 {
 
-
-    /**
-     * An API for accessing the rule database.
-     * The rule database is an enumeration of all formulas with [VARIABLE_COUNT] 
-     * variables, up to a length determined by the RuleGenerator.
-     * The database used to create a set of rewrite rules.
-     * 
-     * The rule database is a single table named FORMULA with the following columns...
-     * 		FORMULA 	- a textual representation of the formula
-     * 		LENGTH 		- the length of the textual representation
-     * 		TRUTHVALUE 	- the truth value
-     * 		CANONICAL 	- indicates that the formula is one of the shortest formulas 
-     * 					  with the associated truth value
-     * 		ID 			- a number assigned to the formula  
-     * 
-     * 
-     * @author Ted Stockwell
-     *
-     */
+    /// <summary>
+    /// TODO:This class is legacy and should be removed.  It been replaced by RuleDatabaseContext.
+    /// </summary>
     public class FormulaDatabase : IDisposable
     {
-
-        string ConnectionString { get; set; }
-        SqliteConnection Connection {  get; set; }
+        string DataSource { get; set; }
 
 
         /// <param name="datasource">path to a file, or ':memory:' to create a memory-based db</param>
         public FormulaDatabase(string datasource)
         {
             //ConnectionString = "DataSource=" + datasource + ";Pooling=True;Max Pool Size=100;";
-            ConnectionString = "DataSource=" + datasource;
-            Connection = new SqliteConnection(ConnectionString);
-            Connection.Open();
-            using (var ctx = GetDatabaseContext())
+            DataSource = datasource;
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
                 ctx.Database.EnsureCreated();
             }
         }
 
-
-        public RuleDatabaseContext GetDatabaseContext()
-        {
-            var options = new DbContextOptionsBuilder()
-                .UseSqlite(Connection)
-                .Options;
-
-            return new RuleDatabaseContext(options);
-        }
-
         public void Clear()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                ctx.Database.ExecuteSqlRaw("DELETE FROM FormulaRecords");
+                ctx.Clear();
             }
         }
 
         public Formula GetLastGeneratedFormula()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var record = ctx.FormulaRecords.AsNoTracking()
-                    .OrderByDescending(f => f.Id)
-                    .FirstOrDefault();
-
-                var formula = record != null ? Formula.Parse(record.Text) : null;
-                return formula;
+                return ctx.GetLastGeneratedFormula();
             }
         }
 
         public List<Formula> GetCanonicalFormulas(TruthTable truthTable)
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var records = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == true)
-                    .OrderBy(f => f.Id)
-                    .ToList();
-                var formulas = records.Select(r => Formula.Parse(r.Text)).ToList();
-                return formulas;
+                return ctx.GetCanonicalFormulas(truthTable);
             }
         }
+
         public List<FormulaRecord> GetAllFormulaRecords()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var records = ctx.FormulaRecords.AsNoTracking()
-                    .OrderBy(f => f.Id)
-                    .ToList();
-                return records;
+                return ctx.GetAllFormulaRecords();
             }
         }
 
         public List<Formula> GetNonCanonicalFormulas(TruthTable truthTable)
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var records = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == false)
-                    .OrderBy(f => f.Id)
-                    .ToList();
-                var formulas = records.Select(r => Formula.Parse(r.Text)).ToList();
-                return formulas;
+                return ctx.GetNonCanonicalFormulas(truthTable);
             }
         }
 
 
         public int GetLengthOfLongestCanonicalFormula()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var formula = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.IsCanonical == true)
-                    .OrderByDescending(f => f.Length)
-                    .FirstOrDefault();
-
-                if (formula == null)
-                    return 0;
-
-                return formula.Length;
+                return ctx.GetLengthOfLongestCanonicalFormula();
             }
         }
 
@@ -156,23 +100,18 @@ namespace TermSAT.RuleDatabase
          */
         public int LengthOfLongestPossibleNonReducibleFormula()
         {
-            int maxLength = GetLengthOfLongestCanonicalFormula();
-            if (maxLength <= 0) // we don't know the length of longest formula yet
-                return int.MaxValue;
-            return maxLength * 2 + 1;
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
+            {
+                return ctx.LengthOfLongestPossibleNonReducibleFormula();
+            }
         }
 
 
         public List<Formula> FindCanonicalFormulasByLength(int size)
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var records = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.Length == size && f.IsCanonical == true)
-                    .OrderBy(f => f.Id)
-                    .ToList();
-                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-                return formulas;
+                return ctx.FindCanonicalFormulasByLength(size);
             }
         }
 
@@ -183,109 +122,64 @@ namespace TermSAT.RuleDatabase
 
         public void AddFormula(int id, Formula formula, bool isCanonical)
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var record = new FormulaRecord(id, formula, isCanonical);
-
-                ctx.FormulaRecords.Add(record);
-                ctx.SaveChanges();
-                ctx.Clear();
+                ctx.AddFormula(id, formula, isCanonical);
             }
         }
         public async Task IsSubsumedBySchemeAsync(Formula formula, string value)
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var record = await ctx.FormulaRecords
-                    .Where(f => f.Text.Equals(formula.ToString()))
-                    .FirstOrDefaultAsync();
-                if (record == null)
-                {
-                    throw new Exception($"formula not found in database:{formula}");
-                }
-
-                record.IsSubsumedByScheme = value;
-
-                await ctx.SaveChangesAsync();
-                ctx.Clear();
+                await ctx.IsSubsumedBySchemeAsync(formula, value);
             }
         }
 
         public List<Formula> GetAllNonCanonicalFormulas(int maxLength)
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var records = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.Length <= maxLength && f.IsCanonical == false)
-                    .OrderBy(f => f.Id)
-                    .ToList();
-                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-                return formulas;
+                return ctx.GetAllNonCanonicalFormulas(maxLength);
             }
         }
+
         public List<Formula> GetAllNonCanonicalFormulas()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var records = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.IsCanonical == false)
-                    .OrderBy(f => f.Id)
-                    .ToList();
-                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-                return formulas;
+                return ctx.GetAllNonCanonicalFormulas();
             }
         }
+
         public List<Formula> GetAllCanonicalFormulas()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var records = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.IsCanonical == true)
-                    .OrderBy(f => f.Id)
-                    .ToList();
-                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-                return formulas;
+                return ctx.GetAllCanonicalFormulas();
             }
         }
+
         public List<Formula> GetAllCanonicalFormulasInLexicalOrder()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var records = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.IsCanonical == true)
-                    .OrderBy(f => f.Text)
-                    .ToList();
-                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-                return formulas;
+                return ctx.GetAllCanonicalFormulasInLexicalOrder();
             }
         }
+
         public List<TruthTable> GetAllTruthTables()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var truthValues = ctx.FormulaRecords.AsNoTracking()
-                    .OrderBy(f => f.TruthValue)
-                    .Select(f => f.TruthValue)
-                    .Distinct()
-                    .ToList();
-                var truthTables = truthValues.Select(v => TruthTable.NewTruthTable(v)).ToList();
-                return truthTables;
+                return ctx.GetAllTruthTables();
             }
         }
 
         public int GetLengthOfCanonicalFormulas(TruthTable truthTable)
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var formula = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.IsCanonical == true && f.TruthValue == truthTable.ToString())
-                    .OrderBy(f => f.Id)
-                    .FirstOrDefault();
-
-                if (formula == null)
-                    return 0;
-
-                return formula.Length;
+                return ctx.GetLengthOfCanonicalFormulas(truthTable);
             }
         }
 
@@ -294,57 +188,42 @@ namespace TermSAT.RuleDatabase
          */
         public Formula FindCanonicalFormula(Formula formula)
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                return ctx.FindCanonicalFormula(TruthTable.NewTruthTable(formula));
+                return ctx.FindCanonicalFormula(formula);
             }
         }
 
         public int CountNonCanonicalFormulas()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var count = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.IsCanonical == false)
-                    .Count();
-                return count;
+                return ctx.CountNonCanonicalFormulas();
             }
         }
 
         public int CountCanonicalFormulas()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var count = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.IsCanonical == true)
-                    .Count();
-                return count;
+                return ctx.CountCanonicalFormulas();
             }
         }
 
 
         public long CountCanonicalTruthTables()
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var count = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.IsCanonical == true)
-                    .Select(f => f.TruthValue)
-                    .Distinct()
-                    .Count();
-                return count;
+                return ctx.CountCanonicalTruthTables();
             }
         }
 
         public List<Formula> GetAllFormulas(TruthTable truthTable)
         {
-            using (var ctx = GetDatabaseContext())
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DataSource))
             {
-                var records = ctx.FormulaRecords.AsNoTracking()
-                    .Where(f => f.TruthValue == truthTable.ToString())
-                    .ToList();
-                var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-                return formulas;
+                return ctx.GetAllFormulas(truthTable);
             }
         }
 

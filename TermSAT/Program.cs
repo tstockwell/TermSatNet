@@ -31,9 +31,8 @@ namespace TermSAT
                 Trace.Listeners.Add(new TextWriterTraceListener("nand-rule-generation-3-trace.log"));
 
                 var database = new FormulaDatabase("nand-rules-3.db");
-                NandReduction.Scripts.RunNandRuleGenerator(database);
-                //var generator = new NandFormulaGenerator(database,3);
-                //new RuleGenerator(database, generator).Run();
+                await TermSAT.NandReduction.Scripts.RunNandRuleGenerator("nand-rules-3.db", "nand-rules-index.db");
+                //TermSAT.NandReduction.Scripts_RuleGenerator_KnuthBendix.RunNandRuleGenerator(database);
             });
             rootCommand.AddCommand(schemeEquivalenceTest);
         }

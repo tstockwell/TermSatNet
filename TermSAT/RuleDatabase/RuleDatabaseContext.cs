@@ -1,37 +1,24 @@
-﻿/*******************************************************************************
- *     termsat SAT solver
- *     Copyright (C) 2010 Ted Stockwell <emorning@yahoo.com>
- * 
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU Affero General Public License as
- *     published by the Free Software Foundation, either version 3 of the
- *     License, or (at your option) any later version.
- * 
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU Affero General Public License for more details.
- * 
- *     You should have received a copy of the GNU Affero General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using TermSAT.Formulas;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace TermSAT.RuleDatabase;
 
+/// <summary>
+/// The rule database is an enumeration of all formulas with [VARIABLE_COUNT] 
+/// variables, up to a length determined by the RuleGenerator.
+/// The database is used to create a set of rewrite rules.
+/// 
+/// The rule database is a single table named FORMULA with the following columns...
+///  		FORMULA 	- a textual representation of the formula
+///  		LENGTH 		- the length of the textual representation
+///  		TRUTHVALUE 	- the truth value
+///  		CANONICAL 	- indicates that the formula is one of the shortest formulas 
+///  					  with the associated truth value
+///  		ID 			- a number assigned to the formula  
+///  		
+/// 
+/// </summary>
 public class RuleDatabaseContext : DbContext
 {
-    //
-    // Summary:
-    //     Initializes a new instance of the Microsoft.EntityFrameworkCore.DbContext class
-    //     using the specified options. The Microsoft.EntityFrameworkCore.DbContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)
-    //     method will still be called to allow further configuration of the options.
-    //
-    // Parameters:
-    //   options:
-    //     The options for this context.
     public RuleDatabaseContext(DbContextOptions options) : base(options)
     {
     }
@@ -53,10 +40,13 @@ public class RuleDatabaseContext : DbContext
         modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.VarCount);
         modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Length);
         modelBuilder.Entity<FormulaRecord>().HasIndex(_ => new { _.Length, _.Text });
+        modelBuilder.Entity<FormulaRecord>().HasIndex(_ => new { _.Length, _.Text, _.TruthValue });
         modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.TruthValue);
         modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsCanonical);
         modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsCompleted);
         modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsSubsumedByScheme);
+
+        modelBuilder.Entity<FormulaRecord>().Ignore(_ => _.Formula);
 
         modelBuilder.Entity<FormulaRecord>(f => f.ToTable("FormulaRecords"));
     }
@@ -72,8 +62,17 @@ public class RuleDatabaseContext : DbContext
     /// So, periodically detach any entries.
     /// </summary>
     public void Clear() => this.ChangeTracker.Clear();
+        public static RuleDatabaseContext GetDatabaseContext(string datasource)
+        {
+            var connectionString = "DataSource=" + datasource;
+            var options = new DbContextOptionsBuilder()
+                .UseSqlite(connectionString)
+                .Options;
 
-    //public void Clear()
+            return new RuleDatabaseContext(options);
+        }
+
+    //public void DeleteAll()
     //{
     //    var changedEntriesCopy = this.ChangeTracker.Entries()
     //        .Where(e => e.State == EntityState.Added ||
@@ -84,38 +83,4 @@ public class RuleDatabaseContext : DbContext
     //    foreach (var entry in changedEntriesCopy)
     //        entry.State = EntityState.Detached;
     //}
-}
-
-public static class RuleDatabaseContextExtensions
-{
-
-    /**
-     * Finds the canonical form of for formulas with the given truth value.
-     */
-    static public FormulaRecord FindCanonicalRecord(this RuleDatabaseContext ctx, TruthTable truthTable)
-    {
-        var tv = truthTable.ToString();
-        var recorrd = ctx.FormulaRecords
-                .OrderBy(_ => _.Length).ThenBy(_ => _.Text)
-                .Where(_ => _.TruthValue == tv)
-                .FirstOrDefault();
-#if DEBUG
-        if (recorrd != null && !recorrd.IsCanonical)
-        {
-            throw new TermSatException($"The canonical form for a formula with truth value {tv} " +
-                $"should be the first formula in the formula order with that truth value.");
-        }
-#endif 
-
-        return recorrd;
-
-    }
-
-    static public Formula FindCanonicalFormula(this RuleDatabaseContext ctx, TruthTable truthTable) =>
-        Formula.Parse(
-            ctx.FormulaRecords
-                .OrderBy(_ => _.Length).ThenBy(_ => _.Text)
-                .Where(_ => _.TruthValue == truthTable.ToString())
-                .FirstOrDefault().Text);
-
 }

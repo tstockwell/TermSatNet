@@ -72,7 +72,19 @@ Examples...
 
 ## Ordering
 
-See the Formula.CompareTo method for an implementation of the ordering.
+
+Basically the rules, in order, are...
+1. Constants are before any other formulas, T is before F.  
+2. Formulas where the highest numbered variable is X come before formulas where the highest numbered variable is Y, and X < Y
+3. Shorter formulas are before longer formulas.  
+4. Formulas of the same length are sorted lexically.  
+
+Examples..
+Rule 1: T comes before .1
+Rule 2: |.1.2 comes before .3
+Rule 3: |.2.1 comes before |.1|.1.2
+Rule 4: |.2.3 comes before |.3.1 
+Rule 4: |.3.2 comes before |.3.3
 
 TermSAT depends on first defining an ordering of all formulas.
 The purpose of this ordering is to provide a method of determining the 'complexity' of a formula.  
@@ -82,20 +94,10 @@ Such an ordering is a necessary condition for producing such a set of rules.
 One consequence of imposing an ordering on formulas is that there is one, 
 and only one, 'canonical' way to represent a given formula.
 
+See the Formula.CompareTo method for an implementation of the ordering.  
 
-Basically the rules, in order, are...
-1. Constants are before any other formulas, T is before F.  
-2. Variables are before than any other formulas, except Constants.  
-	1. Variables are assigned a number, variables with lower numbers are before other variables
-3. Shorter formulas are before longer formulas.  
-4. The lower the TermSAT number the lower the formula in the order.
-
-Examples..
-Rule 1: T comes before .1
-Rule 2: .2 comes before |TT 
-Rule 3: |.2.2 comes before |.1|.1.1
-Rule 4: |.2.1 comes before |.3.1 
-Rule 5: |.1.2 comes before |.1.3
+This ordering matches the order in which the 'rule database' is constructed.  
+See TermSAT.Nand.Scripts.RunNandRuleGenerator.
 
 ### Sorting formulas in a database 
 

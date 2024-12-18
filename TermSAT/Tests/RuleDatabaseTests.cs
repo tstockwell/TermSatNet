@@ -27,18 +27,18 @@ namespace TermSAT.Tests
             var hexAllFalse = new String('0', TruthTable.VARIABLE_COUNT);
 
             // truth table for a formula
-            var tt = TruthTable.NewTruthTable("T".ToFormula());
+            var tt = TruthTable.GetTruthTable("T".ToFormula());
             Assert.AreEqual(hexAllTrue, tt.ToString());
-            tt = TruthTable.NewTruthTable("F".ToFormula());
+            tt = TruthTable.GetTruthTable("F".ToFormula());
             Assert.AreEqual(hexAllFalse, tt.ToString());
 
             // truth table from hex string 
-            tt = TruthTable.NewTruthTable(hexAllTrue);
+            tt = TruthTable.GetTruthTable(hexAllTrue);
             Assert.AreEqual(hexAllTrue, tt.ToString());
-            tt = TruthTable.NewTruthTable(hexAllFalse);
+            tt = TruthTable.GetTruthTable(hexAllFalse);
             Assert.AreEqual(hexAllFalse, tt.ToString());
 
-            tt = TruthTable.NewTruthTable(Variable.NewVariable(1));
+            tt = TruthTable.GetTruthTable(Variable.NewVariable(1));
             var hexVarOne = new String('5', TruthTable.VARIABLE_COUNT);
             Assert.AreEqual(hexVarOne, tt.ToString());
 
@@ -47,13 +47,13 @@ namespace TermSAT.Tests
         [TestMethod]
         public void VariableTruthTableTests()
         {
-            var tt = TruthTable.NewTruthTable(Variable.ONE);
+            var tt = TruthTable.GetTruthTable(Variable.ONE);
             Assert.AreEqual("55", tt.ToString());
 
-            tt = TruthTable.NewTruthTable(Variable.TWO);
+            tt = TruthTable.GetTruthTable(Variable.TWO);
             Assert.AreEqual("33", tt.ToString());
 
-            tt = TruthTable.NewTruthTable(Variable.THREE);
+            tt = TruthTable.GetTruthTable(Variable.THREE);
             Assert.AreEqual("0F", tt.ToString());
         }
 
@@ -111,7 +111,7 @@ namespace TermSAT.Tests
                 formula= generator.GetNextWellFormedFormula();
                 var n= Negation.NewNegation(f);
                 Assert.AreEqual(n, formula);
-                var tt= database.GetCanonicalFormulas(TruthTable.NewTruthTable(n));
+                var tt= database.GetCanonicalFormulas(TruthTable.GetTruthTable(n));
                 if (tt.Count < 0)
                     database.AddFormula(n, isCanonical:true);
             }

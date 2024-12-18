@@ -44,7 +44,7 @@ public static class Scripts
         bool isEquivalent = true;
         foreach (var formula in formulaDatabase.GetAllNonCanonicalFormulas())
         {
-            TruthTable truthTable = TruthTable.NewTruthTable(formula);
+            TruthTable truthTable = TruthTable.GetTruthTable(formula);
             var canonicalFormulas = formulaDatabase.GetCanonicalFormulas(truthTable);
             Debug.Assert(canonicalFormulas.Count == 1, "there is never more than 1 canonical formula");
             var canonicalFormula = canonicalFormulas[0];

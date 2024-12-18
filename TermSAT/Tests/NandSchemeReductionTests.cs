@@ -57,7 +57,7 @@ namespace TermSAT.Tests
                         "|.1|T|.2.3"
                     };
                     var reductionFormulas = reductionSteps.Select(s => Formula.Parse(s)).ToArray();
-                    var truthTables = reductionFormulas.Select(f => TruthTable.NewTruthTable(f).ToString()).Distinct().ToArray();
+                    var truthTables = reductionFormulas.Select(f => TruthTable.GetTruthTable(f).ToString()).Distinct().ToArray();
                     Assert.IsTrue(truthTables.Length == 1);
                 }
                 {
@@ -67,13 +67,13 @@ namespace TermSAT.Tests
                         "|||TT|.2.3||.1.2|.1.3",
                     };
                     var reductionFormulas = reductionSteps.Select(s => Formula.Parse(s)).ToArray();
-                    var truthTables = reductionFormulas.Select(f => TruthTable.NewTruthTable(f).ToString()).Distinct().ToArray();
+                    var truthTables = reductionFormulas.Select(f => TruthTable.GetTruthTable(f).ToString()).Distinct().ToArray();
                     Assert.IsTrue(truthTables.Length == 1);
                 }
 
                 var nonCanonicalformula = (Nand)Formula.Parse("|||T.1|.2.3||.1.2|.1.3");
                 var canonicalFormula = Formula.Parse("|T||.1.2|.1.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -82,7 +82,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|T||.1|T.2|.3|T.1");
                 var canonicalFormula = Formula.Parse("||.1.2||T.1|T.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -95,56 +95,56 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.1T");
                 var canonicalFormula = Formula.Parse("|T.1");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|TT");
                 var canonicalFormula = Formula.Parse("F");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.2.1");
                 var canonicalFormula = Formula.Parse("|.1.2");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.1|.1.2");
                 var canonicalFormula = Formula.Parse("|.1|T.2");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|T|T.1");
                 var canonicalFormula = Formula.Parse(".1");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.1T");
                 var canonicalFormula = Formula.Parse("|T.1");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.2|.1T");
                 var canonicalFormula = Formula.Parse("|.2|T.1");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.2|.3|.1T");
                 var canonicalFormula = Formula.Parse("|.2|.3|T.1");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -155,14 +155,14 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("||.1|T.2|.2|.1T");
                 var canonicalFormula = Formula.Parse("||.1|T.2|.2|T.1");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("||T.2||T.3|.1F");
                 var canonicalFormula = Formula.Parse("|.3|T.2");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -214,14 +214,14 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.1||.2.3||T.3|.1.2");
                 var canonicalFormula = Formula.Parse("|.1||.2.3||T.2|T.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("||.1|.2.3|.3|T.1");
                 var canonicalFormula = Formula.Parse("||.1|T.3|.3|.1.2");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -230,28 +230,28 @@ namespace TermSAT.Tests
                 var nonCanonicalformula = (Nand)Formula.Parse("||.1|.2.3|.2|T.1");
                 // => 
                 var canonicalFormula = Formula.Parse("||.1|T.2|.2|.1.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("||.2.3||T.3|.1T");
                 var canonicalFormula = Formula.Parse("||.2.3||T.1|T.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.3||.1.2||T.1|.2.3");
                 var canonicalFormula = Formula.Parse("|.3||.1.2||T.1|T.2");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.2|T|.1.3");
                 var canonicalFormula = Formula.Parse("|.1|T|.2.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -280,7 +280,7 @@ namespace TermSAT.Tests
                 //  => |.3||T.1|T.2
                 var nonCanonicalformula = (Nand)Formula.Parse("|||T.1|T.3||.1.3|.2.3");
                 var canonicalFormula = Formula.Parse("|T||.1.3|.2.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -292,9 +292,9 @@ namespace TermSAT.Tests
                 //var nonCanonicalFormula = (Formulas.Nand)Formula.Parse("|||T.2|T.3||T.1|T.2");
                 //var nonCanonicalFormula = (Formulas.Nand)Formula.Parse("|T||T.2||T.3|T.1");
                 var nonCanonicalFormula = Formula.Parse("|T||.1.3|T.2");
-                var nonCanonicalTT = TruthTable.NewTruthTable(nonCanonicalFormula).ToString();
+                var nonCanonicalTT = TruthTable.GetTruthTable(nonCanonicalFormula).ToString();
                 var canonicalFormula = Formula.Parse("|T||T.2|.1.3");
-                var canonicalTT = TruthTable.NewTruthTable(canonicalFormula).ToString();
+                var canonicalTT = TruthTable.GetTruthTable(canonicalFormula).ToString();
                 var reducedFormula = NandReducer.Reduce(nonCanonicalFormula);
                 Assert.AreEqual(nonCanonicalTT, canonicalTT);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
@@ -329,7 +329,7 @@ namespace TermSAT.Tests
 
                 var nonCanonicalformula = (Nand)Formula.Parse("|||.1.2|.1.3|.3|T||T.1|T.2");
                 var canonicalFormula = Formula.Parse("|T||.1.2|.1.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -345,7 +345,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("||.1.2|.3|.1|T.2");
                 var canonicalFormula = Formula.Parse("||.1.2|.3|T.1");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -357,7 +357,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("||.2.3|.1|.2.3");
                 var canonicalFormula = Formula.Parse("||T.1|.2.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -367,7 +367,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|T||.1|.2.3|.2.3");
                 var canonicalFormula = Formula.Parse("|T||T.1|.2.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -523,7 +523,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("||.2|.1.3|.3|T.2");
                 var canonicalFormula = Formula.Parse("||.2|T.3|.3|.1.2");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -542,7 +542,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("||.1.2||.1.3|.2|T.1");
                 var canonicalFormula = Formula.Parse("||.1.2||T.2|.1.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -577,7 +577,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("||.2|T.3||.1.2|.1.3");
                 var canonicalFormula = Formula.Parse("|.1.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -621,7 +621,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|||.1.2|.1.3|.1|T|.2|T.3");
                 var canonicalFormula = Formula.Parse("|.1.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -635,7 +635,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.1||.2|T.3|.3|.1.2"); // id=484
                 var canonicalFormula = Formula.Parse("||.2.3||.1.2|.1.3"); //id=483
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -649,7 +649,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|T||.1.2||T.1|T.2");
                 var canonicalFormula = Formula.Parse("||.1|T.2|.2|T.1");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -682,9 +682,9 @@ namespace TermSAT.Tests
                 var canonicalFormula = Formula.Parse("|.3|.1|T.2");
                 var testFormula = Formula.Parse("||.1|.2.3||F.2|.3|TF");
                 var testFormula2 = Formula.Parse("||.1|.2.3||.1.2|.3|TF");
-                Assert.AreEqual(TruthTable.NewTruthTable(testFormula2).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
-                Assert.AreEqual(TruthTable.NewTruthTable(testFormula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(testFormula2).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(testFormula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -704,7 +704,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|||T.2|T.3||.2.3|.1|T.2");
                 var canonicalFormula = Formula.Parse("|T||.1.3|.2.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -714,7 +714,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("||.2.3||.1.2|.3|T.1");
                 var canonicalFormula = Formula.Parse("||.1.3||.1.2|.3|T.2");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -723,7 +723,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|T||.1|T.2|.1|T.3");
                 var canonicalFormula = Formula.Parse("|.1|.2.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -734,7 +734,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|.3||.1|T.2|.2|T.1");
                 var canonicalFormula = Formula.Parse("||.1.2||.1.3|.2.3"); // verified canonical
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -785,7 +785,7 @@ namespace TermSAT.Tests
             {
                 var nonCanonicalformula = (Nand)Formula.Parse("|||.1.2|.3|T.2||.2.3|.1|T.2");
                 var canonicalFormula = Formula.Parse("|.1.3");
-                Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
@@ -809,7 +809,7 @@ namespace TermSAT.Tests
         {
             var nonCanonicalformula = (Nand)Formula.Parse("|.1||T.2|T.3");
             var canonicalFormula = Formula.Parse("|T||.1.2|.1.3");
-            Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+            Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
             var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
             Assert.AreEqual(canonicalFormula, reducedFormula);
         }
@@ -819,7 +819,7 @@ namespace TermSAT.Tests
         {
             var nonCanonicalformula = (Nand)Formula.Parse("|.2|.3|.1.2");
             var canonicalFormula = Formula.Parse("|.2|.3|T.1");
-            Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+            Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
             var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
             Assert.AreEqual(canonicalFormula, reducedFormula);
         }
@@ -903,7 +903,7 @@ namespace TermSAT.Tests
         {
             var nonCanonicalformula = (Nand)Formula.Parse("|T||.1|T.2|.2|T.1"); // id=456
             var canonicalFormula = Formula.Parse("||.1.2||T.1|T.2");
-            Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+            Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
             var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
             Assert.AreEqual(canonicalFormula, reducedFormula);
         }

@@ -64,7 +64,7 @@ public class Nand_NoConstants_ReductionTests
     {
         var nonCanonicalformula = (Nand)Formula.Parse("||.1.1|.1.1");
         var canonicalFormula = Formula.Parse(".1");
-        Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+        Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
         var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
         Proof proof = Proof.GetReductionProof(nonCanonicalformula);
         Assert.AreEqual(canonicalFormula, reducedFormula);
@@ -75,7 +75,7 @@ public class Nand_NoConstants_ReductionTests
     {
         var nonCanonicalformula = (Nand)Formula.Parse("|.1|.1|.1.1");
         var canonicalFormula = Formula.Parse("|.1.1");
-        Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+        Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
         var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
         Proof proof = Proof.GetReductionProof(nonCanonicalformula);
         Assert.AreEqual(canonicalFormula, reducedFormula);
@@ -106,7 +106,7 @@ public class Nand_NoConstants_ReductionTests
     {
         var nonCanonicalformula = (Nand)Formula.Parse("|.1|.1|.1.1");
         var canonicalFormula = Formula.Parse("|.1.1");
-        Assert.AreEqual(TruthTable.NewTruthTable(nonCanonicalformula).ToString(), TruthTable.NewTruthTable(canonicalFormula).ToString());
+        Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
         var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
         Proof proof = Proof.GetReductionProof(nonCanonicalformula);
         Assert.AreEqual(canonicalFormula, reducedFormula);

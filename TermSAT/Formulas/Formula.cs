@@ -17,7 +17,9 @@
  ******************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TermSAT.Formulas
@@ -25,18 +27,19 @@ namespace TermSAT.Formulas
     /**
      * Represents a propositional formula.
      * 
-     * This system represents propositional formulas using only...
+     * This system represents propositional formulas using ...
      * 	...constants TRUE and FALSE.
      *  ...variables.
      *  ...a negation operator 
-     *  ...an implication operator (aka the if-then operator, most often written as ->).
+     *  ...an implication operator.
+     *  ...a nand operator .
      *  
      * This system supports a textual form for representing formulas.
      * The normal form uses Polish notation and...
      * 	...the symbols 'T' and 'F' for TRUE and FALSE.
      *  ...the symbol '-' for the negation operator, followed by a formula. 
-     *  ...the symbol '*' for the implication operator, followed by the consequent 
-     *  	and then the antecedent. 
+     *  ...the symbol '*' for the implication operator, followed by the consequent and then the antecedent. 
+     *  ...the symbol '|' for the nand operator, followed by the consequent and then the antecedent. 
      *  ...the symbol '.' followed by a sequence of digits, for representing variables.
      *  
      *  Polish notation is used because it is compact, eliminates the 
@@ -86,19 +89,14 @@ namespace TermSAT.Formulas
         }
 
         /// <summary>
-        /// 
-        ///     Here's an important point to understand about formula ordering...
-        /// 
-        ///     In order to prove that TermSAT's set of reduction rules is 'complete' we 
-        ///     need to create an ordering of formulas in terms of 'simplicity'.
-        ///     That is, 'simpler' formulas must come before more 'complex' formulas in the ordering.
-        ///     
         ///     This method implements TermSAT's ordering.
-        ///     
         /// </summary>
         public int CompareTo(Formula other)
         {
             if (other == this)
+                return 0;
+
+            if (this.Equals(other))
                 return 0;
 
             // shorter formulas are simpler than longer formulas
@@ -154,19 +152,39 @@ namespace TermSAT.Formulas
             {
                 if (other is Nand impOther) 
                 {
-                    // nands with simpler antecedents come first
+
+                    // if we get to here then the formulas have the same length and are *not* equal.
+                    // return the lexicographical comparison
+                    var thisEnum = new FormulaDFSEnumerator(this);
+                    var otherEnum = new FormulaDFSEnumerator(other);
+                    while (otherEnum.MoveNext())
                     {
-                        var aThis = nandThis.Antecedent;
-                        var aOther = impOther.Antecedent;
-                        var c = aThis.CompareTo(aOther);
-                        if (c != 0)
-                            return c;
+                        thisEnum.MoveNext();
+                        if (thisEnum.Current is Nand)
+                        {
+                            if (!(otherEnum.Current is Nand))
+                            {
+                                return 1;
+                            }
+                        }
+                        else if (otherEnum.Current is Nand)
+                        {
+                            return -1;
+                        }
+                        else
+                        {
+                            var value = thisEnum.Current.CompareTo(otherEnum.Current);
+                            if (value != 0)
+                            {
+                                return value;
+                            }
+                        }
                     }
 
-                    var cThis = nandThis.Subsequent;
-                    var cOther = impOther.Subsequent;
-                    var i = cThis.CompareTo(cOther);
-                    return i;
+                    return 0;
+#if DEBUG
+                    throw new TermSatException($"Since these formulas are not equal, we shouldn't get here");
+#endif
                 }
 
                 return -1; // nand comes before implication
