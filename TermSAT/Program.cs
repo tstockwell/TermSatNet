@@ -3,14 +3,33 @@ using System.CommandLine;
 using TermSAT.RuleDatabase;
 using System.Diagnostics;
 using TermSAT.NandReduction;
+using System.IO;
 
 namespace TermSAT
 {
+    public class TermSATTraceListener : TraceListener
+    {
+        Task continuation = Task.CompletedTask;
+        TextWriter TextWriter {  get; }
+        public TermSATTraceListener(TextWriter textWriter)
+        {
+            TextWriter = textWriter;
+        }
+        public override void Write(string message)
+        {
+            continuation.ContinueWith(async _ => await TextWriter.WriteAsync(message));
+        }
+
+        public override void WriteLine(string message)
+        {
+            continuation.ContinueWith(async _ => await TextWriter.WriteLineAsync(message));
+        }
+    }
     public static class Program
     {
         static async Task<int> Main(string[] args)
         {
-            Trace.Listeners.Add(new TextWriterTraceListener(System.Console.Out));
+            Trace.Listeners.Add(new TermSATTraceListener(System.Console.Out));
 
             var rootCommand = new RootCommand("TermSAT");
 
@@ -30,8 +49,8 @@ namespace TermSAT
             {
                 Trace.Listeners.Add(new TextWriterTraceListener("nand-rule-generation-3-trace.log"));
 
-                var database = new FormulaDatabase("nand-rules-3.db");
                 await TermSAT.NandReduction.Scripts.RunNandRuleGenerator("nand-rules-3.db", "nand-rules-index.db");
+                //var database = new FormulaDatabase("nand-rules-3.db");
                 //TermSAT.NandReduction.Scripts_RuleGenerator_KnuthBendix.RunNandRuleGenerator(database);
             });
             rootCommand.AddCommand(schemeEquivalenceTest);

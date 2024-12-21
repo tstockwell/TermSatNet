@@ -44,7 +44,7 @@ public static partial class FormulaIndex
             modelBuilder.Entity<Node>().HasIndex(f => f.Parent);
             modelBuilder.Entity<Node>().HasIndex(_ => new { _.Parent, _.Key});
 
-            modelBuilder.Entity<Node>(f => f.ToTable("IndexRecords"));
+            modelBuilder.Entity<Node>(f => f.ToTable(nameof(NodeContext.Nodes)));
         }
 
         public override int SaveChanges()

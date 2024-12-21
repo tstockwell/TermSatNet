@@ -13,29 +13,35 @@ public static class RuleDatabaseExtensions
     /**
      * Finds the canonical form of for formulas with the given truth value.
      */
-    static public FormulaRecord FindCanonicalByTruthValue(this RuleDatabaseContext ctx, string truthValue)
+    static public async Task<FormulaRecord> FindCanonicalByTruthValueAsync(this RuleDatabaseContext ctx, string truthValue)
     {
-        var recorrd = ctx.FormulaRecords
+        var recorrd = await ctx.FormulaRecords
                 .OrderBy(_ => _.Length).ThenBy(_ => _.Text)
-                .Where(_ => _.TruthValue == truthValue)
-                .FirstOrDefault();
-#if DEBUG
-        if (recorrd != null && !recorrd.IsCanonical)
-        {
-            throw new TermSatException($"The canonical form for a formula with truth value {truthValue} " +
-                $"should be the first formula in the formula order with that truth value.");
-        }
-#endif 
+                .Where(_ => _.TruthValue == truthValue)                        
+                .FirstOrDefaultAsync();
+
+// This check can't be done here
+//#if DEBUG
+//        if (recorrd != null && !recorrd.IsCanonical)
+//        {
+//            throw new TermSatException($"The canonical form for a formula with truth value {truthValue} " +
+//                $"should be the first formula in the formula order with that truth value.");
+//        }
+//#endif 
 
         return recorrd;
 
     }
 
-    static public Formula FindCanonicalFormula(this RuleDatabaseContext ctx, string truthValue) =>
-        Formula.Parse(FindCanonicalByTruthValue(ctx, truthValue).Text);
+    static public async Task<Formula> FindCanonicalFormulaAsync(this RuleDatabaseContext ctx, string truthValue)
+    {
+        var record = await FindCanonicalByTruthValueAsync(ctx, truthValue);
+        var formula = Formula.Parse(record.Text);
+        return formula;
+    }
 
-    static public FormulaRecord FindById(this RuleDatabaseContext ctx, int id) =>
-        ctx.FormulaRecords.AsNoTracking().Where(_ => _.Id == id).First();
+    static public async Task<FormulaRecord> FindByIdAsync(this RuleDatabaseContext ctx, int id) =>
+        await ctx.FormulaRecords.AsNoTracking().Where(_ => _.Id == id).FirstAsync();
 
 
 

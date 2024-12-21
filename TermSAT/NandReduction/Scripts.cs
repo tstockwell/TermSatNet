@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using TermSAT.Common;
 using TermSAT.Formulas;
@@ -11,10 +15,11 @@ using TermSAT.RuleDatabase;
 
 namespace TermSAT.NandReduction;
 
-public class Scripts
+public static class Scripts
 {
-    static readonly int VARIABLE_COUNT = 3;
-    static readonly string DATABASE_PATH = $"nand-rules-{VARIABLE_COUNT}.db";
+    const int CONCURRENCY_LIMIT = 32;
+
+
 
     /*
      * A formula can be reduced if it is a substitution instance of 
@@ -38,8 +43,8 @@ public class Scripts
             {
                 substitutions.Add(Variable.NewVariable(substitution.Key), substitution.Value);
             }
-            var nonCanonicalRecord = ctx.FindById(searchResult.Node.Value);
-            var canonicalRecord = ctx.FindCanonicalByTruthValue(nonCanonicalRecord.TruthValue);
+            var nonCanonicalRecord = await ctx.FindByIdAsync(searchResult.Node.Value);
+            var canonicalRecord = await ctx.FindCanonicalByTruthValueAsync(nonCanonicalRecord.TruthValue);
             Formula canonicalFormula = Formula.Parse(canonicalRecord.Text);
             var reducedFormula = canonicalFormula.CreateSubstitutionInstance(substitutions);
             if (formula.CompareTo(reducedFormula) <= 0)
@@ -50,17 +55,6 @@ public class Scripts
         return false;
     }
 
-
-
-    [TestMethod]
-    public void RunNandRuleReport()
-    {
-        var database = new FormulaDatabase(DATABASE_PATH);
-        var options = new DatabaseReport.DatabaseReportOptions();
-        if (VARIABLE_COUNT <= 2)
-            options.ShowNonCanonicalFormulas = true;
-        new DatabaseReport(database, options).Run();
-    }
 
 
     /// <summary>
@@ -87,6 +81,7 @@ public class Scripts
 
             try
             {
+
                 Formula reducedFormula = formula.Reduce();
 
                 if (reducedFormula.Equals(canonicalFormula))
@@ -120,23 +115,12 @@ public class Scripts
 
     /**
      * This method generates a database of rewrite 'rules' for reducing TermSAT formulas.  
-     * Each formula has a 'truth value' that identifies equivalent formulas.
-     * Formulas are also marked as either canonical of non-canonical.  
-     * The formulas are in 'TermSAT order'...
-     *  - formulas where the highest numbered variable is X come before formulas where the highest numbered variable is Y, and X < Y
-     *  - shorter formulas before longer formulas
-     *  - formulas of the same length are sorted lexically.  
+     * Its really just a table of formulas broken down into canonical and non-canonical formulas.
      * The first formula in the formula order with a particular truth value is canonical, others are non-canonical.  
+     * Each formula has a 'truth value' that identifies equivalent formulas.
      * Thus, the database is also a table of rewrite rules, 
      * where each non-canonical formula is the left side of a rewrite rule, 
      * and the right-side of the rule is the corresponding canonical formula.
-     * 
-     * First, all formulas with just one variable are constructed.  
-     *      First, the formula .1 is added to the database.
-     *      Then .1 is closed, resulting |.1.1 being added to the database. 
-     *      Then |.1.1 is closed, resulting in |.1|.1.1, ||.1.1.1, and ||.1.1|.1.1 being added to the database.
-     *      And so on...
-     * Then two variables, then three, and so on, until adding a new variable results in no new formulas/rules being added to the database.  
      * 
      * This method takes a different approach than Scripts_RuleGenerator_KnuthBendix.RunNandRuleGenerator.
      * Instead of constructing the closure of all formulas as they're added to the database of rules, this method calculates 
@@ -148,17 +132,19 @@ public class Scripts
      *  This method calculates these formulas very efficiently, its much less work than looking for formulas 
      *  in the enumeration of the transitive closure of a variable.
      * 
-     * When completing a new variable, new formulas are calculated in formula order.  
-     * First, all rules for all formulas of Length == 1 are added to the database and marked as completed, canonical formulas.
-     * Then, all all formulas of Length == 2 are calculated from the previously completed, canonical formulas are generated.
-     * And so on, until no more formulas are added to the database.
-     * 
+     * First, all formulas with just one variable are constructed.  
+     *      First, the formula .1 is added to the database.
+     *      Then .1 is closed, resulting |.1.1 being added to the database. 
+     *      Then |.1.1 is closed, resulting in |.1|.1.1, ||.1.1.1, and ||.1.1|.1.1 being added to the database.
+     *      And so on...
+     * Then two variables, then three, and so on, until adding a new variable results in no new formulas/rules being added to the database.  
+     *  
+     *  
      * Conceptually, I consider this method to be a homegrown implementation of the [Knuth-Bendix completion method](https://en.wikipedia.org/wiki/Knuth%E2%80%93Bendix_completion_algorithm#:~:text=The%20Knuth%E2%80%93Bendix%20completion%20algorithm,problem%20for%20the%20specified%20algebra.).  
      * The idea behind both is to calculate the *deductive closure* of a set of rules.  
      * The difference being that this method is specifically designed for TermSAT formulas 
      * and calculates the closure much more efficiently than unoptimized Knuth-Bendix.
      * The database produced by this method contains all the formulas included in the deductive closure. 
-     * 
      * 
      * Notes...   
      * Since all reductions are guaranteed to converge to the same singular canonical formula, these rules are locally confluent.  
@@ -171,17 +157,55 @@ public class Scripts
      */
 
     [TestMethod]
-    public static async Task RunNandRuleGenerator(string formulasConnectionString, string indexConnectionString)
+    public static async Task RunNandRuleGenerator(string formulaDataSource, string indexDataSource)
     {
+        int lastFormulaId = 0;
 
-        using (var ruleDb = RuleDatabaseContext.GetDatabaseContext(formulasConnectionString))
+        var ruleOptions = 
+            new DbContextOptionsBuilder()
+            //.UseSqlite("Data Source=file:rules?mode=memory&cache=shared;Pooling=False;")
+            .UseSqlite("Data Source=file:rules?mode=memory&cache=shared")
+            .Options;
+
+        DbContextOptions idxOptions = 
+            new DbContextOptionsBuilder()
+            .UseSqlite("Data Source=file:index?mode=memory&cache=shared")
+            .Options;
+
+        using (var ruleDb = new RuleDatabaseContext(ruleOptions))
+        using (var instanceRecognizer = new FormulaIndex.NodeContext(idxOptions))
         {
-            ruleDb.Database.EnsureCreated();
-            ruleDb.DeleteAll(); 
+            {   // initialization
+                //ruleDb.Database.ExecuteSqlRaw($"PRAGMA cache_size = 1000000;"); // 2000 is the default, ~8mb.  1000000 is ~4gb
+                //ruleDb.Database.ExecuteSqlRaw($"PRAGMA synchronous = OFF;"); // https://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite
 
-            using (var instanceRecognizer = FormulaIndex.GetDatabaseContext(indexConnectionString))
-            {
-                instanceRecognizer.Database.EnsureCreated();
+                //// https://news.ycombinator.com/item?id=35547819
+                ruleDb.Database.ExecuteSqlRaw($"PRAGMA journal_mode = WAL;");
+                //ruleDb.Database.ExecuteSqlRaw($"PRAGMA synchronous = normal;");
+                //ruleDb.Database.ExecuteSqlRaw($"PRAGMA temp_store = memory;");
+                //ruleDb.Database.ExecuteSqlRaw($"PRAGMA mmap_size = 30000000000;");
+                //ruleDb.Database.ExecuteSqlRaw($"PRAGMA cache_size = 1000000;"); // 2000 is the default, ~8mb.  1000000 is ~4gb
+
+                if (!ruleDb.Database.EnsureCreated())
+                {
+                    throw new TermSatException("!ruleDb.Database.EnsureCreated()");
+                }
+                ruleDb.DeleteAll();
+
+                if (ruleDb.FormulaRecords.Any())
+                {
+                    lastFormulaId = ruleDb.FormulaRecords.OrderByDescending(_ => _.Id).First().Id;
+                }
+
+
+                instanceRecognizer.Database.ExecuteSqlRaw($"PRAGMA journal_mode = WAL;");
+
+                //instanceRecognizer.Database.ExecuteSqlRaw($"PRAGMA cache_size = 1000000"); // 2000 is the default, ~8mb.  1000000 is ~4gb
+                //instanceRecognizer.Database.ExecuteSqlRaw($"PRAGMA synchronous = OFF"); // https://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite
+                if (!instanceRecognizer.Database.EnsureCreated())
+                {
+                    throw new TermSatException("!instanceRecognizer.Database.EnsureCreated()");
+                }
                 instanceRecognizer.DeleteAll();
 
 
@@ -193,130 +217,153 @@ public class Scripts
                         await instanceRecognizer.AddGeneralizationAsync(nonCanonical);
                     }
                 }
+            }
 
 
-                int nextFormulaId = ruleDb.FormulaRecords.Any() ? ruleDb.FormulaRecords.OrderByDescending(_ => _.Id).First().Id + 1 : 1;
+            // Enumerate formulas starting with formulas of just one variable, then two variables, and so on.
+            // It's hoped that completing formulas with 7 variables will not produce any new rules,
+            // and thus the rules will be complete, in the Knuth-Bendix sense.
+            for (int variableNumber = 1; variableNumber <= 7; variableNumber++)
+            {
+                Trace.WriteLine($"Start generating all rules with exactly {variableNumber} variables.");
 
-                // In order to be able to use induction to show that there are no rules with more than 6 variables, 
-                // rules are generated formulas starting with formulas of just one variable,
-                // then two variables, and so on.
-                for (int variableNumber = 1; variableNumber <= 7; variableNumber++)
-                {
-                    int saveStartId = nextFormulaId;
-
-                    Trace.WriteLine($"Start generating all rules with exactly {variableNumber} variables.");
-
-                    // start by adding variable formula to database
+                {   // start by adding variable formula to database
                     Trace.WriteLine($"Start by adding a new variable, {variableNumber}.");
+
                     var variableFormula = Variable.NewVariable(variableNumber);
+                    var varRecord = ruleDb.FormulaRecords.Where(_ => _.Text == variableFormula.ToString()).FirstOrDefault();
+                    if (varRecord != null)
                     {
-                        var varRecord = ruleDb.FormulaRecords.Where(_ => _.Text == variableFormula.ToString()).FirstOrDefault();
-                        if (varRecord != null)
-                        {
-                            Trace.WriteLine($"Skipping, variable already exists: {variableFormula}");
-                            nextFormulaId = varRecord.Id++;
-                        }
-                        else
-                        {
-                            var variableForumulaId = nextFormulaId++;
-                            ruleDb.FormulaRecords.Add(new FormulaRecord(variableForumulaId, variableFormula, isCanonical: true)
-                            {
-                                // todo rename VarCount to VarNum
-                                VarCount = variableNumber // its more convenient to just make all formulas with the variable # instead of the count
-                            });
-                            ruleDb.SaveChanges();
-                            ruleDb.Clear();
-                            Trace.WriteLine($"New variable added: {variableFormula}");
-                        }
+                        Trace.WriteLine($"Skipping, variable already exists: {variableFormula}");
                     }
-
-                    Trace.WriteLine($"Now, generate all possible formulas with exactly {variableNumber} variables...");
+                    else
                     {
-                        bool gotoNextTotalLength = true;
-                        for (int iTotalLength = 3; gotoNextTotalLength; iTotalLength += 2)
+                        var variableForumulaId = Interlocked.Increment(ref lastFormulaId);
+                        ruleDb.FormulaRecords.Add(new FormulaRecord(variableForumulaId, variableFormula, isCanonical: true)
                         {
-                            gotoNextTotalLength = false;
+                            // todo rename VarCount to VarNum
+                            VarCount = variableNumber // its more convenient to just make all formulas with the variable # instead of the count
+                        });
+                        ruleDb.SaveChanges();
+                        ruleDb.Clear();
+                        Trace.WriteLine($"New variable added: {variableFormula}");
+                    }
+                }
 
-                            Trace.WriteLine($"Generate all possible formulas of length {iTotalLength}...");
+                Trace.WriteLine($"Now, generate all possible formulas with exactly {variableNumber} variables...");
+                {
+                    bool gotoNextTotalLength = true;
+                    for (int iTotalLength = 3; gotoNextTotalLength; iTotalLength += 2)
+                    {
+                        gotoNextTotalLength = false;
 
-                            var allFormulas = new List<Formula>();
+                        Trace.WriteLine($"Generate all possible formulas of length {iTotalLength}...");
 
-                            for (int iInnerLength = 1; iInnerLength < iTotalLength; iInnerLength += 2)
+                        for (int iInnerLength = 1; iInnerLength < iTotalLength; iInnerLength += 2)
+                        {
+
+                            // select canonical formulas derived from the current variable, in formula order
+                            var innerFormulas = ruleDb.FormulaRecords
+                                .Where(_ => _.Length == iInnerLength && _.IsCanonical == true && _.VarCount == variableNumber)
+                                .OrderBy(_ => _.Text)
+                                .Select(_ => Formula.Parse(_.Text));
+
+                            var iOuterLength = iTotalLength - iInnerLength - 1;
+
+                            // select all canonical formulas in the database, in formula order
+                            var outerFormulas = ruleDb.FormulaRecords
+                                .Where(_ => _.Length == iOuterLength && _.IsCanonical == true)
+                                .OrderBy(_ => _.Text)
+                                .Select(_ => Formula.Parse(_.Text));
+
+
+                            //allFormulas.Sort((a, b) => a.CompareTo(b));
+
+                            // This block is asynchronous.
+                            // For every non-reducible formula in the list, this method adds the formula to the rule database.
+                            // We can do this asynchronously because all the formulas are the same length, and therefore 
+                            // we know that none of them will be reduced by any of the other formulas in the list.
+                            // Therefore they don't need to be processed sequentially.
+                            //
+                            // These formulas used to be processed sequentially, in order.
+                            // One side-effect of the change is that Ids do not match formula order.
+                            // That's OK though, formula order does not depend on the Id.  
+                            // Now, the Id just represents the order in which the formula was added to the database.  
+                            // It should be possible to write a script that verifies that every formulas' Id is greater than 
+                            // the Id of any formula that can reduce the formula.
+                            //
+                            // For performance reasons, 
+                            var tasks = new List<Task>();
+                            foreach (var pair in SystemExtensions.CartesianProduct(innerFormulas, outerFormulas))
                             {
+                                //while (CONCURRENCY_LIMIT < tasks.Count)
+                                //{
+                                //    await tasks[0];
+                                //    tasks.RemoveAt(0);
+                                //}
+                                var derivedFormula = Nand.NewNand(pair.Item1, pair.Item2);
 
-                                // select canonical formulas derived from the current variable, in formula order
-                                var innerFormulas = ruleDb.FormulaRecords
-                                    .Where(_ => _.Length == iInnerLength && _.IsCanonical == true && _.VarCount == variableNumber)
-                                    .OrderBy(_ => _.Text)
-                                    .Select(_ => Formula.Parse(_.Text));
-
-                                var iOuterLength = iTotalLength - iInnerLength - 1;
-
-                                // select all canonical formulas in the database, in formula order
-                                var outerFormulas = ruleDb.FormulaRecords
-                                    .Where(_ => _.Length == iOuterLength && _.IsCanonical == true)
-                                    .OrderBy(_ => _.Text)
-                                    .Select(_ => Formula.Parse(_.Text));
-
-                                // The product of all canonical formulas of length==inner and length==outer in formula order.
-                                foreach (var i in innerFormulas)
+                                var action = async () =>
                                 {
-                                    foreach (var o in outerFormulas)
+                                    using (var _ruleDb = new RuleDatabaseContext(ruleOptions))
+                                    using (var _indexDb = new FormulaIndex.NodeContext(idxOptions))
                                     {
-                                        allFormulas.Add(Nand.NewNand(i, o));
+                                        try
+                                        {
+                                            // No need to complete formulas that can already be reduced.
+                                            var isReducible = await Scripts.FormulaCanBeReducedAsync(_ruleDb, _indexDb, derivedFormula);
+
+                                            if (isReducible)
+                                            {
+                                                Trace.WriteLine($"Not added to db, can be reduced : {derivedFormula}");
+                                            }
+                                            else
+                                            {
+                                                Formula canonicalFormula = null;
+                                                {
+                                                    var tt = TruthTable.GetTruthTable(derivedFormula);
+
+                                                    var canonicalRecord = await _ruleDb.FindCanonicalByTruthValueAsync(tt.ToString());
+
+                                                    if (canonicalRecord != null)
+                                                    {
+                                                        canonicalFormula = Formula.Parse(canonicalRecord.Text);
+                                                    }
+                                                }
+
+                                                var nextFormulaId = Interlocked.Increment(ref lastFormulaId);
+                                                var nextRecord = new FormulaRecord(nextFormulaId, derivedFormula, isCanonical: canonicalFormula == null);
+
+                                                await _ruleDb.FormulaRecords.AddAsync(nextRecord);
+                                                await _ruleDb.SaveChangesAsync();
+
+
+                                                if (nextRecord.IsCanonical)
+                                                {
+                                                    Trace.WriteLine($"Added canonical formula         : {derivedFormula}");
+                                                }
+                                                else
+                                                {
+                                                    // going forward, we'll prevent substitution instances of this formula from becoming new rules.
+                                                    await _indexDb.AddGeneralizationAsync(nextRecord);
+                                                    await _indexDb.SaveChangesAsync();
+
+                                                    Trace.WriteLine($"Added non-canonical formula     : {derivedFormula} => {canonicalFormula}");
+                                                }
+
+                                                gotoNextTotalLength = true;
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Trace.TraceError($"FATAL ERROR: {ex.Message}\n{ex.StackTrace}");
+                                        }
                                     }
-                                }
+                                };
+                                var task = Task.Run(action);
+                                tasks.Add(task);
                             }
-
-                            allFormulas.Sort((a, b) => a.CompareTo(b));
-
-                            foreach (var derivedFormula in allFormulas)
-                            {
-
-                                // No need to complete formulas that can already be reduced.
-                                if (await Scripts.FormulaCanBeReducedAsync(ruleDb, instanceRecognizer, derivedFormula))
-                                {
-                                    Trace.WriteLine($"Not added to db, can be reduced : {derivedFormula}");
-                                    continue;
-                                }
-
-                                // if already in database then skip
-                                if (ruleDb.FormulaRecords.Where(_ => _.Text == derivedFormula.ToString()).Any())
-                                {
-                                    Trace.WriteLine($"Not added to db, already in db  : {derivedFormula}");
-                                    continue;
-                                }
-
-                                var tt = TruthTable.GetTruthTable(derivedFormula);
-                                Formula canonicalFormula = null;
-                                var canonicalRecord = ruleDb.FindCanonicalByTruthValue(tt.ToString());
-                                if (canonicalRecord != null)
-                                {
-                                    canonicalFormula = Formula.Parse(canonicalRecord.Text);
-                                }
-
-                                var nextRecord = new FormulaRecord(nextFormulaId, derivedFormula, canonicalFormula == null);
-                                ruleDb.FormulaRecords.Add(nextRecord);
-                                ruleDb.SaveChanges();
-                                ruleDb.ChangeTracker.Clear();
-
-                                if (nextRecord.IsCanonical)
-                                {
-                                    Trace.WriteLine($"Added canonical formula         : {derivedFormula}");
-                                }
-                                else
-                                {
-                                    // going forward, we'll prevent substitution instances of this formula from becoming new rules.
-                                    await instanceRecognizer.AddGeneralizationAsync(nextRecord);
-                                    await instanceRecognizer.SaveChangesAsync();
-                                    instanceRecognizer.ChangeTracker.Clear();
-
-                                    Trace.WriteLine($"Added non-canonical formula     : {derivedFormula} => {canonicalFormula}");
-                                }
-
-                                nextFormulaId++;
-                                gotoNextTotalLength = true;
-                            }
+                            await Task.WhenAll(tasks);
                         }
                     }
                 }
@@ -324,4 +371,5 @@ public class Scripts
         }
     }
 
+    
 }

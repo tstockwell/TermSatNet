@@ -96,5 +96,16 @@ namespace TermSAT.Common
 
             return mergedeStream;
         }
+
+        public static IEnumerable<(T,T)> CartesianProduct<T>(IEnumerable<T> left, IEnumerable<T> right)
+        {
+            foreach (var l in left)
+            {
+                foreach (var r in right)
+                {
+                    yield return (l,r);
+                }
+            }
+        }
     }
 }

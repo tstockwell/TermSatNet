@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Diagnostics;
 
 namespace TermSAT.Formulas;
 
@@ -74,7 +75,7 @@ public static partial class FormulaIndex
     }
 
     static public void DeleteAll(this NodeContext ctx) =>
-        ctx.Database.ExecuteSqlRaw("DELETE FROM IndexRecords");
+        ctx.Database.ExecuteSqlRaw($"DELETE FROM {nameof(NodeContext.Nodes)}");
 
 
     static public async Task AddGeneralizationAsync(this NodeContext ctx, FormulaRecord formulaRecord)
@@ -132,8 +133,8 @@ public static partial class FormulaIndex
         var todo = new Stack<(int position, Dictionary<int, Formula> substitutions, Node node)>();
         {
             var root = await ctx.GetRootAsync();
-            var branches = await ctx.Nodes.Where(_ => _.Parent == root.Id).ToArrayAsync();
-            foreach (var branch in branches.Reverse())
+            var branches = await ctx.Nodes.Where(_ => _.Parent == root.Id).ToListAsync();
+            foreach (var branch in branches.AsEnumerable().Reverse())
             {
                 todo.Push(new(0, new Dictionary<int, Formula>(), branch));
             }
@@ -190,9 +191,9 @@ public static partial class FormulaIndex
                 }
             }
 
-            var children = await ctx.Nodes.Where(_ => _.Parent == state.node.Id).ToArrayAsync();
+            var children = await ctx.Nodes.Where(_ => _.Parent == state.node.Id).ToListAsync();
 
-            if (children.Length <= 0)
+            if (children.Count <= 0)
             {
                 // this node is a leaf but there is still formula left, so not a match
                 if (currentPosition < formulaToMatch.Length)
@@ -217,7 +218,7 @@ public static partial class FormulaIndex
             }
 
             // keep searching, put branches on the queue
-            foreach (var child in children.Reverse())
+            foreach (var child in children.AsEnumerable().Reverse())
             {
                 todo.Push(new(currentPosition, currentSubstitutions, child));
             }
