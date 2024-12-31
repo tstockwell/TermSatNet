@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using TermSAT.Formulas;
 
 namespace TermSAT.RuleDatabase;
 
@@ -20,68 +21,29 @@ namespace TermSAT.RuleDatabase;
 /// </summary>
 public class RuleDatabaseContext : DbContext
 {
+
+    public static RuleDatabaseContext GetDatabaseContext(string datasource)
+    {
+        var connectionString = "DataSource=" + datasource;
+        var options = new DbContextOptionsBuilder()
+            .UseSqlite(connectionString)
+            .Options;
+
+        return new RuleDatabaseContext(options);
+    }
+
     public RuleDatabaseContext(DbContextOptions options) : base(options)
     {
     }
+
     public DbSet<FormulaRecord> FormulaRecords { get; set; }
+    public DbSet<MetaRecord> Meta { get; set; }
+    public DbSet<FormulaIndex.Node> Lookup { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.Id).IsRequired();
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.Text).IsRequired();
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.VarCount).IsRequired();
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.Length).IsRequired();
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.TruthValue).IsRequired();
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.IsCanonical).HasDefaultValue(false);
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.IsCompleted).HasDefaultValue(false);
-        modelBuilder.Entity<FormulaRecord>().Property(f => f.IsSubsumedByScheme).HasDefaultValue(false);
-
-        modelBuilder.Entity<FormulaRecord>().HasKey(f => f.Id);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Text);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.VarCount);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.Length);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(_ => new { _.Length, _.Text });
-        modelBuilder.Entity<FormulaRecord>().HasIndex(_ => new { _.Length, _.Text, _.TruthValue });
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.TruthValue);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsCanonical);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsCompleted);
-        modelBuilder.Entity<FormulaRecord>().HasIndex(f => f.IsSubsumedByScheme);
-
-        modelBuilder.Entity<FormulaRecord>().Ignore(_ => _.Formula);
-
-        modelBuilder.Entity<FormulaRecord>(f => f.ToTable("FormulaRecords"));
+        FormulaRecord.OnModelCreating(modelBuilder, nameof(FormulaRecords));
+        MetaRecord.OnModelCreating(modelBuilder, nameof(Meta));
+        FormulaIndex.OnModelCreating(modelBuilder, nameof(Lookup));
     }
-
-    public override int SaveChanges()
-    {
-        var result = base.SaveChanges();
-        return result;
-    }
-
-    /// <summary>
-    /// I think that ef still tracks after an add/ssavechanges.
-    /// So, periodically detach any entries.
-    /// </summary>
-    public void Clear() => this.ChangeTracker.Clear();
-        public static RuleDatabaseContext GetDatabaseContext(string datasource)
-        {
-            var connectionString = "DataSource=" + datasource;
-            var options = new DbContextOptionsBuilder()
-                .UseSqlite(connectionString)
-                .Options;
-
-            return new RuleDatabaseContext(options);
-        }
-
-    //public void DeleteAll()
-    //{
-    //    var changedEntriesCopy = this.ChangeTracker.Entries()
-    //        .Where(e => e.State == EntityState.Added ||
-    //                    e.State == EntityState.Modified ||
-    //                    e.State == EntityState.Deleted)
-    //        .ToList();
-
-    //    foreach (var entry in changedEntriesCopy)
-    //        entry.State = EntityState.Detached;
-    //}
 }

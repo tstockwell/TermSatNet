@@ -1,14 +1,11 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using TermSAT.Common;
 
 namespace TermSAT.Formulas
 {
     public partial class Negation : Formula
     {
-        static private ConditionalWeakTable<Formula, Negation> __negations= new ConditionalWeakTable<Formula, Negation>();
+        static private ConditionalWeakTable<Formula, Negation> __negations= new ();
 
         public Formula Child { get; }
 

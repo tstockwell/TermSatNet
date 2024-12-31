@@ -15,12 +15,13 @@ namespace RuleGeneratorScript
 
         public static void Main(string[] args)
         {
-            Trace.Listeners.Add(new TextWriterTraceListener(System.Console.Out));
-            Trace.Listeners.Add(new TextWriterTraceListener("rules-trace-" + TruthTable.VARIABLE_COUNT + ".txt"));
+            throw new NotImplementedException();
+            //Trace.Listeners.Add(new TextWriterTraceListener(System.Console.Out));
+            //Trace.Listeners.Add(new TextWriterTraceListener("rules-trace-" + TruthTable.VARIABLE_COUNT + ".txt"));
 
-            var database = new FormulaDatabase(DATABASE_PATH);
-            database.Clear();
-            new RuleGenerator(database, new FormulaGenerator(database, TruthTable.VARIABLE_COUNT)).Run();
+            //var database = new FormulaDatabase(DATABASE_PATH);
+            //database.Clear();
+            //new RuleGenerator(database, new FormulaGenerator(database, TruthTable.VARIABLE_COUNT)).Run();
         }
 
 

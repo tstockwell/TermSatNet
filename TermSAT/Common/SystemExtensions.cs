@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore;
 
 namespace TermSAT.Common
 {
-    public static class SystemExtensions
+    public static partial class SystemExtensions
     {
 
         public static Task ForEachAsync<TValue>(this ICollection<TValue> collection, Func<TValue, Task> asyncAction)
@@ -107,5 +109,6 @@ namespace TermSAT.Common
                 }
             }
         }
+        
     }
 }

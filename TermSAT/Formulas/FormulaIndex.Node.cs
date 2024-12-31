@@ -12,6 +12,7 @@ public static partial class FormulaIndex
         /// </summary>
         [Key]
         public int Id { get; private set; }
+        public const int ROOT_ID = 0;
 
 
         /// <summary>

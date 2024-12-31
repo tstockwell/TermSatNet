@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace TermSAT.Formulas;
 
@@ -53,65 +54,73 @@ public static partial class FormulaIndex
         return new NodeContext(options);
     }
 
-    public static bool TryGetRoot(this DbSet<Node> db, out Node root)
+    public static bool TryGetRoot(this IQueryable<Node> db, out Node root)
     {
         root = db.Where(_ => _.Parent == Node.PARENT_NONE).FirstOrDefault();
         return root != null;
     }
-    public static async Task<Node> AddRootAsync(this NodeContext db)
+    public static async Task<Node> GetRootAsync(this DbSet<Node> db)
+    {
+        var root = await db.Where(_ => _.Parent == Node.PARENT_NONE).FirstOrDefaultAsync();
+        Debug.Assert(root != null);
+        return root;
+    }
+    public static async Task<Node> AddRootAsync(this DbSet<Node> nodeSet)
     {
         var root = new Node(Node.PARENT_NONE, Node.KEY_ROOT, Node.VALUE_NONE);
-        db.Add(root);
-        await db.SaveChangesAsync();
+        await nodeSet.AddAsync(root);
         return root;
     }
-    public static async Task<Node> GetRootAsync(this NodeContext db)
-    {
-        if (!db.Nodes.TryGetRoot(out var root))
-        {
-            root = await db.AddRootAsync();
-        }
-        return root;
-    }
+    //public static async Task<Node> GetRootAsync(this NodeContext db)
+    //{
+    //    if (!db.Nodes.TryGetRoot(out var root))
+    //    {
+    //        root = await db.AddRootAsync();
+    //    }
+    //    return root;
+    //}
 
     static public void DeleteAll(this NodeContext ctx) =>
         ctx.Database.ExecuteSqlRaw($"DELETE FROM {nameof(NodeContext.Nodes)}");
 
 
-    static public async Task AddGeneralizationAsync(this NodeContext ctx, FormulaRecord formulaRecord)
+    static public async Task AddGeneralizationAsync(this RuleDatabaseContext ctx, FormulaRecord formulaRecord)
     {
+        var nodeSet = ctx.Lookup;
+
         // add formula to index by navigating to the node associated with the formula, 
         // adding missing nodes along the way.
-        if (!ctx.Nodes.TryGetRoot(out var nodeRecord))
+        if (!nodeSet.TryGetRoot(out var nodeRecord))
         {
-            nodeRecord = await ctx.AddRootAsync();
+            nodeRecord = await nodeSet.AddRootAsync();
+            await ctx.SaveChangesAsync();
         }
         foreach(var term in formulaRecord.Formula.AsFlatTerm())
         {
             if (term is Nand)
             {
-                var nextNode = await ctx.Nodes
+                var nextNode = await nodeSet.AsNoTracking()
                     .Where(_ => _.Parent == nodeRecord.Id && _.Key == Node.KEY_NAND)
                     .FirstOrDefaultAsync();
 
                 if (nextNode == null)
                 {
                     nextNode = new Node(parent:nodeRecord.Id, key:Node.KEY_NAND, value:Node.VALUE_NONE);
-                    await ctx.Nodes.AddAsync(nextNode);
+                    await nodeSet.AddAsync(nextNode);
                     await ctx.SaveChangesAsync();
                 }
                 nodeRecord = nextNode;
             }
             else if (term is Variable varFormula)
             {
-                var nextNode = await ctx.Nodes
+                var nextNode = await nodeSet.AsNoTracking()
                     .Where(_ => _.Parent == nodeRecord.Id && _.Key == varFormula.Number)
                     .FirstOrDefaultAsync();
 
                 if (nextNode == null)
                 {
                     nextNode = new Node(parent: nodeRecord.Id, key: varFormula.Number, value: Node.VALUE_NONE);
-                    await ctx.Nodes.AddAsync(nextNode);
+                    await nodeSet.AddAsync(nextNode);
                     await ctx.SaveChangesAsync();
                 }
                 nodeRecord = nextNode;
@@ -127,13 +136,18 @@ public static partial class FormulaIndex
         nodeRecord.Value = formulaRecord.Id;
     }
 
-    public static async IAsyncEnumerable<SearchResult> FindGeneralizationsAsync(this NodeContext ctx, Formula formulaToMatch, int maxMatchCount)
+    public static async IAsyncEnumerable<SearchResult> FindGeneralizationsAsync(this IQueryable<Node> ctx, Formula formulaToMatch, int maxMatchCount)
     {
         //  this method does a depth-first search of the node tree
         var todo = new Stack<(int position, Dictionary<int, Formula> substitutions, Node node)>();
         {
-            var root = await ctx.GetRootAsync();
-            var branches = await ctx.Nodes.Where(_ => _.Parent == root.Id).ToListAsync();
+            // add formula to index by navigating to the node associated with the formula, 
+            // adding missing nodes along the way.
+            if (!ctx.TryGetRoot(out var root))
+            {
+                throw new Exception($"A root must be present before calling {nameof(FindGeneralizationsAsync)}");
+            }
+            var branches = await ctx.AsNoTracking().Where(_ => _.Parent == root.Id).ToListAsync();
             foreach (var branch in branches.AsEnumerable().Reverse())
             {
                 todo.Push(new(0, new Dictionary<int, Formula>(), branch));
@@ -191,7 +205,7 @@ public static partial class FormulaIndex
                 }
             }
 
-            var children = await ctx.Nodes.Where(_ => _.Parent == state.node.Id).ToListAsync();
+            var children = await ctx.AsNoTracking().Where(_ => _.Parent == state.node.Id).ToListAsync();
 
             if (children.Count <= 0)
             {

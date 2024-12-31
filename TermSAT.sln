@@ -15,8 +15,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{71E6E5C3-3E70-4A51-89A5-FF72A3A3064B}"
 	ProjectSection(SolutionItems) = preProject
 		doc\formulas.md = doc\formulas.md
-		doc\proofs.md = doc\proofs.md
 		doc\how-rulesat-works.md = doc\how-rulesat-works.md
+		doc\proofs.md = doc\proofs.md
+		doc\rule-database.md = doc\rule-database.md
 		doc\sat.md = doc\sat.md
 		doc\systemp.wiki = doc\systemp.wiki
 	EndProjectSection

@@ -33,9 +33,9 @@ namespace TermSAT
 
             var rootCommand = new RootCommand("TermSAT");
 
-            AddRuleGeneration3Command(rootCommand);
-            AddOrderingTestCommand(rootCommand);
-            AddSchemeEquivalenceCommand(rootCommand);
+            //AddRuleGeneration3Command(rootCommand);
+            //AddOrderingTestCommand(rootCommand);
+            //AddSchemeEquivalenceCommand(rootCommand);
             AddNandRuleGeneration3Command(rootCommand);
             AddDiscoverRulesSubsumedBySchemeCommand(rootCommand);
 
@@ -61,54 +61,58 @@ namespace TermSAT
             schemeEquivalenceTest.SetHandler(async () =>
             {
                 Trace.Listeners.Add(new TextWriterTraceListener("nand-subsumed-rules.log"));
-
-                var database = new FormulaDatabase("nand-rules-3.db");
-                await NandReduction.Scripts.DiscoverRulesSubsumedBySchemeAsync(database);
+                await NandReduction.Scripts.DiscoverRulesSubsumedBySchemeAsync("nand-rules-3.db");
             });
             rootCommand.AddCommand(schemeEquivalenceTest);
         }
 
-        private static void AddRuleGeneration3Command(RootCommand rootCommand)
-        {
-            var schemeEquivalenceTest = new Command("rule-generation-3");
-            schemeEquivalenceTest.SetHandler(() =>
-            {
-                Trace.Listeners.Add(new TextWriterTraceListener("rules-trace-3.log"));
+        //private static void AddRuleGeneration3Command(RootCommand rootCommand)
+        //{
+        //    var schemeEquivalenceTest = new Command("rule-generation-3");
+        //    schemeEquivalenceTest.SetHandler(() =>
+        //    {
+        //        Trace.Listeners.Add(new TextWriterTraceListener("rules-trace-3.log"));
 
-                var database = new FormulaDatabase("rules-3.db");
-                database.Clear();
-                var generator = new FormulaGenerator(database, 3);
-                new RuleGenerator(database, generator).Run();
-            });
-            rootCommand.AddCommand(schemeEquivalenceTest);
-        }
+        //        // recreate the database
+        //        using (var ctx = RuleDatabaseContext.GetDatabaseContext("rules-3.db"))
+        //        {
+        //            ctx.Database.EnsureDeleted();
+        //            ctx.Database.EnsureCreated();
+        //        }
+
+        //        var ruleDb = new FormulaDatabase("rules-3.db");
+        //        var generator = new FormulaGenerator(ruleDb, 3);
+        //        new RuleGenerator(ruleDb, generator).Run();
+        //    });
+        //    rootCommand.AddCommand(schemeEquivalenceTest);
+        //}
 
 
-        private static void AddOrderingTestCommand(RootCommand rootCommand)
-        {
-            var cmd = new Command("ordering-test");
-            cmd.SetHandler(() =>
-            {
-                Trace.Listeners.Add(new TextWriterTraceListener("ordering-test.log"));
+        //private static void AddOrderingTestCommand(RootCommand rootCommand)
+        //{
+        //    var cmd = new Command("ordering-test");
+        //    cmd.SetHandler(() =>
+        //    {
+        //        Trace.Listeners.Add(new TextWriterTraceListener("ordering-test.log"));
 
-                var database = new FormulaDatabase("rules-3.db");
-                SchemeReducer.Scripts.OrderingTest(database);
-            });
-            rootCommand.AddCommand(cmd);
-        }
+        //        var database = new FormulaDatabase("rules-3.db");
+        //        SchemeReducer.Scripts.OrderingTest(database);
+        //    });
+        //    rootCommand.AddCommand(cmd);
+        //}
 
-        private static void AddSchemeEquivalenceCommand(RootCommand rootCommand)
-        {
-            var schemeEquivalenceTest = new Command("scheme-equivalence-test");
-            schemeEquivalenceTest.SetHandler(() =>
-            {
-                Trace.Listeners.Add(new TextWriterTraceListener("scheme-equivalence-test.log"));
+        //private static void AddSchemeEquivalenceCommand(RootCommand rootCommand)
+        //{
+        //    var schemeEquivalenceTest = new Command("scheme-equivalence-test");
+        //    schemeEquivalenceTest.SetHandler(() =>
+        //    {
+        //        Trace.Listeners.Add(new TextWriterTraceListener("scheme-equivalence-test.log"));
 
-                var database = new FormulaDatabase("rules-3.db");
-                SchemeReducer.Scripts.BasicSchemeEquivalence(database);
-            });
-            rootCommand.AddCommand(schemeEquivalenceTest);
-        }
+        //        var database = new FormulaDatabase("rules-3.db");
+        //        SchemeReducer.Scripts.BasicSchemeEquivalence(database);
+        //    });
+        //    rootCommand.AddCommand(schemeEquivalenceTest);
+        //}
     }
 
     public static class Options

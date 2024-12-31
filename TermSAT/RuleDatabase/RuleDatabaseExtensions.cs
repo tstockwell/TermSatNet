@@ -4,41 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using TermSAT.Formulas;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace TermSAT.RuleDatabase;
 
 public static class RuleDatabaseExtensions
 {
 
-    /**
-     * Finds the canonical form of for formulas with the given truth value.
-     */
-    static public async Task<FormulaRecord> FindCanonicalByTruthValueAsync(this RuleDatabaseContext ctx, string truthValue)
-    {
-        var recorrd = await ctx.FormulaRecords
-                .OrderBy(_ => _.Length).ThenBy(_ => _.Text)
-                .Where(_ => _.TruthValue == truthValue)                        
-                .FirstOrDefaultAsync();
-
-// This check can't be done here
-//#if DEBUG
-//        if (recorrd != null && !recorrd.IsCanonical)
-//        {
-//            throw new TermSatException($"The canonical form for a formula with truth value {truthValue} " +
-//                $"should be the first formula in the formula order with that truth value.");
-//        }
-//#endif 
-
-        return recorrd;
-
-    }
-
-    static public async Task<Formula> FindCanonicalFormulaAsync(this RuleDatabaseContext ctx, string truthValue)
-    {
-        var record = await FindCanonicalByTruthValueAsync(ctx, truthValue);
-        var formula = Formula.Parse(record.Text);
-        return formula;
-    }
 
     static public async Task<FormulaRecord> FindByIdAsync(this RuleDatabaseContext ctx, int id) =>
         await ctx.FormulaRecords.AsNoTracking().Where(_ => _.Id == id).FirstAsync();
@@ -59,77 +31,55 @@ public static class RuleDatabaseExtensions
         return formula;
     }
 
-    static public List<Formula> GetCanonicalFormulas(this RuleDatabaseContext ctx, TruthTable truthTable) =>  
-        ctx.FormulaRecords.AsNoTracking()
-            .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == true)
-            .OrderBy(f => f.Id)
-            .Select(_ => Formula.Parse(_.Text))
-            .ToList();
+    static public IQueryable<FormulaRecord> GetAllCanonicalRecords(this IQueryable<FormulaRecord> db) =>
+        db.Select(_ => _.TruthValue).Distinct()
+        .Select(t =>
+            db.OrderBy(_ => _.VarCount)
+            .ThenBy(_ => _.Length)
+            .ThenBy(_ => _.Text)
+            .Where(_ => _.TruthValue == t).First());
 
-    static public List<FormulaRecord> GetAllFormulaRecords(this RuleDatabaseContext ctx) =>  
-        ctx.FormulaRecords.AsNoTracking()
-            .OrderBy(f => f.Id)
-            .ToList();
+    static public IQueryable<FormulaRecord> GetCanonicalRecordByTruthTable(this IQueryable<FormulaRecord> db, string truthTable) =>
+        db.InFormulaOrder().Where(_ => _.TruthValue == truthTable).Take(1);
 
-    static public List<Formula> GetNonCanonicalFormulas(this RuleDatabaseContext ctx, TruthTable truthTable) =>  
-        ctx.FormulaRecords.AsNoTracking()
-            .Where(f => f.TruthValue == truthTable.ToString() && f.IsCanonical == false)
-            .OrderBy(f => f.Id)
-            .Select(_ => Formula.Parse(_.Text))
-            .ToList();
+    static public IQueryable<Formula> ToFormulas(this IQueryable<FormulaRecord>db) =>
+        db.Select(_ => Formula.Parse(_.Text));
 
 
-    static public int GetLengthOfLongestCanonicalFormula(this RuleDatabaseContext ctx)
-    { 
-        var formula = ctx.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true)
-                .OrderByDescending(f => f.Length)
-                .FirstOrDefault();
+    static public IQueryable<FormulaRecord> GetAllNonCanonicalRecordsByTruthValue(this IQueryable<FormulaRecord> db, string truthTable) =>
+        db.InFormulaOrder().Where(_ => _.TruthValue == truthTable).Skip(1);
 
-        if (formula == null)
-            return 0;
+    static public IQueryable<string> GetAllTruthValues(this IQueryable<FormulaRecord> db) =>
+        db.Select(_ => _.TruthValue).Distinct();
 
-        return formula.Length;
-    }
+    static public IQueryable<FormulaRecord> GetAllNonCanonicalRecords(this IQueryable<FormulaRecord> db) => 
+        db.GetAllTruthValues()
+        .SelectMany(t => 
+            db.OrderBy(_ => _.VarCount)
+            .ThenBy(_ => _.Length)
+            .ThenBy(_ => _.Text)
+            .Where(_ => _.TruthValue == t)
+            .Skip(1));
+
+    static public Task<int> GetLengthOfLongestCanonicalFormulaAsync(this IQueryable<FormulaRecord> db) =>
+        db.GetAllNonCanonicalRecords().OrderBy(_ => _.Length).Select(_ => _.Length).FirstAsync();
+
 
     /**
      * Formulas longer than this length are guaranteed to be reducible with rules,
      * generated from previous formulas. 
      * Therefore processing can stop when formulas get this long.
      */
-    static public int LengthOfLongestPossibleNonReducibleFormula(this RuleDatabaseContext ctx)
+    static public async Task<int> LengthOfLongestPossibleNonReducibleFormulaAsync(this IQueryable<FormulaRecord> db)
     {
-        int maxLength = ctx.GetLengthOfLongestCanonicalFormula();
+        int maxLength = await db.GetLengthOfLongestCanonicalFormulaAsync();
         if (maxLength <= 0) // we don't know the length of longest formula yet
             return int.MaxValue;
         return maxLength * 2 + 1;
     }
 
 
-    static public List<Formula> FindCanonicalFormulasByLength(this RuleDatabaseContext ctx, int size)
-    {
-            var records = ctx.FormulaRecords.AsNoTracking()
-                .Where(f => f.Length == size && f.IsCanonical == true)
-                .OrderBy(f => f.Id)
-                .ToList();
-            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-            return formulas;
-    }
 
-    /// <summary>
-    /// Note, using 0 for id (a field in the primary key) causes the Sqlite driver to use the Sqlite auto increment value
-    /// </summary>
-    static public void AddFormula(this RuleDatabaseContext ctx, Formula formula, bool isCanonical) => 
-        ctx.AddFormula(0, formula, isCanonical);
-
-    static public void AddFormula(this RuleDatabaseContext ctx, int id, Formula formula, bool isCanonical)
-    {
-        var record = new FormulaRecord(id, formula, isCanonical);
-
-        ctx.FormulaRecords.Add(record);
-        ctx.SaveChanges();
-        ctx.Clear();
-    }
 
     static public async Task IsSubsumedBySchemeAsync(this RuleDatabaseContext ctx, Formula formula, string value)
     {
@@ -144,46 +94,21 @@ public static class RuleDatabaseExtensions
         record.IsSubsumedByScheme = value;
 
         await ctx.SaveChangesAsync();
-        ctx.Clear();
+        ctx.ChangeTracker.Clear();
     }
 
-    static public List<Formula> GetAllNonCanonicalFormulas(this RuleDatabaseContext ctx, int maxLength)
-    {
-        var records = ctx.FormulaRecords.AsNoTracking()
-            .Where(f => f.Length <= maxLength && f.IsCanonical == false)
-            .OrderBy(f => f.Id)
-            .ToList();
-        var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-        return formulas;
-    }
-    static public List<Formula> GetAllNonCanonicalFormulas(this RuleDatabaseContext ctx)
-    {
-        var records = ctx.FormulaRecords.AsNoTracking()
-            .Where(f => f.IsCanonical == false)
-            .OrderBy(f => f.Id)
-            .ToList();
-        var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-        return formulas;
-    }
+    static public IQueryable<Formula> GetAllNonCanonicalFormulas(this IQueryable<FormulaRecord> db, int maxLength) => 
+        db.GetAllNonCanonicalRecords().Where(_ => _.Length <= maxLength).ToFormulas();
 
-    static public List<Formula> GetAllCanonicalFormulas(this RuleDatabaseContext ctx)
-    {
-        var records = ctx.FormulaRecords.AsNoTracking()
-            .Where(f => f.IsCanonical == true)
-            .OrderBy(f => f.Id)
-            .ToList();
-        var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-        return formulas;
-    }
-    static public List<Formula> GetAllCanonicalFormulasInLexicalOrder(this RuleDatabaseContext ctx)
-    {
-            var records = ctx.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true)
-                .OrderBy(f => f.Text)
-                .ToList();
-            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-            return formulas;
-    }
+    static public IQueryable<Formula> GetAllNonCanonicalFormulas(this IQueryable<FormulaRecord> db) => 
+        db.GetAllCanonicalRecords().ToFormulas();
+
+    static public IQueryable<Formula> GetAllCanonicalFormulas(this IQueryable<FormulaRecord> db) =>
+        db.GetAllCanonicalRecords().ToFormulas();
+
+    static public IQueryable<Formula> GetAllCanonicalRecordsInLexicalOrder(this IQueryable<FormulaRecord> db) => 
+        db.GetAllCanonicalRecords().InFormulaOrder().ToFormulas();
+
     static public List<TruthTable> GetAllTruthTables(this RuleDatabaseContext ctx)
     {
             var truthValues = ctx.FormulaRecords.AsNoTracking()
@@ -195,60 +120,22 @@ public static class RuleDatabaseExtensions
             return truthTables;
     }
 
-    static public int GetLengthOfCanonicalFormulas(this RuleDatabaseContext ctx, TruthTable truthTable)
-    {
-            var formula = ctx.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true && f.TruthValue == truthTable.ToString())
-                .OrderBy(f => f.Id)
-                .FirstOrDefault();
-
-            if (formula == null)
-                return 0;
-
-            return formula.Length;
-    }
-
-    /**
-     * Finds the canonical form of the given formula.
-     */
-    static public Formula FindCanonicalFormula(this RuleDatabaseContext ctx, Formula formula) => 
-        ctx.FindCanonicalFormula(TruthTable.GetTruthTable(formula).ToString());
-
-    static public int CountNonCanonicalFormulas(this RuleDatabaseContext ctx)
-    {
-            var count = ctx.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == false)
-                .Count();
-            return count;
-    }
-
-    static public int CountCanonicalFormulas(this RuleDatabaseContext ctx)
-    {
-            var count = ctx.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true)
-                .Count();
-            return count;
-    }
+    static public async Task<int> GetLengthOfCanonicalFormulasAsync(this DbSet<FormulaRecord> formulas, string truthTable) => 
+        (await formulas.GetCanonicalRecordByTruthTable(truthTable).FirstAsync()).Length;
 
 
-    static public long CountCanonicalTruthTables(this RuleDatabaseContext ctx)
-    {
-            var count = ctx.FormulaRecords.AsNoTracking()
-                .Where(f => f.IsCanonical == true)
-                .Select(f => f.TruthValue)
-                .Distinct()
-                .Count();
-            return count;
-    }
+    static public async Task<int> CountNonCanonicalFormulas(this DbSet<FormulaRecord> records) => 
+        await records.GetAllNonCanonicalRecords().CountAsync();
 
-    static public List<Formula> GetAllFormulas(this RuleDatabaseContext ctx, TruthTable truthTable)
-    {
-            var records = ctx.FormulaRecords.AsNoTracking()
-                .Where(f => f.TruthValue == truthTable.ToString())
-                .ToList();
-            var formulas = records.Select(r => r.Text.ToFormula()).ToList();
-            return formulas;
-    }
+    static public int CountCanonicalFormulas(this IQueryable<FormulaRecord> db) =>
+            db.GetAllCanonicalRecords().Count();
+
+
+    static public long CountCanonicalTruthTables(this IQueryable<FormulaRecord> db) => 
+            db.GetAllCanonicalRecords().Select(_ => _.TruthValue).Distinct().Count();
+
+    static public IQueryable<FormulaRecord> GetAllByTruthTable(this IQueryable<FormulaRecord> db, string truthTable) => 
+            db.Where(f => f.TruthValue == truthTable);
 
 
 }

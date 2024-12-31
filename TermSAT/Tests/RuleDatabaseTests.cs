@@ -17,7 +17,6 @@ namespace TermSAT.Tests
         public void Initialize()
         {
             database = new FormulaDatabase(":memory:");
-            database.Clear();
         }
 
         [TestMethod]

@@ -21,8 +21,15 @@ namespace TermSAT.Scripts
         [TestMethod]
         public void RunRuleGenerator()
         {
+
+            // recreate the database
+            using (var ctx = RuleDatabaseContext.GetDatabaseContext(DATABASE_PATH))
+            {
+                ctx.Database.EnsureDeleted();
+                ctx.Database.EnsureCreated();
+            }
+
             var database = new FormulaDatabase(DATABASE_PATH);
-            database.Clear();
             new RuleGenerator(database, new FormulaGenerator(database, TruthTable.VARIABLE_COUNT)).Run();
         }
 

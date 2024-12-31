@@ -15,7 +15,7 @@ public static class Scripts
         Formula previousFormula = null;
         FormulaRecord previousRecord = null;
         // note: formulaDatabase.GetAllFormulas() returns formulas ordered by Id.
-        foreach (var record in formulaDatabase.GetAllFormulaRecords())
+        foreach (var record in formulaDatabase.GetLastGeneratedFormula  GetAllFormulaRecords())
         {
             var formula = Formula.Parse(record.Text);
             if (previousRecord != null)

@@ -4,7 +4,11 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <StartupObject>TermSAT.Program</StartupObject>
+	  
 	<ServerGarbageCollection>true</ServerGarbageCollection>
+	  
+	<!-- put on standby instead of release to OS -->
+	<RetainVMGarbageCollection>true</RetainVMGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,11 +25,19 @@
     <Compile Remove="NandReduction\NandReducer - Copy.cs" />
     <Compile Remove="NandReduction\NandReducerDistributiveRules.cs" />
     <Compile Remove="NandReduction\Scripts_RuleGenerator_KnuthBendix.cs" />
+    <Compile Remove="NandReduction\Workers.cs" />
+    <Compile Remove="RuleDatabase\DatabaseReport.cs" />
+    <Compile Remove="RuleDatabase\FormulaConstructor.cs" />
+    <Compile Remove="RuleDatabase\FormulaGenerator.cs" />
+    <Compile Remove="RuleDatabase\RuleGenerator.cs" />
     <Compile Remove="RuleDatabase\RuleRepository.cs" />
     <Compile Remove="RuleDatabase\TruthTables.cs" />
+    <Compile Remove="SchemeReducer\Scripts.cs" />
+    <Compile Remove="Scripts\Scripts.cs" />
     <Compile Remove="Solver\CompletionGenerator.cs" />
     <Compile Remove="Solver\Solver.cs" />
     <Compile Remove="Tests\CompletionTests.cs" />
+    <Compile Remove="Tests\RuleDatabaseTests.cs" />
     <Compile Remove="Tests\RuleReductionTests.cs" />
     <Compile Remove="Tests\RuleRepositoryTests.cs" />
   </ItemGroup>
@@ -37,6 +49,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.6.4" />
     <PackageReference Include="MSTest.TestFramework" Version="3.6.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
 
@@ -46,6 +59,7 @@
 
   <ItemGroup>
     <Folder Include="obj\" />
+    <Folder Include="Scripts\" />
   </ItemGroup>
 
 </Project>
