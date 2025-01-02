@@ -95,7 +95,7 @@ public static partial class FormulaIndex
             nodeRecord = await nodeSet.AddRootAsync();
             await ctx.SaveChangesAsync();
         }
-        foreach(var term in formulaRecord.Formula.AsFlatTerm())
+        foreach(var term in formulaRecord.Formula)
         {
             if (term is Nand)
             {
@@ -156,7 +156,7 @@ public static partial class FormulaIndex
 
         // inside the loop we'll be looking up formulas by position.
         // The time complexity of the GetFormulaAtPosition method grows linearly as a function of the length of the formula,
-        // its much more efficient to put formulaToMatch in an array right now.
+        // I think its much more efficient to put formulaToMatch in an array right now.
         var flatTerm = formulaToMatch.AsFlatTerm().ToArray();
 
         int matchCount = 0;

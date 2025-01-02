@@ -34,7 +34,7 @@ public partial class FormulaRecord
         {
             if (_formula == null && !string.IsNullOrWhiteSpace(Text))
             {
-                _formula = Formula.Parse(Text);
+                _formula = Formula.GetOrParse(Text);
             }
             return _formula;
         }

@@ -50,12 +50,12 @@ namespace TermSAT.Tests
         [TestMethod]
         public void TestFormulaVariables()
         {
-            Assert.AreEqual(3, "**.1.2.3".ToFormula().AllVariables.Count);
-            Assert.AreEqual(3, "**.3.2.1".ToFormula().AllVariables.Count);
-            Assert.AreEqual(3, "**.1.2*.3.1".ToFormula().AllVariables.Count);
-            Assert.IsTrue("**.1.2*.3.1".ToFormula().AllVariables.Contains(Variable.ONE));
-            Assert.IsTrue("**.1.2*.3.1".ToFormula().AllVariables.Contains(Variable.TWO));
-            Assert.IsTrue("**.1.2*.3.1".ToFormula().AllVariables.Contains(Variable.THREE));
+            Assert.AreEqual(3, "**.1.2.3".GetOrParse().AllVariables.Count);
+            Assert.AreEqual(3, "**.3.2.1".GetOrParse().AllVariables.Count);
+            Assert.AreEqual(3, "**.1.2*.3.1".GetOrParse().AllVariables.Count);
+            Assert.IsTrue("**.1.2*.3.1".GetOrParse().AllVariables.Contains(Variable.ONE));
+            Assert.IsTrue("**.1.2*.3.1".GetOrParse().AllVariables.Contains(Variable.TWO));
+            Assert.IsTrue("**.1.2*.3.1".GetOrParse().AllVariables.Contains(Variable.THREE));
         }
 
 
@@ -63,10 +63,10 @@ namespace TermSAT.Tests
         public void TestFormulaConstruction()
         {
             Assert.AreEqual(".1", Variable.NewVariable(1).ToString());
-            Assert.AreEqual("*.1.1", "*.1.1".ToFormula().ToString());
+            Assert.AreEqual("*.1.1", "*.1.1".GetOrParse().ToString());
 
             var text = "***.1.2.3.4";
-            Formula formula1 = text.ToFormula();
+            Formula formula1 = text.GetOrParse();
             Assert.AreEqual(7, formula1.Length);
             Assert.AreEqual(formula1.ToString(), text);
 
@@ -110,10 +110,10 @@ namespace TermSAT.Tests
 
             // gotta test all formulas types, since each has thier own cache
             {
-                Assert.AreEqual("T".ToFormula().GetHashCode(), "T".ToFormula().GetHashCode());
-                Assert.AreEqual(".1".ToFormula().GetHashCode(), ".1".ToFormula().GetHashCode());
-                Assert.AreEqual("-.1".ToFormula().GetHashCode(), "-.1".ToFormula().GetHashCode());
-                Assert.AreEqual("*.1.1".ToFormula().GetHashCode(), "*.1.1".ToFormula().GetHashCode());
+                Assert.AreEqual("T".GetOrParse().GetHashCode(), "T".GetOrParse().GetHashCode());
+                Assert.AreEqual(".1".GetOrParse().GetHashCode(), ".1".GetOrParse().GetHashCode());
+                Assert.AreEqual("-.1".GetOrParse().GetHashCode(), "-.1".GetOrParse().GetHashCode());
+                Assert.AreEqual("*.1.1".GetOrParse().GetHashCode(), "*.1.1".GetOrParse().GetHashCode());
 
                 Implication formula1 = "***.1.2.3.4";
                 Implication rule1 = "*.1.2";
@@ -312,7 +312,7 @@ namespace TermSAT.Tests
         public void TestBasicReductionScheme()
         {
             {
-                var formula = Formula.Parse("***.3.2-*-.1**-.2.4.3-*.1-*.2.4");
+                var formula = Formula.GetOrParse("***.3.2-*-.1**-.2.4.3-*.1-*.2.4");
                 var reducedFormula = formula.ReduceUsingBasicScheme();
                 Assert.IsTrue(reducedFormula.Length < formula.Length, $"reduced formula should be shorter.  \n{formula} ==> {reducedFormula}");
             }

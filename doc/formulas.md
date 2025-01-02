@@ -1,7 +1,6 @@
 # Formulas
 
-All about formulas in RuleSAT.
-The most important part of this document is the section on 
+All about formulas in NandSAT.
 
 ## Syntax
 

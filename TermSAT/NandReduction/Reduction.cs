@@ -97,7 +97,7 @@ namespace TermSAT.NandReduction
         public string MappedFormula { 
             get
             {
-                var starting = StartingFormula.AsFlatTerm();
+                var terms = new FormulaDFSEnumerator(StartingFormula).ToArray();
                 string[] mapped = new string[ReducedFormula.Length];
                 for (int i = 0; i < mapped.Length; i++)
                 {
@@ -105,7 +105,7 @@ namespace TermSAT.NandReduction
                     var m = Mapping[i];
                     if (-1 < m)
                     {
-                        mapped[i] = starting[m].GetIndexingSymbol();
+                        mapped[i] = terms[m].GetIndexingSymbol();
                     }
                 }
                 return string.Join("",mapped);

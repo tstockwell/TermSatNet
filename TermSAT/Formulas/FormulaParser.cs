@@ -1,24 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace TermSAT.Formulas
 {
     public static class FormulaParser
     {
-        public static Constant ToConstant(this string formulaText) => ToFormula(formulaText) as Constant;
-        public static Variable ToVariable(this string formulaText) => ToFormula(formulaText) as Variable;
-        public static Negation ToNegation(this string formulaText) => ToFormula(formulaText) as Negation;
-        public static Implication ToImplication(this string formulaText) => ToFormula(formulaText) as Implication;
+        public static Constant ToConstant(this string formulaText) => GetOrParse(formulaText) as Constant;
+        public static Variable ToVariable(this string formulaText) => GetOrParse(formulaText) as Variable;
+        public static Negation ToNegation(this string formulaText) => GetOrParse(formulaText) as Negation;
+        public static Implication ToImplication(this string formulaText) => GetOrParse(formulaText) as Implication;
 
-        private static readonly ConditionalWeakTable<string, Formula> __cache = new ConditionalWeakTable<string, Formula>();
+        private static readonly MemoryCacheOptions cacheOptions = new MemoryCacheOptions();
+        private static readonly MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
+        private static readonly MemoryCache __cache = new (cacheOptions);
 
+        public static T GetOrCreate<T>(this string formulaText, Func<T> provider)
+            where T:Formula
+        {
+            T formula;
+            if (__cache.TryGetValue(formulaText, out formula))
+                return formula;
+            formula = provider();
+            lock (__cache)
+            {
+                if (__cache.TryGetValue(formulaText, out T _f))
+                    return _f;
+                __cache.Set(formulaText, formula, cacheEntryOptions);
+            }
+            return formula;
+        }
 
         /**
          * Parses out the first formula from the beginning of the given string
          */
-        public static Formula ToFormula(this string formulaText)
+        public static Formula GetOrParse(this string formulaText)
         {
             Formula formula;
             lock (__cache)
@@ -103,11 +120,18 @@ namespace TermSAT.Formulas
             if (stack.Count != 1)
                 throw new Exception("Invalid postcondition after evaluating formula wellformedness: count < 1");
 
-            formula = stack.Pop();
             lock (__cache)
             {
-                __cache.AddOrUpdate(formulaText, formula);
+                // always gotta check twice
+                if (__cache.TryGetValue(formulaText, out formula))
+                {
+                    return formula;
+                }
+
+                formula = stack.Pop();
+                __cache.Set(formulaText, formula, cacheEntryOptions);
             }
+
             return formula;
         }
 

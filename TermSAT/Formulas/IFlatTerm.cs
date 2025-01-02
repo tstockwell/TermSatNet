@@ -1,13 +1,11 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using TermSAT.Common;
 
 namespace TermSAT.Formulas
 {
     /// <summary>
     /// 
-    /// This source module extends the Formula class with an API that represents Formulas as an array of all the 
+    /// This source module defines an API that represents Formulas as an array of all the 
     /// subformulas in the formula, ordered from the leftmost subformula (the formula itself) to the rightmost 
     /// subformula (the last constant or variable that appears in the formula).
     /// The name FlatTerm comes from the chapter on Term Indexing in the book 
@@ -47,47 +45,15 @@ namespace TermSAT.Formulas
     ///  formulas as strings in a convenient way.
     ///
     /// </summary>
-    public class FlatTerm : ISequence<Formula>
+    public interface IFlatTerm<TItem> : IEnumerable<TItem>
+        where TItem : IComparable<TItem>, IEquatable<TItem>
     {
-        private static ConditionalWeakTable<Formula, FlatTerm> __sequences =
-            new ConditionalWeakTable<Formula, FlatTerm>();
+        public TItem this[int index] { get; }
 
-        public static FlatTerm GetFlatTerm(Formula f)
-        {
-            if (!__sequences.TryGetValue(f, out FlatTerm sequence))
-            {
-                lock (__sequences)
-                {
-                    if (__sequences.TryGetValue(f, out sequence))
-                        return sequence;
-                    sequence = new FlatTerm(f);
-                    __sequences.Add(f, sequence);
-                }
-            }
-
-            return sequence;
-        }
-
-        public Formula Formula { get; private set; }
-
-        private FlatTerm(Formula formula)
-        {
-            Formula = formula;
-        }
-
-        public int Length => Formula.Length;
-
-        public override string ToString() => Formula.ToString();
-
-        public IEnumerator<Formula> GetEnumerator() => new FormulaDFSEnumerator(Formula);
-
-        IEnumerator IEnumerable.GetEnumerator() => new FormulaDFSEnumerator(Formula);
-
-        public Formula this[int index] { get => Formula.GetFormulaAtPosition(index); }
+        public int Length { get; }
     }
 
 
 
+
 }
-
-

@@ -5,17 +5,12 @@ namespace TermSAT.Formulas
 {
     public partial class Negation : Formula
     {
-        static private ConditionalWeakTable<Formula, Negation> __negations= new ();
+        static private Dictionary<Formula, Negation> __negations= new ();
 
         public Formula Child { get; }
 
-        public static Negation NewNegation(Formula child) { 
-            lock( __negations )
-            {
-                var n = __negations.GetValue(child, c => new Negation(child));
-                return n;
-            }
-        }
+        public static Negation NewNegation(Formula child) =>
+            FormulaParser.GetOrCreate($"{Symbol.Negation.Value}{child}", () => new Negation(child));
 
         public static implicit operator Negation(string formulaText) => formulaText.ToNegation();
 

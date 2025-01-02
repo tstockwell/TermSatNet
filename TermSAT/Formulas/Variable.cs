@@ -29,7 +29,7 @@ namespace TermSAT.Formulas
         public static readonly Variable TWO = NewVariable(2);
         public static readonly Variable THREE = NewVariable(3);
 
-        public static implicit operator Variable(string formulaText) => FormulaParser.ToFormula(formulaText) as Variable;
+        public static implicit operator Variable(string formulaText) => FormulaParser.GetOrParse(formulaText) as Variable;
 
         string _text;
 

@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TermSAT.Formulas
 {
@@ -19,12 +20,12 @@ namespace TermSAT.Formulas
 
     public static class FormulaSequenceExtensions
     {
-        public static FlatTerm AsFlatTerm(this Formula formula) => FlatTerm.GetFlatTerm(formula);
+        public static Formula[] AsFlatTerm(this Formula formula) => new FormulaDFSEnumerator(formula).ToArray();
 
         /**
          * Creates a new formula from a DFS ordering and some changes
          */
-        public static Formula ToFormula(this FlatTerm sequence, IDictionary<int, Formula> replacements)
+        public static Formula WithReplacements(this IFlatTerm<Formula> sequence, IDictionary<int, Formula> replacements)
         {
             Formula formula;
 
@@ -220,71 +221,6 @@ namespace TermSAT.Formulas
             }
 
             return -1;
-        }
-    }
-
-
-    /**
-     * This class enumerates all of a Formula's subformulas in the same order as they 
-     * are written.  Basically that means that implication antecedents come before consequents.
-     * The first formula returned is the enumerated formula itself.
-     */
-    public class FormulaDFSEnumerator : IEnumerator<Formula>
-    {
-        private readonly Formula formula;
-        private readonly Stack<Formula> stack = new Stack<Formula>();
-
-        public Formula Current { get; private set; }
-
-        object IEnumerator.Current { get { return Current; } }
-
-        public FormulaDFSEnumerator(Formula formula)
-        {
-            this.formula = formula;
-        }
-
-        public void Dispose() { /* do nothing */ }
-
-        public bool MoveNext()
-        {
-            if (Current == null)
-            {
-                Current = formula;
-                return true;
-            }
-            if (Current is Constant || Current is Variable)
-            {
-                if (stack.Count <= 0)
-                    return false;
-                Current = stack.Pop();
-                return true;
-            }
-            if (Current is Negation)
-            {
-                Current = (Current as Negation).Child;
-                return true;
-            }
-            if (Current is Nand)
-            {
-                var nand = Current as Nand;
-                stack.Push(nand.Subsequent);
-                Current = nand.Antecedent;
-                return true;
-            }
-            if (Current is Implication)
-            {
-                stack.Push((Current as Implication).Consequent);
-                Current = (Current as Implication).Antecedent;
-                return true;
-            }
-
-            throw new Exception($"unknown formula type: {Current.GetType().FullName}");
-
-        }
-
-        public void Reset()
-        {
-            this.Current = null;
         }
     }
 

@@ -31,7 +31,7 @@ namespace TermSAT.Formulas
         public static Symbol True = new Symbol('T');
         public static Symbol False = new Symbol('F');
 
-        private string Text { get; }
+     
 
         private Symbol(char c) : base(c) { }
 

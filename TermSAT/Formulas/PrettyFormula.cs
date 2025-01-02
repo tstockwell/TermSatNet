@@ -42,7 +42,7 @@ namespace TermSAT.Formulas
 
         public static string ToPrettyString(this string formulaText)
         {
-            return ToPrettyString(formulaText.ToFormula());
+            return ToPrettyString(formulaText.GetOrParse());
         }
 
         public static string ToPrettyString(this Formula formula)

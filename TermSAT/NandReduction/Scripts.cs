@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime;
 using System.Threading;
 using System.Threading.Tasks;
 using TermSAT.Common;
@@ -15,7 +17,9 @@ namespace TermSAT.NandReduction;
 
 public static class Scripts
 {
-    const int CONCURRENCY_LIMIT = 64; // by comparison, the postgresql default max connections is 100
+    const int CONCURRENCY_LIMIT = 32; // by comparison, the postgresql default max connections is 100
+    const int CHUNK_SIZE = 128; // # of records in a single transaction
+    const int GC_COUNT = 500; // do a full garbage collect every GC_COUNT chunks
 
 
 
@@ -117,7 +121,7 @@ public static class Scripts
                 .Where(_ => _.TruthValue == nonCanonicalRecord.TruthValue)
                 .FirstAsync();
 
-            Formula canonicalFormula = Formula.Parse(canonicalRecord.Text);
+            Formula canonicalFormula = Formula.GetOrParse(canonicalRecord.Text);
             var reducedFormula = canonicalFormula.CreateSubstitutionInstance(substitutions);
             if (formula.CompareTo(reducedFormula) <= 0)
                 return false;
@@ -174,6 +178,7 @@ public static class Scripts
     public static async Task RunNandRuleGenerator(string formulaDataSource, string indexDataSource)
     {
         int lastFormulaId = 0;
+        int gcCounter= 0;
 
         var ruleOptions =
             new DbContextOptionsBuilder()
@@ -261,6 +266,9 @@ public static class Scripts
                 bool gotoNextTotalLength = true;
                 for (int iTotalLength = 3; gotoNextTotalLength; iTotalLength += 2)
                 {
+                    GC.Collect();
+                    GCSettings.LatencyMode = GCLatencyMode.Batch;
+
                     gotoNextTotalLength = false;
 
                     Trace.WriteLine($"Generate all possible formulas of length {iTotalLength}...");
@@ -276,6 +284,7 @@ public static class Scripts
                         {
                             for (int iInnerLength = 1; iInnerLength < iTotalLength; iInnerLength += 2)
                             {
+
                                 // select canonical formulas derived from the current variable, in formula order
                                 var innerFormulas = await ruleDb.FormulaRecords.AsNoTracking()
                                     .Select(_ => _.TruthValue)
@@ -307,7 +316,7 @@ public static class Scripts
 
                                 var chunks = SystemExtensions.CartesianProduct(innerFormulas, outerFormulas)
                                     .Select(_ => Nand.NewNand(_.Item1, _.Item2))
-                                    .Chunk(1000);
+                                    .Chunk(CHUNK_SIZE);
 
                                 lock (todo)
                                 {
@@ -342,6 +351,7 @@ public static class Scripts
                             chunkTasks.RemoveAt(0);
                         }
 
+
                         Nand[] nextChunk = null;
                         lock (todo)
                         {
@@ -365,6 +375,12 @@ public static class Scripts
                         }
                         if (nextChunk != null)
                         {
+                            if ((++gcCounter % GC_COUNT) == 0)
+                            {
+                                GC.Collect();
+                            }
+
+
                             Nand[] _nextChunk = nextChunk;
                             var chunkTask = Task.Run(async () =>
                             {
@@ -431,7 +447,7 @@ public static class Scripts
                                     .Where(_ => _.TruthValue == t && _.Length == iTotalLength)
                                     .Skip(1))
                                 .ToListAsync())
-                                .Chunk(1000);
+                                .Chunk(CHUNK_SIZE);
                         }
 
                         foreach (var indexChunk in indexChunks)
@@ -441,6 +457,11 @@ public static class Scripts
                                 Trace.Write($".");
                                 await indexTasks[0];
                                 indexTasks.RemoveAt(0);
+                            }
+
+                            if ((++gcCounter % GC_COUNT) == 0)
+                            {
+                                GC.Collect();
                             }
 
                             var _chunk = indexChunk;

@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using Microsoft.Extensions.Caching.Memory;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -20,8 +22,9 @@ namespace TermSAT.Formulas
 
     public class FormulaIndexingKey : IEnumerable<string>
     {
-        private static ConditionalWeakTable<Formula, FormulaIndexingKey> indexingKeys =
-            new ConditionalWeakTable<Formula, FormulaIndexingKey>();
+        private static readonly MemoryCacheOptions cacheOptions = new MemoryCacheOptions();
+        private static readonly MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
+        private static readonly MemoryCache indexingKeys = new(cacheOptions);
 
         public static FormulaIndexingKey GetIndexingKey(Formula f)
         {
@@ -32,7 +35,7 @@ namespace TermSAT.Formulas
                     if (indexingKeys.TryGetValue(f, out indexingKey))
                         return indexingKey;
                     indexingKey = new FormulaIndexingKey(f);
-                    indexingKeys.Add(f, indexingKey);
+                    indexingKeys.Set(f, indexingKey, cacheEntryOptions);
                 }
             }
 

@@ -99,15 +99,14 @@ public class WildcardAnalyzer : Proof
             {
                 // discover the position at which the reduction occurred
                 var reductionPosition = -1;
-                var reducedFlatTerm = reduction.ReducedFormula.AsFlatTerm();
-                var startingFlatTerm = reduction.StartingFormula.AsFlatTerm();
+                var startingFlatTerms = new FormulaDFSEnumerator(StartingFormula).ToArray();
                 {
                     int i = 0;
-                    foreach (var term in reducedFlatTerm)
+                    foreach (var term in new FormulaDFSEnumerator(ReducedFormula))
                     {
                         if (term.Equals(Constant.TRUE))
                         {
-                            var startingTerm = startingFlatTerm[i];
+                            var startingTerm = startingFlatTerms[i];
                             if (!term.Equals(startingTerm))
                             {
                                 reductionPosition = i;
@@ -120,7 +119,7 @@ public class WildcardAnalyzer : Proof
 
                 if (0 <= reductionPosition)
                 {
-                    var ruleTarget = startingFlatTerm[reductionPosition];
+                    var ruleTarget = startingFlatTerms[reductionPosition];
                     int subtermPosition = ruleTarget.PositionOf(Subterm);
                     if (0 <= subtermPosition)
                     {

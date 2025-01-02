@@ -15,12 +15,14 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using TermSAT.Common;
 using TermSAT.Formulas;
+using TermSAT.Tests;
 
 namespace TermSAT.RuleDatabase
 {
@@ -51,9 +53,6 @@ namespace TermSAT.RuleDatabase
 	    public const int MAX_TRUTH_VALUES= 1 << VARIABLE_COUNT;
 	    public const long MAX_TRUTH_TABLES= 1 << MAX_TRUTH_VALUES;
 
-        static WeakCache<string, TruthTable> __cache = new WeakCache<string, TruthTable>();
-        static ConditionalWeakTable<Formula, TruthTable> __formulaCache = new ConditionalWeakTable<Formula, TruthTable>();
-
         private BitArray values = new BitArray(MAX_TRUTH_VALUES);
 
         private TruthTable(BitArray values)
@@ -64,14 +63,23 @@ namespace TermSAT.RuleDatabase
         private TruthTable(string valueText) : this(valueText.ToBitArray()) {  }
         private TruthTable(Formula formula) : this(ToBitArray(formula)) { }
 
-        public static TruthTable GetTruthTable(string valueText) { 
-            __cache.GetValue(valueText, out TruthTable t, () => new TruthTable(valueText));
-            return t;
-        }
+        private static readonly MemoryCacheOptions cacheOptions = new MemoryCacheOptions();
+        private static readonly MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
+        private static readonly MemoryCache __cache = new(cacheOptions);
 
-        public static TruthTable GetTruthTable(Formula formula) { 
-            var t = __formulaCache.GetValue(formula, _ => new TruthTable(_));
-            return t;
+        public static TruthTable GetTruthTable(Formula formula) 
+        {
+            TruthTable tt;
+            if (__cache.TryGetValue(formula, out tt))
+                return tt;
+            tt = new TruthTable(formula);
+            lock (__cache)
+            {
+                if (__cache.TryGetValue(formula, out TruthTable _f))
+                    return _f;
+                __cache.Set(formula, tt, cacheEntryOptions);
+            }
+            return tt;
         }
 
         /// <summary>

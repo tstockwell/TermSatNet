@@ -7,25 +7,14 @@ namespace TermSAT.Formulas
 {
     public partial class Nand : Formula
     {
-        //static readonly WeakCache<Formula, WeakCache<Formula, Implication>> formulaCache = new WeakCache<Formula, WeakCache<Formula, Implication>>();
-        static private ConditionalWeakTable<Formula, ConditionalWeakTable<Formula, Nand>> __implications= 
-                new ConditionalWeakTable<Formula, ConditionalWeakTable<Formula, Nand>>();
-
         public static Nand NewNand(Formula antecedent, Formula consequent)
         {
-            lock(__implications)
-            {
-                var implications = __implications.GetValue(antecedent, (a) => new ConditionalWeakTable<Formula, Nand>());
-                lock (implications)
-                {
-                    var implication = implications.GetValue(consequent, (a) => new Nand(antecedent, consequent));
-                    return implication;
-                }
-            }
+            var text = $"{Nand.symbol}{antecedent.Text}{consequent.Text}";
+            return Formula.GetOrCreate(text, () => new Nand(antecedent, consequent));
         }
 
         public static implicit operator Nand(string formulaText) =>
-            FormulaParser.ToFormula(formulaText) as Nand;
+            FormulaParser.GetOrParse(formulaText) as Nand;
 
         public Formula Antecedent { get; }
         public Formula Subsequent { get; }

@@ -44,7 +44,7 @@ public static class NandReducer
     {
 #if DEBUG
         //Debug.Assert(!reductionProof.HasReduced(startingFormula), $"reductionProof has already reduced formula {startingFormula}");
-        if (startingFormula.Equals(Formula.Parse("|T||.1.3|T.2")))
+        if (startingFormula.Equals(Formula.GetOrParse("|T||.1.3|T.2")))
         {
 
         }

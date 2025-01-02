@@ -1,31 +1,14 @@
-/*******************************************************************************
- *     termsat SAT solver
- *     Copyright (C) 2019 Ted Stockwell <emorning@yahoo.com>
- * 
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU Affero General Public License as
- *     published by the Free Software Foundation, either version 3 of the
- *     License, or (at your option) any later version.
- * 
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU Affero General Public License for more details.
- * 
- *     You should have received a copy of the GNU Affero General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace TermSAT.Formulas
 {
     /**
      * Represents a propositional formula.
+     * 
+     * @see wiki/formulas.md 
      * 
      * This system represents propositional formulas using ...
      * 	...constants TRUE and FALSE.
@@ -34,20 +17,10 @@ namespace TermSAT.Formulas
      *  ...an implication operator.
      *  ...a nand operator .
      *  
-     * This system supports a textual form for representing formulas.
-     * The normal form uses Polish notation and...
-     * 	...the symbols 'T' and 'F' for TRUE and FALSE.
-     *  ...the symbol '-' for the negation operator, followed by a formula. 
-     *  ...the symbol '*' for the implication operator, followed by the consequent and then the antecedent. 
-     *  ...the symbol '|' for the nand operator, followed by the consequent and then the antecedent. 
-     *  ...the symbol '.' followed by a sequence of digits, for representing variables.
-     *  
-     *  Polish notation is used because it is compact, eliminates the 
-     *  necessity of using parenthesis, and is simple to parse.
-     *  
      *  Because this system is, eventually, meant to be used to solve large and 
      *  complex formulas, care is taken to make the system as memory efficient as 
      *  possible.  
+     *  
      *  There is only ever a single instance created of any particular formula.
      *  All subclasses of the Formula class cache instances of previously created formulas 
      *  so that only one instance of that formula is ever created.
@@ -65,7 +38,7 @@ namespace TermSAT.Formulas
      * 
      * @author Ted Stockwell <emorning@yahoo.com>
      */
-    abstract public partial class Formula : IEquatable<Formula>, IComparable<Formula>
+    abstract public partial class Formula : IEquatable<Formula>, IComparable<Formula>, IFlatTerm<Formula>
     {
 
         /// <summary>
@@ -77,10 +50,13 @@ namespace TermSAT.Formulas
         /// I'm going to leave them in and leave this warning.
         /// Note: I think I originally wrote this code in 2019, no regrets as of 2024.
         /// </summary>
-        public static implicit operator Formula(string formulaText) => FormulaParser.ToFormula(formulaText);
+        public static implicit operator Formula(string formulaText) => FormulaParser.GetOrParse(formulaText);
 
 
         public int Length { get; }
+
+        public string _text= null;
+        public string Text => ToString();
 
         /// <param name="length">The number of symbols in this formula</param>
         protected Formula(int length)
@@ -263,10 +239,10 @@ namespace TermSAT.Formulas
         /// <summary>
         /// Parses out the first formula from the beginning of the given string
         /// </summary>
-        public static Formula Parse(string formulaText)
-        {
-            return formulaText.ToFormula();
-        }
+        public static Formula GetOrParse(string formulaText) => 
+            FormulaParser.GetOrParse(formulaText);
+        public static T GetOrCreate<T>(string formulaText, Func<T> provider) where T:Formula => 
+            FormulaParser.GetOrCreate(formulaText, provider);
 
         /**
          * Returns substitutions that will convert the given formulas into a single formula 
@@ -405,6 +381,9 @@ namespace TermSAT.Formulas
                 return subterms;
             }
         }
+
+        public Formula this[int index] => throw new NotImplementedException();
+
         abstract public void GetAllSubterms(ICollection<Formula> subterms);
 
         /**
@@ -484,6 +463,10 @@ namespace TermSAT.Formulas
 
             return criticalTerms;
         }
+
+        public IEnumerator<Formula> GetEnumerator() => new FormulaDFSEnumerator(this);
+
+        IEnumerator IEnumerable.GetEnumerator() => new FormulaDFSEnumerator(this);
     }
 
 

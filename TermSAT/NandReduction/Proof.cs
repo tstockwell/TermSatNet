@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -11,8 +12,8 @@ using static System.Net.Mime.MediaTypeNames;
 namespace TermSAT.NandReduction;
 
 /// <summary>
-/// A proof is a list of reductions from a starting formula to a reduced formula that 
-/// proves that the starting and reduced formulas are equivalent.
+/// A proof is a list of reductions from a terms formula to a reduced formula that 
+/// proves that the terms and reduced formulas are equivalent.
 /// 
 /// NandSAT basically works by building a set of proofs, for every term in a formula, to the terms canonical form.
 /// These proofs are called 'reduction proofs'.
@@ -26,14 +27,16 @@ namespace TermSAT.NandReduction;
 /// </summary>
 public class Proof 
 {
-    private static readonly ConditionalWeakTable<Formula, Proof> __cache = new ConditionalWeakTable<Formula, Proof>();
+    private static readonly MemoryCacheOptions cacheOptions = new MemoryCacheOptions();
+    private static readonly MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
+    private static readonly MemoryCache __cache = new(cacheOptions);
 
     public static Proof GetReductionProof(Formula startingFormula)
     {
-        if (!__cache.TryGetValue(startingFormula, out var result))
+        if (!__cache.TryGetValue(startingFormula, out Proof result))
         {
             result = new Proof(startingFormula);
-            __cache.Add(startingFormula, result);
+            __cache.Set(startingFormula, result, cacheEntryOptions);
         }
         return result;
     }
@@ -59,10 +62,6 @@ public class Proof
     public Formula StartingFormula { get; }
 
 
-    //    private List<Reduction> _reductions = new();
-    private IImmutableList<int> _mapping = null;
-
-    //public IReadOnlyList<Reduction> Reductions => _reductions;
     public Reduction NextReduction { get; private set; } = null;
 
     Formula _reducedFormula= null;
@@ -130,8 +129,6 @@ public class Proof
             }
             todoProof = Proof.GetReductionProof(todoProof.ReducedFormula);
         }
-
-        _mapping = null;
 
 #if DEBUG
         var mapping = Mapping.ToImmutableList();
@@ -230,7 +227,7 @@ public class Proof
     {
         get
         {
-            var starting = StartingFormula.AsFlatTerm();
+            var terms = new FormulaDFSEnumerator(StartingFormula).ToArray();
             string[] mapped = new string[ReducedFormula.Length];
             for (int i = 0; i < mapped.Length; i++)
             {
@@ -238,7 +235,7 @@ public class Proof
                 var m = Mapping[i];
                 if (-1 < m)
                 {
-                    mapped[i] = starting[m].GetIndexingSymbol();
+                    mapped[i] = terms[m].GetIndexingSymbol();
                 }
             }
             return string.Join("", mapped);

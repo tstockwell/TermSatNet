@@ -5,7 +5,7 @@ namespace TermSAT.Formulas
 {
     public partial class Constant : Formula
     {
-        public static implicit operator Constant(string formulaText) => FormulaParser.ToFormula(formulaText) as Constant;
+        public static implicit operator Constant(string formulaText) => FormulaParser.GetOrParse(formulaText) as Constant;
         public static implicit operator Constant(bool value) => value ? TRUE : FALSE;
 
         // constants

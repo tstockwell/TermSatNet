@@ -7,25 +7,15 @@ namespace TermSAT.Formulas
 {
     public partial class Implication : Formula
     {
-        //static readonly WeakCache<Formula, WeakCache<Formula, Implication>> formulaCache = new WeakCache<Formula, WeakCache<Formula, Implication>>();
-        static private ConditionalWeakTable<Formula, ConditionalWeakTable<Formula, Implication>> __implications= 
-                new ConditionalWeakTable<Formula, ConditionalWeakTable<Formula, Implication>>();
 
         public static Implication NewImplication(Formula antecedent, Formula consequent)
         {
-            lock(__implications)
-            {
-                var implications = __implications.GetValue(antecedent, (a) => new ConditionalWeakTable<Formula, Implication>());
-                lock (implications)
-                {
-                    var implication = implications.GetValue(consequent, (a) => new Implication(antecedent, consequent));
-                    return implication;
-                }
-            }
+            var text = $"{Implication.symbol}{antecedent.Text}{consequent.Text}";
+            return Formula.GetOrCreate(text, () => new Implication(antecedent, consequent));
         }
 
         public static implicit operator Implication(string formulaText) =>
-            FormulaParser.ToFormula(formulaText) as Implication;
+            FormulaParser.GetOrParse(formulaText) as Implication;
 
         public Formula Antecedent { get; }
         public Formula Consequent { get; }

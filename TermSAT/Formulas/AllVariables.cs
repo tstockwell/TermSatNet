@@ -15,6 +15,7 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -22,6 +23,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TermSAT.Common;
+using TermSAT.Tests;
 
 namespace TermSAT.Formulas
 {
@@ -42,12 +44,8 @@ namespace TermSAT.Formulas
      *  ...The Formula class (and related subclasses) got very large and hard to understand/maintain.
      *  
      *  For these reasons I have made the Formula class a partial class and have started breaking features out into 
-     *  thier own source files.  This makes for a better separation of concerns and makes it easier to understand/maintain each feature.
+     *  their own source files.  This makes for a better separation of concerns and makes it easier to understand/maintain each feature.
      *  
-     *  Also, instead of saving references to cached data in the Formula class (which will suck up a small amount of memory 
-     *  for each and every formula regardless of whether the feature is used) a ConditionalWeakTable is used for caching, which is a way 
-     *  of dynamically adding properties to objects.  
-     *  By using the ConditionalWeakTable, memory use is only impacted when the AllVariables property is actually being used.
      *  
      * @author Ted Stockwell <emorning@yahoo.com>
      */
@@ -69,7 +67,9 @@ namespace TermSAT.Formulas
 
     public partial class Variable : Formula
     {
-        private static readonly ConditionalWeakTable<Variable, List<Variable>> __varListCache = new ConditionalWeakTable<Variable, List<Variable>>();
+        private static readonly MemoryCacheOptions cacheOptions = new MemoryCacheOptions();
+        private static readonly MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
+        private static readonly MemoryCache __varListCache = new(cacheOptions);
 
         override public IList<Variable> AllVariables
         {
@@ -78,15 +78,13 @@ namespace TermSAT.Formulas
                 List<Variable> variables;
                 if (__varListCache.TryGetValue(this, out variables))
                     return variables;
-
+                variables= new List<Variable>() { this };
                 lock (__varListCache)
                 {
                     if (__varListCache.TryGetValue(this, out variables))
                         return variables;
-                    variables= new List<Variable>() { this };
-                    __varListCache.Add(this, variables);
+                    __varListCache.Set(this, variables, cacheEntryOptions);
                 }
-
                 return variables;
             }
         }
@@ -99,7 +97,9 @@ namespace TermSAT.Formulas
 
     public partial class Implication 
     {
-        private static readonly ConditionalWeakTable<Implication, IList<Variable>> __varListCache = new ConditionalWeakTable<Implication, IList<Variable>>();
+        private static readonly MemoryCacheOptions cacheOptions = new MemoryCacheOptions();
+        private static readonly MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
+        private static readonly MemoryCache __varListCache = new(cacheOptions);
 
         public override IList<Variable> AllVariables
         {
@@ -125,7 +125,7 @@ namespace TermSAT.Formulas
                     sortedVars.Sort();
 
                     variables = sortedVars;
-                    __varListCache.Add(this, variables);
+                    __varListCache.Set(this, variables, cacheEntryOptions);
                 }
 
                 return variables;
@@ -135,7 +135,9 @@ namespace TermSAT.Formulas
 
     public partial class Nand
     {
-        private static readonly ConditionalWeakTable<Nand, IList<Variable>> __varListCache = new ConditionalWeakTable<Nand, IList<Variable>>();
+        private static readonly MemoryCacheOptions cacheOptions = new MemoryCacheOptions();
+        private static readonly MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
+        private static readonly MemoryCache __varListCache = new(cacheOptions);
 
         public override IList<Variable> AllVariables
         {
@@ -160,7 +162,7 @@ namespace TermSAT.Formulas
                         .Select(_ => Variable.NewVariable(_))
                         .ToList();
 
-                    __varListCache.Add(this, variables);
+                    __varListCache.Set(this, variables, cacheEntryOptions);
                 }
 
                 return variables;

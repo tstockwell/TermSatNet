@@ -27,7 +27,7 @@ public static class RuleDatabaseExtensions
             .OrderByDescending(f => f.Id)
             .FirstOrDefault();
 
-        var formula = record != null ? Formula.Parse(record.Text) : null;
+        var formula = record != null ? Formula.GetOrParse(record.Text) : null;
         return formula;
     }
 
@@ -43,7 +43,7 @@ public static class RuleDatabaseExtensions
         db.InFormulaOrder().Where(_ => _.TruthValue == truthTable).Take(1);
 
     static public IQueryable<Formula> ToFormulas(this IQueryable<FormulaRecord>db) =>
-        db.Select(_ => Formula.Parse(_.Text));
+        db.Select(_ => Formula.GetOrParse(_.Text));
 
 
     static public IQueryable<FormulaRecord> GetAllNonCanonicalRecordsByTruthValue(this IQueryable<FormulaRecord> db, string truthTable) =>
@@ -108,17 +108,6 @@ public static class RuleDatabaseExtensions
 
     static public IQueryable<Formula> GetAllCanonicalRecordsInLexicalOrder(this IQueryable<FormulaRecord> db) => 
         db.GetAllCanonicalRecords().InFormulaOrder().ToFormulas();
-
-    static public List<TruthTable> GetAllTruthTables(this RuleDatabaseContext ctx)
-    {
-            var truthValues = ctx.FormulaRecords.AsNoTracking()
-                .OrderBy(f => f.TruthValue)
-                .Select(f => f.TruthValue)
-                .Distinct()
-                .ToList();
-            var truthTables = truthValues.Select(v => TruthTable.GetTruthTable(v)).ToList();
-            return truthTables;
-    }
 
     static public async Task<int> GetLengthOfCanonicalFormulasAsync(this DbSet<FormulaRecord> formulas, string truthTable) => 
         (await formulas.GetCanonicalRecordByTruthTable(truthTable).FirstAsync()).Length;

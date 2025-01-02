@@ -28,69 +28,69 @@ namespace TermSAT.Tests
         public void BasicReductionTests()
         {
             {
-                var nonCanonicalformula = Formula.Parse("*-.2*-.1.3");
-                var canonicalFormula = Formula.Parse("*-.1*-.2.3");
+                var nonCanonicalformula = Formula.GetOrParse("*-.2*-.1.3");
+                var canonicalFormula = Formula.GetOrParse("*-.1*-.2.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
-                var nonCanonicalformula = Formula.Parse("*-.2**.1.2.3");
-                var canonicalFormula = Formula.Parse("*-.1*-.2.3");
+                var nonCanonicalformula = Formula.GetOrParse("*-.2**.1.2.3");
+                var canonicalFormula = Formula.GetOrParse("*-.1*-.2.3");
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
-                var nonCanonicalformula = Formula.Parse("**.1.2-*.1.3");
-                var canonicalFormula = Formula.Parse("-*.1-*.2-.3");
+                var nonCanonicalformula = Formula.GetOrParse("**.1.2-*.1.3");
+                var canonicalFormula = Formula.GetOrParse("-*.1-*.2-.3");
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
-                var nonCanonicalformula = Formula.Parse("**.1.2-*.3.2");
-                var canonicalFormula = Formula.Parse("-**-.1.3.2");
+                var nonCanonicalformula = Formula.GetOrParse("**.1.2-*.3.2");
+                var canonicalFormula = Formula.GetOrParse("-**-.1.3.2");
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
-                var nonCanonicalformula = Formula.Parse("*.2*.1.3");
-                var canonicalFormula = Formula.Parse("*.1*.2.3");
+                var nonCanonicalformula = Formula.GetOrParse("*.2*.1.3");
+                var canonicalFormula = Formula.GetOrParse("*.1*.2.3");
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
-                var nonCanonicalformula = Formula.Parse("*-.2-*.1.2");
-                var canonicalFormula = Formula.Parse("*-.1.2");
+                var nonCanonicalformula = Formula.GetOrParse("*-.2-*.1.2");
+                var canonicalFormula = Formula.GetOrParse("*-.1.2");
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
-                var nonCanonicalformula = Formula.Parse("*-.1-*.2.3");
-                var canonicalFormula = Formula.Parse("**.2.3.1");
+                var nonCanonicalformula = Formula.GetOrParse("*-.1-*.2.3");
+                var canonicalFormula = Formula.GetOrParse("**.2.3.1");
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
-                var nonCanonicalformula = Formula.Parse("*-.1.1");
-                var canonicalFormula = Formula.Parse(".1");
+                var nonCanonicalformula = Formula.GetOrParse("*-.1.1");
+                var canonicalFormula = Formula.GetOrParse(".1");
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
-                var nonCanonicalformula = Formula.Parse("*.1T");
-                var canonicalFormula = Formula.Parse("T");
+                var nonCanonicalformula = Formula.GetOrParse("*.1T");
+                var canonicalFormula = Formula.GetOrParse("T");
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
-                var nonCanonicalformula = Formula.Parse("*.1F");
-                var canonicalFormula = Formula.Parse("-.1");
+                var nonCanonicalformula = Formula.GetOrParse("*.1F");
+                var canonicalFormula = Formula.GetOrParse("-.1");
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }
             {
-                var nonCanonicalformula = Formula.Parse("*.1.1");
-                var canonicalFormula = Formula.Parse("T");
+                var nonCanonicalformula = Formula.GetOrParse("*.1.1");
+                var canonicalFormula = Formula.GetOrParse("T");
                 var reducedFormula = nonCanonicalformula.ReduceUsingBasicScheme();
                 Assert.AreEqual(canonicalFormula, reducedFormula);
             }

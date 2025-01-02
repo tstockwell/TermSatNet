@@ -62,8 +62,8 @@ public class Nand_NoConstants_ReductionTests
     [TestMethod]
     public void ReduceFormula_TT_5()
     {
-        var nonCanonicalformula = (Nand)Formula.Parse("||.1.1|.1.1");
-        var canonicalFormula = Formula.Parse(".1");
+        var nonCanonicalformula = (Nand)Formula.GetOrParse("||.1.1|.1.1");
+        var canonicalFormula = Formula.GetOrParse(".1");
         Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
         var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
         Proof proof = Proof.GetReductionProof(nonCanonicalformula);
@@ -73,8 +73,8 @@ public class Nand_NoConstants_ReductionTests
     [TestMethod]
     public void ReduceFormula_TT_A()
     {
-        var nonCanonicalformula = (Nand)Formula.Parse("|.1|.1|.1.1");
-        var canonicalFormula = Formula.Parse("|.1.1");
+        var nonCanonicalformula = (Nand)Formula.GetOrParse("|.1|.1|.1.1");
+        var canonicalFormula = Formula.GetOrParse("|.1.1");
         Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
         var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
         Proof proof = Proof.GetReductionProof(nonCanonicalformula);
@@ -104,8 +104,8 @@ public class Nand_NoConstants_ReductionTests
     [TestMethod]
     public void ReduceDoubleNegationTest()
     {
-        var nonCanonicalformula = (Nand)Formula.Parse("|.1|.1|.1.1");
-        var canonicalFormula = Formula.Parse("|.1.1");
+        var nonCanonicalformula = (Nand)Formula.GetOrParse("|.1|.1|.1.1");
+        var canonicalFormula = Formula.GetOrParse("|.1.1");
         Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula).ToString(), TruthTable.GetTruthTable(canonicalFormula).ToString());
         var reducedFormula = NandReducer.Reduce(nonCanonicalformula);
         Proof proof = Proof.GetReductionProof(nonCanonicalformula);
