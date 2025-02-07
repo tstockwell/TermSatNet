@@ -8,7 +8,7 @@ Formulas are as simple as possible.
 There is one operator, nand, aka the Sheffer stroke.
 And numbered variables.
 That's it, no negation, no constants.
-The normal form uses Polish notation and the symbol '*' for the implication operator, followed by the antecedent and then consequent. 
+The normal form uses Polish notation and the symbol '|' for the nand operator, followed by the proximal and then the distal.  
 Variables are represented by the '.' followed by an integer number greater than 0 for representing variables.
 
 Some examples of formulas...

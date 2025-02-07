@@ -18,7 +18,7 @@ namespace TermSAT.Formulas
         /// </summary>
         public IDictionary<int, Formula> Replacements { get; internal set; }
 
-        public Formula ReducedFormula { get => Formula.WithReplacements(Replacements); }
+        public Formula ReducedFormula { get => Formula.AsFlatTerm().WithReplacements(Replacements); }
     }
 
 

@@ -12,7 +12,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace TermSAT.NandReduction;
 
 /// <summary>
-/// A proof is a list of reductions from a terms formula to a reduced formula that 
+/// A proof is a list of reductions from some formula to a reduced formula that 
 /// proves that the terms and reduced formulas are equivalent.
 /// 
 /// NandSAT basically works by building a set of proofs, for every term in a formula, to the terms canonical form.
@@ -227,7 +227,7 @@ public class Proof
     {
         get
         {
-            var terms = new FormulaDFSEnumerator(StartingFormula).ToArray();
+            var terms = StartingFormula.AsFlatTerm().ToArray();
             string[] mapped = new string[ReducedFormula.Length];
             for (int i = 0; i < mapped.Length; i++)
             {

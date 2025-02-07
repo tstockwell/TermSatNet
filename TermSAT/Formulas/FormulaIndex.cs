@@ -84,7 +84,7 @@ public static partial class FormulaIndex
         ctx.Database.ExecuteSqlRaw($"DELETE FROM {nameof(NodeContext.Nodes)}");
 
 
-    static public async Task AddGeneralizationAsync(this RuleDatabaseContext ctx, FormulaRecord formulaRecord)
+    static public async Task AddGeneralizationAsync(this ReRiteDbContext ctx, ReductionRecord formulaRecord)
     {
         var nodeSet = ctx.Lookup;
 
@@ -136,8 +136,10 @@ public static partial class FormulaIndex
         nodeRecord.Value = formulaRecord.Id;
     }
 
-    public static async IAsyncEnumerable<SearchResult> FindGeneralizationsAsync(this IQueryable<Node> ctx, Formula formulaToMatch, int maxMatchCount)
+    public static async Task<IEnumerable<SearchResult>> FindGeneralizationsAsync(this IQueryable<Node> ctx, Formula formulaToMatch, int maxMatchCount)
     {
+        List<SearchResult> results = null;
+
         //  this method does a depth-first search of the node tree
         var todo = new Stack<(int position, Dictionary<int, Formula> substitutions, Node node)>();
         {
@@ -220,7 +222,16 @@ public static partial class FormulaIndex
                 if (formulaToMatch.Length <= currentPosition)
                 {
                     matchCount++;
-                    yield return new SearchResult(state.node, currentSubstitutions);
+                    var result = new SearchResult(state.node, currentSubstitutions);
+                    if (maxMatchCount <= 1)
+                    {
+                        return [result];
+                    }
+                    if (results == null)
+                    {
+                        results = new();
+                    }
+                    results.Add(result);
                 }
                 continue;
             }
@@ -238,5 +249,10 @@ public static partial class FormulaIndex
             }
 
         }
+        if (results == null)
+        {
+            return Enumerable.Empty<SearchResult>();
+        }
+        return results;
     }
 }

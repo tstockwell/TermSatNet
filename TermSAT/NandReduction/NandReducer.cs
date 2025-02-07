@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using TermSAT.Formulas;
+using TermSAT.RuleDatabase;
 
 namespace TermSAT.NandReduction;
 
@@ -16,7 +20,7 @@ namespace TermSAT.NandReduction;
 /// For every formula a global proof is maintained. 
 /// A proof specifies...
 ///     - Reduction: an atomic Reduction to a simpler form of a formula based on a rule.
-///         This reduction must be populated and never changes.  
+///         This nextReduction must be populated and never changes.  
 ///         If the formula is canonical then NextReduction will have a description like "formula is canonical".  
 ///     - Result: the simplest known form of the formula. 
 ///         Basically a slot for memoizing the last value found for ReducedFormula.
@@ -36,56 +40,75 @@ namespace TermSAT.NandReduction;
 /// </summary>
 public static class NandReducer
 {
+    public record struct WildcardReduction(ReductionRecord Reduction, int ReductionPosition, int StartingPosition)
+    {
+        public static WildcardReduction NotFound() => new(null,-1,-1);
+    }
+
     /// <summary>
-    /// Returns the first reduction that can be produced by all of NandReducers' internal rules (like wildcard analysis or proof-rules).
-    /// Returns false if no reduction is found, in which case the given formula is canonical.  
+    /// Returns the first nextReduction that can be produced by all of NandReducers' internal rules (like wildcard analysis or proof-rules).
+    /// Returns null if no next Reduction can be produced, in which case the given formula is canonical.  
     /// </summary>
-    static bool TryFindReduction(this Formula startingFormula, out Reduction result)
+    public static async Task<ReductionRecord> TryGetNextReductionAsync(this ReRiteDbContext db, ReductionRecord startingRecord)
     {
 #if DEBUG
         //Debug.Assert(!reductionProof.HasReduced(startingFormula), $"reductionProof has already reduced formula {startingFormula}");
-        if (startingFormula.Equals(Formula.GetOrParse("|T||.1.3|T.2")))
-        {
+        //if (startingFormula.Equals(Formula.GetOrParse("|T||.1.3|T.2")))
+        //{
 
-        }
+        //}
 #endif
 
-        var lastReduction = startingFormula;
-
-        {   // get any cached value
-            var reductionProof = Proof.GetReductionProof(startingFormula);
-            if (reductionProof.ReducedFormula != null)
-            {
-                lastReduction = reductionProof.ReducedFormula;
-            }
+        if (0 < startingRecord.NextReductionId)
+        {
+            var nextReduction = await db.Formulas.TryGetReductionRecordAsync(startingRecord.NextReductionId);
+            Debug.Assert(nextReduction != null, $"internal error: formula not found {startingRecord.NextReductionId}");
+            return nextReduction;
         }
 
-        List<Reduction> incompleteProofs = new();
+        List<ReductionRecord> incompleteProofs = new();
 
         // if given formula is not a nand then it must be a variable or constant and is not reducible.
-        if (lastReduction is Nand lastNand)
+        ReductionRecord result= null;
+        if (startingRecord.Formula is Nand lastNand)
         {
-            if (lastNand.TryReduceDescendants(out result)) 
+            result= await db.TryLookupReductionAsync(startingRecord);
+            if (result != null)
             {
-                return true;
+                goto FoundReduction;
             }
 
-            if (lastNand.TryReduceConstants(out result))
+
+            result= await db.TryReduceDescendantsAsync(startingRecord);
+            if (result != null) 
             {
-                return true;
+                goto FoundReduction;
             }
 
-            if (lastNand.TryReduceWildcards(out result))
+            result = await db.TryReduceConstantsAsync(startingRecord);
+            if (result != null)
             {
-                return true;
+                goto FoundReduction;
             }
 
+            result = await db.TryReduceCommutativeFormulas(startingRecord);
+            if (result != null)
+            {
+                goto FoundReduction;
+            }
+
+            result = await db.TryGetWildcardReductionAsync(startingRecord);
+            if (result != null)
+            {
+                goto FoundReduction;
+            }
+
+            result = await db.TryGetSwappedWildcardReductionAsync(startingRecord);
+            if (result != null)
+            {
+                goto FoundReduction;
+            }
             //if (lastNand.TryReduceWildcards_NoConstants(out result))
-            //{
-            //    return true;
-            //}
-
-            //if (lastNand.TryReduceCommutativeFormulas(out result))
             //{
             //    return true;
             //}
@@ -96,68 +119,199 @@ public static class NandReducer
             //}
         }
 
-        result = null;
-        return false;
+        return null; // reduction not found
+
+        FoundReduction:;
+
+        return result;
     }
 
     /// <summary>
-    /// Repeatedly reduces startingFormula to its canonical form.  
-    /// The reduction process stops when no more reductions can be made.
-    /// Returns a logically equivalent formula in canonical form.
+    /// Repeatedly reduces startingFormula until it reaches its canonical form.  
+    /// The process stops when no more reductions can be made.
+    /// Always returns a logically equivalent formula in canonical form.  
     /// </summary>
-    public static Formula Reduce(this Formula startingFormula)
+    public static async Task<ReductionRecord> GetCanonicalRecordAsync(this ReRiteDbContext db, ReductionRecord reductionRecord)
     {
-        var startingProof = Proof.GetReductionProof(startingFormula);
-        if (!startingProof.IsComplete())
+        if (0 < reductionRecord.CanonicalReductionId)
         {
-            // Repeatedly reduce formulas, depth-first, until starting formula is complete
-            Stack<Proof> todo = new Stack<Proof>();
-            todo.Push(startingProof);
-            var reducedFormula = startingProof.ReducedFormula;
-            if (reducedFormula == null) 
-            { 
-                reducedFormula = startingFormula;
-            }
+            var canonicalRecord = await db.Formulas.TryGetReductionRecordAsync(reductionRecord.CanonicalReductionId);
+            Debug.Assert(canonicalRecord != null, $"Failed to find canonical formula: {reductionRecord.CanonicalReductionId}");
+            return canonicalRecord;
+        }
 
-            while (todo.Any())
+        var mostReducedRecord = await db.Formulas.GetLastReductionAsync(reductionRecord); 
+
+        // Repeatedly reduce formulas, depth-first, until starting formula is complete
+        Stack<ReductionRecord> todo = new Stack<ReductionRecord>();
+        todo.Push(mostReducedRecord);
+
+        while (todo.Any())
+        {
+            var todoProof = todo.Pop();
+            mostReducedRecord = todoProof;
+
+            if (!(await db.Formulas.IsCompleteAsync(todoProof)))
             {
-                var todoProof = todo.Peek();
-                if (!todoProof.IsComplete())
+                // handle an empty proof
+                if (todoProof.NextReductionId <= 0)
                 {
-                    // handle an empty proof
-                    if (todoProof.NextReduction == null)
+                    var nextReduction = await db.TryGetNextReductionAsync(todoProof);
+                    if (nextReduction != null)
                     {
-                        if (todoProof.StartingFormula.TryFindReduction(out var reduction))
-                        {
-                            todoProof.SetNextReduction(reduction);
-                            todo.Push(Proof.GetReductionProof(reduction.ReducedFormula));
-                            reducedFormula = reduction.ReducedFormula;
-                        }
-                        else
-                        {
-                            // the given formula is canonical
-                            todoProof.AddCompletionMarker(todoProof.StartingFormula);
-                            reducedFormula = todoProof.StartingFormula;
-                        }
-                        continue;
+                        var lastReduction = await db.Formulas.GetLastReductionAsync(nextReduction);
+                        todo.Push(lastReduction);
                     }
-
-                    // if last formula is not yet complete then complete it first.
-                    var lastProof = Proof.GetReductionProof(todoProof.ReducedFormula);
-                    if (!lastProof.IsComplete())
+                    else
                     {
-                        todo.Push(lastProof);
-                        continue;
+                        // the given formula is canonical
+                        db.Formulas.AddCompletionMarker(todoProof);
                     }
-                    Debug.Assert(lastProof.ReducedFormula.CompareTo(reducedFormula) <= 0);
-                    reducedFormula = lastProof.ReducedFormula;
-
-                    // all that's missing is a completion marker, add it
-                    todoProof.AddCompletionMarker(todoProof.StartingFormula);
+                    continue;
                 }
-                todo.Pop();
+
+                // if last formula is not yet complete then complete it first.
+                var lastProof = await db.Formulas.GetLastReductionAsync(todoProof);
+                if (!(await db.Formulas.IsCompleteAsync(todoProof)))
+                {
+                    todo.Push(lastProof);
+                    continue;
+                }
+                Debug.Assert(lastProof.Formula.CompareTo(mostReducedRecord.Formula) <= 0);
+                mostReducedRecord = lastProof; // lastProof is the canonical form of todoProof
+
+                // all that's missing is a completion marker, add it
+                db.Formulas.AddCompletionMarker(todoProof);
             }
         }
-        return startingProof.ReducedFormula;
+
+        return mostReducedRecord;
     }
+
+
+    /// <summary>
+    /// Returns a tuple of...
+    ///     - WildcardReduction : the first reduction of startingRecord that identifies the target term as a wildcard.  
+    ///     - ReductionPosition : the position within WildcardReduction.Formula of the target term.  
+    ///     - StartingPosition : the position within startingRecord.Formula of the target term.  
+    /// 
+    /// Repeatedly reduces startingFormula until...
+    ///     - a reduction that identifies targetTerm as a wildcard is found.  
+    ///     - all instances of the target term have been reduced.  
+    ///     - startingRecord is reduced to its canonical form and cant be reduced any further.  
+    /// Returns a tuple with WildcardReduction == null if no wildcard reduction was found.
+    /// 
+    /// </summary>
+    /// <param name="targetTerm">any sub-term of the starting formula that's not a constant</param>
+    public static async Task<WildcardReduction> TryGetWildcardReductionAsync(this ReRiteDbContext db, ReductionRecord startingRecord, Formula targetTerm, Constant testValue)
+    {
+        // constants cant be reduced
+        if (startingRecord.VarCount == 0)
+        {
+            return WildcardReduction.NotFound();
+        }
+
+        // if formula is known to be canonical then formula cant be reduced
+        if (startingRecord.IsCanonical)
+        {
+            return WildcardReduction.NotFound();
+        }
+
+        // follow/create reductions while looking for one that identifies a wildcard
+        var prevReduction = startingRecord;
+        var prevReductionTerms = prevReduction.Formula.AsFlatTerm().ToArray();
+        var nextReduction = await db.TryGetNextReductionAsync(prevReduction);
+        var proofPath = new List<ReductionRecord>();
+        while (nextReduction != null)
+        {
+            var nextFlatTerms = nextReduction.Formula.AsFlatTerm().ToArray();
+
+            if (prevReduction.RuleDescriptor == "|.1F => T" || prevReduction.RuleDescriptor == "|F.1 => T")
+            {
+                // if .1 contains targetTerm then targetTerm is a wildcard
+                {
+                    for (int i = 0; i < prevReductionTerms.Length; i++)
+                    {
+                        var startingTerm = prevReductionTerms[i];
+                        if (startingTerm.Equals(targetTerm))
+                        {
+                            int startingPosition = i;
+                            foreach (var r in proofPath) 
+                            {
+                                startingPosition = r.Mapping[startingPosition];
+                            }
+                            if (0 <= startingPosition) 
+                            {
+                                return new(nextReduction, i, startingPosition); // WILDCARD FOUND!
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Replacing a target term during a reduction also identifies a wildcard.
+            // Currently, replacement only happens during wildcard analysis
+            // See NandSchemeReductionTests.ReduceFormulaWithManyTargetsOneWildcard for an example.
+            else if (prevReduction.RuleDescriptor.StartsWith("wildcard")) 
+            {
+                var reductionPosition = -1;
+                {
+                    int i = 0;
+                    var wildIdentifier = testValue.Equals(Constant.TRUE) ? Constant.FALSE : Constant.TRUE;
+                    foreach (var term in nextFlatTerms)
+                    {
+                        if (term.Equals(wildIdentifier))
+                        {
+                            var startingTerm = prevReductionTerms[i];
+                            if (!term.Equals(startingTerm))
+                            {
+                                reductionPosition = i;
+                                break;
+                            }
+                        }
+                        i++;
+                    }
+                }
+                if (0 <= reductionPosition)
+                {
+                    var ruleTarget = prevReductionTerms[reductionPosition];
+                    int subtermPosition = ruleTarget.PositionOf(targetTerm);
+                    if (0 <= subtermPosition)
+                    {
+                        var adjustedReductionPosition = reductionPosition + subtermPosition;
+                        int startingPosition = adjustedReductionPosition;
+                        foreach (var r in proofPath)
+                        {
+                            startingPosition = r.Mapping[startingPosition];
+                        }
+                        WildcardReduction wildcardReduction = new(nextReduction, adjustedReductionPosition, startingPosition); // WILDCARD FOUND!
+
+#if DEBUG
+                        if (adjustedReductionPosition != -1)
+                        {
+                            if (!(0 <= adjustedReductionPosition && adjustedReductionPosition < startingRecord.Length))
+                            {
+                                // probably indicates that the mapping is wrong or doesnt map enough variable instances
+                                throw new AssertFailedException("invalid reduction mapping found");
+                            }
+                            if (!(targetTerm.Equals(startingRecord.Formula.GetFormulaAtPosition(adjustedReductionPosition))))
+                            {
+                                throw new AssertFailedException($"an instance of the subterm {targetTerm} was not found at position {adjustedReductionPosition}");
+                            }
+                        }
+#endif
+                    }
+                }
+            }
+
+            // move to, or create, the next reduction
+            proofPath.Add(prevReduction);
+            prevReduction = nextReduction;
+            prevReductionTerms = nextFlatTerms;
+            nextReduction = await db.TryGetNextReductionAsync(nextReduction);
+        }
+
+        return WildcardReduction.NotFound(); // no wildcard reduction found;
+    }
+
 }

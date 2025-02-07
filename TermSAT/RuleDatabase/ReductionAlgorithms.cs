@@ -221,7 +221,7 @@ namespace TermSAT.RuleDatabase
         ///// Removes constants from a formula
         ///// </summary>
         ///// <returns>A reduced formula, or the original formula if the orginal formula connot be reduced.</returns>
-        //public static bool TryReduceConstants(FlatTerm flatterm, out ReplacementReduction reduction)
+        //public static bool TryReduceConstantsAsync(FlatTerm flatterm, out ReplacementReduction reduction)
         //{
         //    reduction = null;
             

@@ -38,10 +38,10 @@ public static partial class FormulaIndex
         /// -1 == n/a
         /// </summary>
         [Required]
-        public int Value { get; set; }
-        public const int VALUE_NONE = -1;
+        public long Value { get; set; }
+        public const long VALUE_NONE = -1;
 
-        public Node(int parent, int key, int value)
+        public Node(int parent, int key, long value)
         {
             Parent = parent;
             Key = key;

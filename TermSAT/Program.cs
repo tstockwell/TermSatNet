@@ -4,6 +4,9 @@ using TermSAT.RuleDatabase;
 using System.Diagnostics;
 using TermSAT.NandReduction;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace TermSAT
 {
@@ -47,7 +50,12 @@ namespace TermSAT
             var schemeEquivalenceTest = new Command("nand-rule-generation-3");
             schemeEquivalenceTest.SetHandler(async () =>
             {
-                Trace.Listeners.Add(new TextWriterTraceListener("nand-rule-generation-3-trace.log"));
+                //ServiceProvider serviceProvider = new ServiceCollection()
+                //    .AddLogging((loggingBuilder) => loggingBuilder
+                //        .SetMinimumLevel(LogLevel.Trace)
+                //        .AddConsole())
+                //    .BuildServiceProvider();
+                //Trace.Listeners.Add(new TextWriterTraceListener("nand-rule-generation-3-trace.log"));
 
                 await TermSAT.NandReduction.Scripts.RunNandRuleGenerator("nand-rules-3.db", "nand-rules-index.db");
                 //var database = new FormulaDatabase("nand-rules-3.db");

@@ -1,19 +1,26 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using TermSAT.Common;
 using TermSAT.Formulas;
+using TermSAT.RuleDatabase;
 
 namespace TermSAT.NandReduction;
 
-public static class NandReducerCommutativeRules
+public static class CommutativeRules
 {
 
     /// <summary>
     /// 'Commutative' rules are rules where the length doesn't change, just the symbols are rearranged.  
     /// </summary>
-    public static bool TryReduceCommutativeFormulas(this Nand startingNand, out Reduction result)
+    public static async Task<ReductionRecord> TryReduceCommutativeFormulas(this ReRiteDbContext db, ReductionRecord startingRecord)
     {
+        // if given formula is not a nand then it must be a variable or constant and is not reducible.
+        if (!(startingRecord.Formula is Nand startingNand))
+        {
+            return null;
+        }
 
         // |.2.1 => |.1.2 
         // A pure ordering rule, because the length doesn't change, just the symbols are rearranged.
@@ -22,25 +29,41 @@ public static class NandReducerCommutativeRules
         // Wildcard analysis does this by noting that .1 and .2 are wildcards for each other, so they
         // can be swapped for each other.
         // And that, swapping them actually results in a 'reduced' formula.  
+        //
+        // NOTE 1/22/25...
+        //  Still no such thing as 'instance swapping' in the reduction algorithm.
+        //  The concept of wildcard as used here refers to the fact that when one term is F the other is irrelevant.
+        //  Therefore we can swap them for each other, but only when the result is simpler.
         {
             if (startingNand.Subsequent.CompareTo(startingNand.Antecedent) < 0)
             {
                 var reducedFormula = Formulas.Nand.NewNand(startingNand.Subsequent, startingNand.Antecedent);
-                var mapping = Enumerable.Repeat(-1, 1)
+                var nextReduction = new ReductionRecord(reducedFormula);
+
+                startingRecord.RuleDescriptor = "|.2.1 => |.1.2";
+                startingRecord.Mapping =  Enumerable.Repeat(-1, 1)
                     .Concat(Enumerable.Range(startingNand.Antecedent.Length + 1, startingNand.Subsequent.Length))
                     .Concat(Enumerable.Range(1, startingNand.Antecedent.Length))
-                    .ToImmutableList();
-                result = new Reduction(startingNand, reducedFormula, "|.2.1 => |.1.2", mapping);
-                return true;
+                    .ToArray();
+                startingRecord.NextReductionId =  nextReduction.Id;
+
+                await db.SaveChangesAsync();
+
+                return nextReduction;
+
             }
         }
 
+
+        /**
+         * 
+         * 
+         
         // |.2|T|.1.3 => |.1|T|.2.3.  
         // A pure ordering rule, because the length doesn't change, just the symbols are rearranged.
         // swap .1 <-> .2
         // NOTE!!!!!!: This rule could be subsumed by wildcard analysis if wildcard analysis is extended to discover 
         // when two terms are wildcards for each other and swapping them reduces the formula.
-        // PPS: We can easily see that 1. and .2 are swappable because they can both be swapped with the T.
         {
             if (startingNand.Subsequent is Formulas.Nand nand
                 && nand.Antecedent == Constant.TRUE
@@ -63,7 +86,7 @@ public static class NandReducerCommutativeRules
                         .Concat(Enumerable.Range(1, startingNand.Antecedent.Length)) //.2
                         .Concat(Enumerable.Range(startingNand.Antecedent.Length + nandSubNand.Antecedent.Length + 4, nandSubNand.Subsequent.Length)) //.3
                         .ToImmutableList();
-                    result = new Reduction(startingNand, reducedFormula, "|.2|T|.1.3 => |.1|T|.2.3", mapping);
+                    result = new ReductionRecord(startingNand, reducedFormula, "|.2|T|.1.3 => |.1|T|.2.3", mapping);
                     return true;
                 }
             }
@@ -181,13 +204,15 @@ public static class NandReducerCommutativeRules
                         .Concat(Enumerable.Range(nandAnt.Antecedent.Length + 3, nandAntSub.Antecedent.Length)) // .2
                         .ToImmutableList();
 
-                    result = new Reduction(startingNand, reducedFormula, "||.1|.2.3|.3|T.1 => ||.1|T.3|.3|.1.2", mapping);
+                    result = new ReductionRecord(startingNand, reducedFormula, "||.1|.2.3|.3|T.1 => ||.1|T.3|.3|.1.2", mapping);
                     return true;
                 }
             }
         }
+        *
+        *
+        **/
 
-        result = null;
-        return false;
+        return null;
     }
 }

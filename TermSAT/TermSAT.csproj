@@ -20,15 +20,24 @@
   <ItemGroup>
     <Compile Remove="Common\ServerCommandLineInterface.cs" />
     <Compile Remove="Formulas\FormulaSequence-Array.cs" />
+    <Compile Remove="NandReduction\DistributiveRules.cs" />
     <Compile Remove="NandReduction\NandFormulaConstructor.cs" />
     <Compile Remove="NandReduction\NandFormulaGenerator.cs" />
     <Compile Remove="NandReduction\NandReducer - Copy.cs" />
     <Compile Remove="NandReduction\NandReducerDistributiveRules.cs" />
+    <Compile Remove="NandReduction\NandReducerWildcardRules_NoConstants.cs" />
+    <Compile Remove="NandReduction\Proof.cs" />
+    <Compile Remove="NandReduction\Reduction.cs" />
     <Compile Remove="NandReduction\Scripts_RuleGenerator_KnuthBendix.cs" />
+    <Compile Remove="NandReduction\WildcardAnalyzer.cs" />
     <Compile Remove="NandReduction\Workers.cs" />
     <Compile Remove="RuleDatabase\DatabaseReport.cs" />
     <Compile Remove="RuleDatabase\FormulaConstructor.cs" />
     <Compile Remove="RuleDatabase\FormulaGenerator.cs" />
+    <Compile Remove="RuleDatabase\FormulaRecord.cs" />
+    <Compile Remove="RuleDatabase\FormulaRecordExtensions.cs" />
+    <Compile Remove="RuleDatabase\ReductionRule.cs" />
+    <Compile Remove="RuleDatabase\RuleDatabaseContext.cs" />
     <Compile Remove="RuleDatabase\RuleGenerator.cs" />
     <Compile Remove="RuleDatabase\RuleRepository.cs" />
     <Compile Remove="RuleDatabase\TruthTables.cs" />
@@ -37,6 +46,7 @@
     <Compile Remove="Solver\CompletionGenerator.cs" />
     <Compile Remove="Solver\Solver.cs" />
     <Compile Remove="Tests\CompletionTests.cs" />
+    <Compile Remove="Tests\Nand_NoConstants_ReductionTests.cs" />
     <Compile Remove="Tests\RuleDatabaseTests.cs" />
     <Compile Remove="Tests\RuleReductionTests.cs" />
     <Compile Remove="Tests\RuleRepositoryTests.cs" />
@@ -45,7 +55,9 @@
   <ItemGroup>
     <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.6.4" />

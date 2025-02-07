@@ -55,7 +55,6 @@ namespace TermSAT.Formulas
 
         public int Length { get; }
 
-        public string _text= null;
         public string Text => ToString();
 
         /// <param name="length">The number of symbols in this formula</param>
@@ -372,7 +371,7 @@ namespace TermSAT.Formulas
         /**
          * @return a list of all subterms.  Includes this formula.
          */
-        virtual public ICollection<Formula> AllSubterms
+        virtual public ICollection<Formula>  AllSubterms
         {
             get
             {

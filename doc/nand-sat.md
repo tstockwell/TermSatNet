@@ -1,4 +1,36 @@
-# NandSAT - A SAT solver with a polynomial time complexity.  
+# ReRite - A trainable SAT solver with an eventually polynomial time complexity.  
+
+ReRite is a [term rewriting system](https://en.wikipedia.org/wiki/Rewriting#Term_rewriting_systems) 
+designed to reduce propositional formulas in nand-normal-form to their canonical form (the shortest, simplest equivalent formula).  
+ReRite is composed of a reduction engine and a database of reduction rules.  
+As ReRite solves new formulas it also discovers new rules and adds them to its database of rules.  
+If trained with enough formulas then eventually its database will contain 
+a finite and complete (in the Knuth-Bendix sense) set of reduction rules 
+that are capable of reducing any formula to its canonical form, in a polynomial number of steps.  
+
+## Theoretical Foundation
+Here's a list of things that will need to be proved true in order for ReRites' claims to be true...
+- That wildcard analysis is sound 
+	> That rules work correctly and produce simpler, equivalent formulas
+	> That formulas that are not reducible via wildcard analysis are canonical
+- That wildcard analysis is functionally complete, that is, it reduces any given non-canonical formula.
+- That if a formula and its canonical form are both the same length 
+	then wildcard analysis reduces the formula to its canonical form in one step
+- That eventually the set of rules in the RR database will be complete, in the Knuth-Bendix sense.
+	> This implies that the Knuth-Bendix completion will terminate and the set of rules in the RR database will be finite. 
+	> Show that the final set is the Knuth-Bendix closure of this axiom set (see https://publications.anl.gov/anlpubs/2000/06/36482.pdf) 
+	> and is therefore complete.
+	> (x|x)|(x|x)=x,  x|(y|(y|y)) = x|x,  (x|(y|z))|(x|(y|z)) = ((y|y)|x)|((z|z)|x)
+	> Show that the final set is the Knuth-Bendix closure of the ReRite axiom set and that set has no more than 6 variables.
+- That wildcard analysis is equivalent to a complete set of reduction rules.  
+	> That is, that wildcard analysis can reduce any formula that is reducible using reduction rules
+	> Is it enough that wildcard analysis subsumes any/all the axioms?
+- That rules, and therefore wildcard analysis, can reduce nand formulas to their canonical form in a polynomial (4Le2) number of steps.  
+	> Show that applying a reduction either reduces the length of the formula, or translates the formula to another formula of equal length.   
+	> BUT, keep in mind any term can only be reduced once, because after applying a reduction the result is canonical and cant be further reduced.
+	> To minimalize the # of steps, start with the first (top-level) term and work in a breadth-first manner.
+
+
 
 NandSAT is a 'SAT solver' for a system of propositional logic based on formulas in 'nand normal form'.  
 NandSAT doesn't work like other SAT solvers, it doesn't use resolution, it's a [term rewriting system](https://en.wikipedia.org/wiki/Rewriting#Term_rewriting_systems).  
@@ -210,4 +242,8 @@ Must
 
 ## Trie idea for competitive solver
 NandSAT's native reduction algorithm gebarety
+
+
+
+
 

@@ -83,11 +83,7 @@ namespace TermSAT.NandReduction
         /// </summary>
         public IImmutableList<Reduction> IncompleteProofs { get; }
 
-        /// <summary>
-        /// The child proof used to reduce the result of an expansive rule (for instance, |a|bc -> |T||a|Tb|a|Tc -> *).  
-        /// Null otherwise;
-        /// </summary>
-        public Proof ChildProof { get; }
+      
 
 #if DEBUG
         /// <summary>
@@ -97,7 +93,7 @@ namespace TermSAT.NandReduction
         public string MappedFormula { 
             get
             {
-                var terms = new FormulaDFSEnumerator(StartingFormula).ToArray();
+                var terms = StartingFormula.AsFlatTerm().ToArray();
                 string[] mapped = new string[ReducedFormula.Length];
                 for (int i = 0; i < mapped.Length; i++)
                 {
@@ -125,7 +121,6 @@ namespace TermSAT.NandReduction
             {
                 IncompleteProofs = ImmutableList<Reduction>.Empty;
             }
-            ChildProof = childProof;
 
             Validate();
         }

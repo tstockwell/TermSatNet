@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using TermSAT.Formulas;
+using TermSAT.RuleDatabase;
 
 namespace TermSAT.NandReduction;
 
@@ -32,7 +33,7 @@ namespace TermSAT.NandReduction;
 ///     - if reducing the result identifies a wildcard then 
 ///     - replacing all matching terms in the formulas subsequent the opposite of the test value.  
 /// It was thought at the time that just finding the first such wildcard was sufficient.  
-/// It was also though that there was a performance advantage in stopping a reduction after the first wildcard was found.  
+/// It was also thought that there was a performance advantage in stopping a reduction after the first wildcard was found.  
 /// But it turns out that its necessary for all matching instances of the test term to be wildcards.
 /// 
 /// </summary>
@@ -66,7 +67,7 @@ public class WildcardAnalyzer : Proof
     //public ReductionResult WildcardReduction { get; private set; }
 
     /// <summary>
-    /// The position within StartingFormula of an instance of Subterm also a 'wildcard'.
+    /// The position within Formula of an instance of Subterm also a 'wildcard'.
     /// </summary>
     public int ReductionPosition { get; private set; } = -2;
     public bool FoundReductionTarget() => 0 <= ReductionPosition;
@@ -85,12 +86,12 @@ public class WildcardAnalyzer : Proof
 
     /// <summary>
     /// This method detects wildcards.  
-    /// It works by tracking, for each reduction, the position of all instances of SubTerm in StartingFormula.  
+    /// It works by tracking, for each reduction, the position of all instances of SubTerm in Formula.  
     /// When a wildcard is detected it calculates the position, in the starting formula, of the matching 
     /// wildcard in the reduction.  
     /// </summary>
     /// <param name="reduction"></param>
-    override public bool SetNextReduction(Reduction reduction)
+    override public bool SetNextReduction(ReductionRecord reduction)
     {
         if (ReductionPosition < -1)
         {
@@ -99,10 +100,10 @@ public class WildcardAnalyzer : Proof
             {
                 // discover the position at which the reduction occurred
                 var reductionPosition = -1;
-                var startingFlatTerms = new FormulaDFSEnumerator(StartingFormula).ToArray();
+                var startingFlatTerms = StartingFormula.AsFlatTerm().ToArray();
                 {
                     int i = 0;
-                    foreach (var term in new FormulaDFSEnumerator(ReducedFormula))
+                    foreach (var term in ReducedFormula.AsFlatTerm())
                     {
                         if (term.Equals(Constant.TRUE))
                         {
@@ -159,7 +160,7 @@ public class WildcardAnalyzer : Proof
                 var reductionPosition = -1;
                 int i = 0;
                 var reducedFlatTerm = reduction.ReducedFormula.AsFlatTerm();
-                var startingFlatTerm = reduction.StartingFormula.AsFlatTerm();
+                var startingFlatTerm = reduction.Formula.AsFlatTerm();
                 var wildIdentifier = TestValue.Equals(Constant.TRUE) ? Constant.FALSE : Constant.TRUE;
                 foreach (var term in reducedFlatTerm)
                 {

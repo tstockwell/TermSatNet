@@ -9,7 +9,7 @@ namespace TermSAT.Formulas
      * are written.  Basically that means that implication antecedents come before consequents.
      * The first formula returned is the enumerated formula itself.
      */
-    public class FormulaDFSEnumerator : IEnumerator<Formula>, IEnumerable<Formula>
+    public class FormulaDFSEnumerator : IEnumerator<Formula>
     {
         private readonly Formula formula;
         private readonly Stack<Formula> stack = new Stack<Formula>();
@@ -65,16 +65,6 @@ namespace TermSAT.Formulas
         public void Reset()
         {
             this.Current = null;
-        }
-
-        public IEnumerator<Formula> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
         }
     }
 

@@ -78,11 +78,11 @@ namespace TermSAT.Formulas
                 List<Variable> variables;
                 if (__varListCache.TryGetValue(this, out variables))
                     return variables;
-                variables= new List<Variable>() { this };
                 lock (__varListCache)
                 {
                     if (__varListCache.TryGetValue(this, out variables))
                         return variables;
+                    variables= new List<Variable>() { this };
                     __varListCache.Set(this, variables, cacheEntryOptions);
                 }
                 return variables;

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace TermSAT.Formulas
 {
@@ -20,54 +21,57 @@ namespace TermSAT.Formulas
 
     public static class FormulaSequenceExtensions
     {
-        public static Formula[] AsFlatTerm(this Formula formula) => new FormulaDFSEnumerator(formula).ToArray();
+        public static Formula[] AsFlatTerm(this Formula formula)
+        {
+            Formula[] flatterm = new Formula[formula.Length];
+            int i = 0;
+            var terms = new FormulaDFSEnumerator(formula);
+            while (terms.MoveNext())
+            {
+                flatterm[i++] = terms.Current;
+            }
+            return flatterm;
+        }
+
+        public static Formula AsFormula(this IEnumerable<Formula> flatterm)
+        {
+            var builder = new StringBuilder();
+            foreach (var term in flatterm)
+            {
+                if (term is Nand)
+                {
+                    builder.Append('|');
+
+                }
+                else
+                {
+                    builder.Append(term.ToString());
+                }
+            }
+
+            var result = Formula.GetOrParse(builder.ToString());
+            return result;
+        }
 
         /**
          * Creates a new formula from a DFS ordering and some changes
          */
-        public static Formula WithReplacements(this IFlatTerm<Formula> sequence, IDictionary<int, Formula> replacements)
+        public static Formula WithReplacements(this Formula[] flatterm, IDictionary<int, Formula> replacements)
         {
-            Formula formula;
-
-            Stack<Formula> stack = new Stack<Formula>();
-            for (int i = sequence.Length; 0 < i--;)
+            var sequence = new List<Formula>(flatterm);
+            foreach (var index in replacements.Keys.OrderDescending())
             {
-                if (!replacements.TryGetValue(i, out Formula subformula))
-                    subformula = sequence[i];
-                if (subformula is Negation)
-                {
-                    Formula f = stack.Pop();
-                    stack.Push(Negation.NewNegation(f));
-                }
-                else if (subformula is Implication)
-                {
-                    Formula antecendent = stack.Pop();
-                    Formula consequent = stack.Pop();
-                    stack.Push(Implication.NewImplication(antecendent, consequent));
-                }
-                else if (subformula is Variable)
-                {
-                    stack.Push(subformula);
-                }
-                else if (subformula == Constant.TRUE)
-                {
-                    stack.Push(Constant.TRUE);
-                }
-                else if (subformula == Constant.FALSE)
-                {
-                    stack.Push(Constant.FALSE);
-                }
-                else
-                    throw new Exception("wtf");
+                var formula = flatterm[index];
+                var replacementFormula = replacements[index];
+                sequence = sequence.GetRange(0, index)
+                    .Concat(replacementFormula.AsFlatTerm())
+                    .Concat(sequence.GetRange(index + formula.Length, sequence.Count - index - formula.Length))
+                    .ToList();
             }
 
-            if (stack.Count != 1)
-                throw new Exception("hmm, looks like an invalid formula DFS ordering");
-
-            formula = stack.Pop();
-            return formula;
+            var result = sequence.AsFormula();
+            return result;
         }
-
 
     }
 
