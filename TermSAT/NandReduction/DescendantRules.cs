@@ -19,19 +19,19 @@ public static class DescendantRules
             return null;
         }
 
-        var antecedentRecord = await db.GetReductionRecordAsync(startingNand.Antecedent);
+        var antecedentRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Antecedent);
         var canonicalAntecedent = await db.GetCanonicalRecordAsync(antecedentRecord);
 
-        var subsequentRecord = await db.GetReductionRecordAsync(startingNand.Subsequent);
+        var subsequentRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Subsequent);
         var canonicalSubsequent = await db.GetCanonicalRecordAsync(subsequentRecord);
         var reduced = Nand.NewNand(canonicalAntecedent.Formula, canonicalSubsequent.Formula);
         if (reduced.CompareTo(startingNand) < 0)
         {
-            var antProof = await db.GetReductionRecordAsync(startingNand.Antecedent); // another thread may have changed mapping, so need to update
-            var subProof = await db.GetReductionRecordAsync(startingNand.Subsequent);
+            var antProof = await db.GetMostlyCanonicalRecordAsync(startingNand.Antecedent); // another thread may have changed mapping, so need to update
+            var subProof = await db.GetMostlyCanonicalRecordAsync(startingNand.Subsequent);
             var antMapping = antProof.Mapping.Select(_ => (_ < 0) ? _ : _ + 1);
             var submapping = subProof.Mapping.Select(_ => (_ < 0) ? _ : _ + startingNand.Antecedent.Length + 1);
-            var nextReduction = await db.GetReductionRecordAsync(reduced);
+            var nextReduction = await db.GetMostlyCanonicalRecordAsync(reduced);
 
             startingRecord.RuleDescriptor = "reduce antecedent and subsequent";
             startingRecord.Mapping =  Enumerable.Repeat(-1, 1).Concat(antMapping).Concat(submapping).ToArray();

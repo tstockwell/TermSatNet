@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -65,18 +66,18 @@ public static class NandReducer
             Debug.Assert(nextReduction != null, $"internal error: formula not found {startingRecord.NextReductionId}");
             return nextReduction;
         }
-
-        List<ReductionRecord> incompleteProofs = new();
-
+       
         // if given formula is not a nand then it must be a variable or constant and is not reducible.
         ReductionRecord result= null;
         if (startingRecord.Formula is Nand lastNand)
         {
-            result= await db.TryLookupReductionAsync(startingRecord);
+#if DEBUG
+            result= await db.TryLookupReductionAsync(lastNand);
             if (result != null)
             {
-                goto FoundReduction;
+                throw new TermSatException($"Invalid argument: {nameof(startingRecord)} should have already been reduced to a 'mostly canonical' formula that is not reducible via an existing reduction rule.");
             }
+#endif
 
 
             result= await db.TryReduceDescendantsAsync(startingRecord);
@@ -159,14 +160,15 @@ public static class NandReducer
                     var nextReduction = await db.TryGetNextReductionAsync(todoProof);
                     if (nextReduction != null)
                     {
-                        var lastReduction = await db.Formulas.GetLastReductionAsync(nextReduction);
-                        todo.Push(lastReduction);
+                        //await db.InsertFormulaRecordAsync(nextReduction);
+                        todo.Push(nextReduction);
                     }
                     else
                     {
                         // the given formula is canonical
-                        db.Formulas.AddCompletionMarker(todoProof);
+                        await db.AddCompletionMarkerAsync(todoProof);
                     }
+
                     continue;
                 }
 
@@ -181,12 +183,14 @@ public static class NandReducer
                 mostReducedRecord = lastProof; // lastProof is the canonical form of todoProof
 
                 // all that's missing is a completion marker, add it
-                db.Formulas.AddCompletionMarker(todoProof);
+                await db.AddCompletionMarkerAsync(todoProof);
             }
         }
 
         return mostReducedRecord;
     }
+
+    
 
 
     /// <summary>

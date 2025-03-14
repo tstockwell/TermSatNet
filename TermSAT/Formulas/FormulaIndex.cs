@@ -13,8 +13,8 @@ namespace TermSAT.Formulas;
 
 
 /// <summary>
-/// A rewrite of TermSAT.Common.TrieIndex built specifically for TermSAT formulas (that is, nand operators and variables only).  
-/// Also, its specifically built for the Scripts.RunNandRuleGenerator method, it stores data in a database instead of memory.  
+/// A rewrite of TermSAT.Common.TrieIndex built specifically for TermSAT formulas (that is, only nand operators, variables, and constants).  
+/// Also, its specifically built for the Scripts.RunNandRuleGenerator method, it stores data in a database instead of in structures in memory.  
 /// If you want an in-memory version of this class then use an in-memory database.  
 /// 
 /// This class is not meant to be a prefix tree exactly, its meant to be an index for quickly finding generalizations of a given formula.  
@@ -31,8 +31,8 @@ namespace TermSAT.Formulas;
 ///     .2 => 2
 /// ```
 /// However, its important to note that this class doesn't treat a TermSAT # as a string, but as an enumeration of ints, 
-/// more like this ```{0,0,2,0,1,0,1,1,0,0,1,2,0,0,1,1,0,3,0,1,2}```.
-/// where 0 represents a nand operator and every other value represents a variable with that number.
+/// more like this ```{0,0,2,0,1,0,1,1,0,0,-1,-2,0,0,1,1,0,3,0,1,2}```.
+/// where 0 represents a nand operator, -1 & -2 are T and F, and every positive value represents a variable with that number.
 /// 
 /// 
 /// Notes...
@@ -126,20 +126,35 @@ public static partial class FormulaIndex
                 nodeRecord = nextNode;
 
             }
+            else if (term is Constant constFormula)
+            {
+                var constKey = (constFormula == Constant.TRUE) ? Node.KEY_TRUE : Node.KEY_FALSE;
+                var nextNode = await nodeSet.AsNoTracking()
+                    .Where(_ => _.Parent == nodeRecord.Id && _.Key == constKey)
+                    .FirstOrDefaultAsync();
+
+                if (nextNode == null)
+                {
+                    nextNode = new Node(parent: nodeRecord.Id, key: constKey, value: Node.VALUE_NONE);
+                    await nodeSet.AddAsync(nextNode);
+                    await ctx.SaveChangesAsync();
+                }
+                nodeRecord = nextNode;
+            }
             else
             {
-                throw new TermSatException("Not a valid TermSAT formula, should be nuttin but nand operators and variables.");
+                throw new TermSatException("Not a valid TermSAT formula, should be nuttin but nand operators, variables, and constants.");
             }
         }
 
         // when we get to here then nodeRecord is the leaf node, store the formula Id as the value
         nodeRecord.Value = formulaRecord.Id;
+        await ctx.SaveChangesAsync();
+
     }
 
-    public static async Task<IEnumerable<SearchResult>> FindGeneralizationsAsync(this IQueryable<Node> ctx, Formula formulaToMatch, int maxMatchCount)
+    public static async IAsyncEnumerable<SearchResult> FindGeneralizationsAsync(this IQueryable<Node> ctx, Formula formulaToMatch)
     {
-        List<SearchResult> results = null;
-
         //  this method does a depth-first search of the node tree
         var todo = new Stack<(int position, Dictionary<int, Formula> substitutions, Node node)>();
         {
@@ -158,11 +173,11 @@ public static partial class FormulaIndex
 
         // inside the loop we'll be looking up formulas by position.
         // The time complexity of the GetFormulaAtPosition method grows linearly as a function of the length of the formula,
-        // I think its much more efficient to put formulaToMatch in an array right now.
+        // So, I think it's much more efficient to put formulaToMatch in an array right now.
         var flatTerm = formulaToMatch.AsFlatTerm().ToArray();
 
         int matchCount = 0;
-        while (todo.Any() && matchCount < maxMatchCount)
+        while (todo.Any())
         {
             var state = todo.Pop();
             int currentPosition = state.position; // current position within the formula to match
@@ -206,6 +221,18 @@ public static partial class FormulaIndex
                     continue;
                 }
             }
+            else if (currentSymbol == Node.KEY_FALSE || currentSymbol == Node.KEY_TRUE)
+            {
+                // if current target term in not a matching constant then not a match
+                if (instanceSubformula.Equals(currentSymbol == Node.KEY_FALSE ? Constant.FALSE : Constant.TRUE))
+                {
+                    currentPosition++;
+                }
+                else
+                {
+                    continue;
+                }
+            }
 
             var children = await ctx.AsNoTracking().Where(_ => _.Parent == state.node.Id).ToListAsync();
 
@@ -223,15 +250,8 @@ public static partial class FormulaIndex
                 {
                     matchCount++;
                     var result = new SearchResult(state.node, currentSubstitutions);
-                    if (maxMatchCount <= 1)
-                    {
-                        return [result];
-                    }
-                    if (results == null)
-                    {
-                        results = new();
-                    }
-                    results.Add(result);
+
+                    yield return result;
                 }
                 continue;
             }
@@ -249,10 +269,5 @@ public static partial class FormulaIndex
             }
 
         }
-        if (results == null)
-        {
-            return Enumerable.Empty<SearchResult>();
-        }
-        return results;
     }
 }

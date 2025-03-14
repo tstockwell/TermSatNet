@@ -39,6 +39,7 @@ public static class CommutativeRules
             {
                 var reducedFormula = Formulas.Nand.NewNand(startingNand.Subsequent, startingNand.Antecedent);
                 var nextReduction = new ReductionRecord(reducedFormula);
+                await db.InsertFormulaRecordAsync(nextReduction); // need to save and populate id
 
                 startingRecord.RuleDescriptor = "|.2.1 => |.1.2";
                 startingRecord.Mapping =  Enumerable.Repeat(-1, 1)
@@ -50,7 +51,6 @@ public static class CommutativeRules
                 await db.SaveChangesAsync();
 
                 return nextReduction;
-
             }
         }
 

@@ -29,7 +29,7 @@ public class ReRiteDbContext : DbContext
 
 
     public DbSet<ReductionRecord> Formulas { get; set; }
-    public DbSet<MaterialTermRecord> MaterialTerms { get; set; }
+    public DbSet<GroundingRecord> Groundings { get; set; }
     public DbSet<FormulaIndex.Node> Lookup { get; set; }
     public DbSet<MetaRecord> Meta { get; set; }
 
@@ -44,25 +44,10 @@ public class ReRiteDbContext : DbContext
         ReductionRecord.OnModelCreating(modelBuilder, nameof(TermSAT.Formulas));
         MetaRecord.OnModelCreating(modelBuilder, nameof(Meta));
         FormulaIndex.OnModelCreating(modelBuilder, nameof(Lookup));
+        GroundingRecord.OnModelCreating(modelBuilder, nameof(Groundings));
     }
 
     ReductionRecord _true;
     ReductionRecord _false;
 
-    public async Task<ReductionRecord> GetConstant(bool value)
-    {
-        if (value)
-        {
-            if (_true == null)
-            {
-                _true = await this.Formulas.Where(_ => _.Text == "T").FirstAsync();
-            }
-            return _true;
-        }
-        if (_false == null)
-        {
-            _true = await this.Formulas.Where(_ => _.Text == "F").FirstAsync();
-        }
-        return _false;
-    }
 }

@@ -119,10 +119,4 @@ public static class ReductionRecordExtensions
         db.GetAllCanonicalRecords().Count();
 
 
-    public static void AddCompletionMarker(this IQueryable<ReductionRecord> db, ReductionRecord proof)
-    {
-        Debug.Assert(string.IsNullOrEmpty(proof.RuleDescriptor), "Cant complete a formula that's already been reduced");
-        proof.RuleDescriptor = ReductionRecord.PROOF_IS_COMPLETE;
-    }
-
 }

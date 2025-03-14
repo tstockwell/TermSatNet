@@ -38,63 +38,76 @@ public static class WildcardSwapping
 
         if (startingNand.Antecedent == Constant.TRUE)
         {
-            var subsequentRecord = await db.GetReductionRecordAsync(startingNand.Subsequent);
-            Debug.Assert(subsequentRecord.Formula.Equals(startingNand.Subsequent), "The starting formula is expected to be 'mostly canonical', that is, all terms in the formula should be canonical");
+            var rightRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Subsequent);
 
-            await foreach (var relevanceResult in db.GetAllMaterialTermsAsync(subsequentRecord, formulaValue:false))
+            var reductiveGroundings = await db.Groundings
+                .Where(_ => _.FormulaId == rightRecord.Id && _.FormulaValue == false)
+                .ToArrayAsync();
+
+            foreach (var reductiveGrounding in reductiveGroundings)
             {
+                var replaceValue = reductiveGrounding.TermValue ? Constant.FALSE : Constant.TRUE;
+                var targetTerm = await db.Formulas.FindAsync(reductiveGrounding.TermId);
 
-                //var testValue = Constant.TRUE;
-                //var replacedSubsequent = relevanceResult.UnifiedFormula; // await db.ReplaceRelevantTermAsync(subsequentRecord, relevanceResult.Formula , Constant.TRUE);
-                if (relevanceResult.UnifiedFormula.PositionOf(startingNand.Subsequent) < 0) 
+                // todo: using ReplaceAll will not be good enough in the long run.
+                // In the long run it will be necessary to look for terms that can be unified to targetTerm.
+                var reducedRight = rightRecord.Formula.ReplaceAll(targetTerm.Formula, replaceValue);
+
+                var reducedFormula = Nand.NewNand(targetTerm.Formula, reducedRight);
+
+                if (reducedFormula.CompareTo(startingNand) < 0) // applying the reduction doesn't always produced a 'reduced' formula 
                 {
-                    var unifiedRecord = await db.GetReductionRecordAsync(relevanceResult.UnifiedFormula);
-                    var canonicalTestCaseRecord = await db.GetCanonicalRecordAsync(unifiedRecord);
+                    Debug.Assert(startingRecord.NextReductionId <= 0, $"we should not be attempting to reduce a formula that is already reduced.");
 
-                    if (canonicalTestCaseRecord.Formula == Constant.FALSE)
-                    {
+                    // this call creates a record, AND groundings, AND completes proof tree for reducedFormula (if not already done)
+                    var nextReduction = await db.GetMostlyCanonicalRecordAsync(reducedFormula);
 
-                        var reducedFormula = Nand.NewNand(
-                            relevanceResult.RelevantTerm, 
-                            relevanceResult.UnifiedFormula.ReplaceAll(relevanceResult.RelevantTerm, Constant.TRUE));
-                        var reducedRecord = await db.GetReductionRecordAsync(reducedFormula);
+                    startingRecord.RuleDescriptor = $"wildcard swap: {targetTerm}";
+                    startingRecord.Mapping =  Enumerable.Repeat(-1, reducedFormula.Length).ToArray();
+                    startingRecord.NextReductionId =  nextReduction.Id;
 
-                        startingRecord.RuleDescriptor = $"wildcard swap: {relevanceResult}";
-                        startingRecord.Mapping =  Enumerable.Repeat(-1, reducedFormula.Length).ToArray();
-                        startingRecord.NextReductionId =  reducedRecord.Id;
+                    await db.SaveChangesAsync();
 
-                        await db.SaveChangesAsync();
-
-                        return reducedRecord;
-                    }
+                    // return the first reduction found
+                    return nextReduction;
                 }
             }
         }
 
-        if (startingNand.Antecedent is Variable)
+        else if (startingNand.Antecedent is Variable)
         {
-            // construct test case formula and make sure its been fully reduced.
-            var replacedSubsequent = startingNand.Subsequent.ReplaceAll(Constant.TRUE, Constant.FALSE);
-            var testCaseFormula = Nand.NewNand(startingNand.Antecedent, replacedSubsequent);
-            if (testCaseFormula.PositionOf(startingRecord.Formula) < 0)
+            var rightRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Subsequent);
+
+            var reductiveGroundings = await db.Groundings
+                .Where(_ => _.FormulaId == rightRecord.Id && _.FormulaValue == false)
+                .ToArrayAsync();
+
+            foreach (var reductiveGrounding in reductiveGroundings)
             {
-                var testCaseRecord = await db.GetReductionRecordAsync(testCaseFormula);
-                var canonicalTestCaseRecord = await db.GetCanonicalRecordAsync(testCaseRecord);
+                var replaceValue = startingNand.Antecedent;
+                var targetTerm = await db.Formulas.FindAsync(reductiveGrounding.TermId);
 
-                if (canonicalTestCaseRecord.Formula == Constant.TRUE)
+                // todo: using ReplaceAll will not be good enough in the long run.
+                // In the long run it will be necessary to look for terms that can be unified to targetTerm.
+                var reducedRight = rightRecord.Formula.ReplaceAll(targetTerm.Formula, replaceValue);
+
+                var reducedFormula = Nand.NewNand(targetTerm.Formula, reducedRight);
+
+                if (reducedFormula.CompareTo(startingNand) < 0) // applying the reduction doesn't always produced a 'reduced' formula 
                 {
-                    var reducedFormula = Nand.NewNand(
-                        Constant.TRUE, 
-                        startingNand.Subsequent.ReplaceAll(Constant.TRUE, startingNand.Antecedent));
-                    var reducedRecord = await db.GetReductionRecordAsync(reducedFormula);
+                    Debug.Assert(startingRecord.NextReductionId <= 0, $"we should not be attempting to reduce a formula that is already reduced.");
 
-                    startingRecord.RuleDescriptor = $"wildcard swap inverse: {startingNand.Antecedent}";
+                    // this call creates a record, AND groundings, AND completes proof tree for reducedFormula (if not already done)
+                    var nextReduction = await db.GetMostlyCanonicalRecordAsync(reducedFormula);
+
+                    startingRecord.RuleDescriptor = $"wildcard swap: {targetTerm}";
                     startingRecord.Mapping =  Enumerable.Repeat(-1, reducedFormula.Length).ToArray();
-                    startingRecord.NextReductionId =  reducedRecord.Id;
+                    startingRecord.NextReductionId =  nextReduction.Id;
 
                     await db.SaveChangesAsync();
 
-                    return reducedRecord;
+                    // return the first reduction found
+                    return nextReduction;
                 }
             }
         }

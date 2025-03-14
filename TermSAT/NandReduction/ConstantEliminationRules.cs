@@ -25,7 +25,7 @@ public static class ConstantEliminationRules
             {
                 // |TT => F, and |TF => T
                 var reducedFormula = constantConsequent.Equals(Constant.TRUE) ? Constant.FALSE : Constant.TRUE;
-                var nextReduction = await db.GetReductionRecordAsync(reducedFormula);
+                var nextReduction = await db.GetMostlyCanonicalRecordAsync(reducedFormula);
                 startingRecord.RuleDescriptor = constantConsequent.Equals(Constant.TRUE) ? "|TT => F" : "|TF => T";
                 startingRecord.Mapping =  Enumerable.Repeat(-1, reducedFormula.Length).ToArray();
                 startingRecord.NextReductionId =  nextReduction.Id;
@@ -40,7 +40,7 @@ public static class ConstantEliminationRules
                 {
                     // |T|T.1 => .1
                     var reducedFormula = nandConsequent.Subsequent;
-                    var nextReduction = await db.GetReductionRecordAsync(reducedFormula);
+                    var nextReduction = await db.GetMostlyCanonicalRecordAsync(reducedFormula);
                     startingRecord.RuleDescriptor = "|T|T.1 => .1";
                     startingRecord.Mapping =  Enumerable.Range(4, nandConsequent.Subsequent.Length).ToArray();
                     startingRecord.NextReductionId =  nextReduction.Id;
@@ -54,7 +54,7 @@ public static class ConstantEliminationRules
         if (startingNand.Antecedent == Constant.FALSE)
         {
             // |F.1 => T
-            var nextReduction = await db.GetReductionRecordAsync(Constant.TRUE);
+            var nextReduction = await db.GetMostlyCanonicalRecordAsync(Constant.TRUE);
             startingRecord.RuleDescriptor = "|F.1 => T";
             startingRecord.Mapping =  Enumerable.Repeat(-1, startingNand.Length).ToArray(); ;
             startingRecord.NextReductionId =  nextReduction.Id;
@@ -67,7 +67,7 @@ public static class ConstantEliminationRules
         {
             // |.1T => |T.1
             var reducedFormula = Nand.NewNand(Constant.TRUE, startingNand.Antecedent);
-            var nextReduction = await db.GetReductionRecordAsync(reducedFormula);
+            var nextReduction = await db.GetMostlyCanonicalRecordAsync(reducedFormula);
             startingRecord.RuleDescriptor = "|.1T => |T.1";
             startingRecord.Mapping =  Enumerable.Empty<int>()
                 .Append(-1)
@@ -83,7 +83,7 @@ public static class ConstantEliminationRules
         if (startingNand.Subsequent == Constant.FALSE)
         {
             // |.1F => T
-            var nextReduction = await db.GetReductionRecordAsync(Constant.TRUE);
+            var nextReduction = await db.GetMostlyCanonicalRecordAsync(Constant.TRUE);
             startingRecord.RuleDescriptor = "|.1F => T";
             startingRecord.Mapping =  Enumerable.Repeat(-1, startingNand.Length).ToArray();
             startingRecord.NextReductionId =  nextReduction.Id;

@@ -244,47 +244,6 @@ Must
 NandSAT's native reduction algorithm gebarety
 
 
-# The latest description of wildcard analysis and wildcard swapping - 1/25/25
-
- RR refers to all instances of T in a formula as *wildcards*.  
- So called because they can often be replaced with multiple values without changing the truth table of the formula.  
- RR production rules basically seem to mostly work by doing wildcard reduction until the formula is 'mostly canonical'.  
- Then 'wildcard swapping' can restart the process.  
- 
- This is wildcard reduction.  
-     Wildcard reduction is a kind of proof analysis that identifies terms that are mostly irrelevant and that can be reduced to constants.
-         Let F be a formula where a term S appears in both sides of the formula
-         Let V (for test value) be a variable that has a constant value of T or F.
-         Let C (for test case) be the formula created by replacing all instances of S with V on one side of S.  
-         Let P (for proof) be the proof that reduces C to its canonical form.
-         Then... all instances of S in C, that are inherited from F, and that are irrelevant to P, 
-         may be replaced with V?F:T to create a reduced formula R.
-
-This is what it means for a term to be 'mostly irrelevant'...
-	Consider this reduction rule... F.1 => T.
-	.1 can be replaced with *any* expression and the rule is still true.
-	Put another way, .1 is irrelevant to the rule, aka a wildcard, and we can literally replace it with any other term.  
-	If we're interested in reducing the formula then we'll choose to replace .1 in |F.1 with F to get |FF.
-	There's more to the concept of wildcard
 
 
-         
- This is wildcard swapping.  
-     wildcard swapping is chiral, this form replaces many terms with a constant value...
-         Let F be a formula of the form |TD (D for dextral) 
-         Let V (for test value) be a variable that has a constant value of T or F.
-         Let C (for test case) be the formula created by replacing all instances of S with V on one side of S.  
-         If C reduces to F then all instances of S in F may be replaced with T, and the leading T replaced with S.  
-         
-     The other form of swapping, where constants are replaced by terms, is only valid when 
-     S.Length == 1, and is covered by some hard-codes rules in NandReducerCommutativeRules.
-     
- For this sprint...
-  - change the current implementation of wildcard analysis to match the description above (which it doesnt as of writing).
-  - implement wildcard swapping 
-  - extend wildcard analysis by implementing 'term blacklisting'.  See ReduceFormulaWithDeepProof.
-         > This removes the need for using 'independent terms'.
-  - need to add unification to wildcard analysis and wildcard swapping
-         < That is, a term can be replaced if any of its substitutions match the test term.  
-         < Substitutions in a formula F are discovered by following the mappings back to other formulas that reduce to F.  
 

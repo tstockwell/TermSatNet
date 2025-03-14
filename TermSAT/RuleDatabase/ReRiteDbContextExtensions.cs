@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using TermSAT.Formulas;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -28,32 +29,92 @@ public static class ReRiteDbContextExtensions
     /// Use this method, not DbContext.Add, to add a ReductionRecord to the DB because 
     /// besides creating a reduction record...
     /// - the formula should also be added to the LOOKUP table
+    /// - GroundingRecords need to be calculated and created for the new formula
     /// 
-    /// >> instead of doing this all the time its now just done when needed.
-    /// >> Moved to wildcard swapping. 
-    /// >> - the formula should also be analyzed to discover material terms
+    /// NOTE: The given formula should be 'mostly canonical'.
+    /// 
     /// </summary>
-    public static async Task<ReductionRecord> CreateReductionRecordAsync(this ReRiteDbContext db, Formula startingFormula)
+    public static async Task InsertFormulaRecordAsync(this ReRiteDbContext db, ReductionRecord record)
     {
+        await db.AddAsync(record);
 
+        // have to save here in order for id to be populated before calling AddGeneralizationAsync
+        await db.SaveChangesAsync();
+
+        // NOTE: The given formula should not be reducible using the current lookups.
+#if DEBUG
+        //{
+        //    await foreach (var generalization in db.Lookup.FindGeneralizationsAsync(record.Formula))
+        //    {
+        //        if (generalization != null)
+        //        {
+        //            var generalizationRecord = await db.Formulas.FindAsync(generalization.Node.Value);
+        //            var canonicalRecord = await db.GetCanonicalRecordAsync(generalizationRecord);
+        //            if (canonicalRecord.Formula.CompareTo(generalizationRecord.Formula) < 0)
+        //            {
+        //                throw new TermSatException("Attempt to add lookup record for a formula that is currently reducible via lookup");
+        //            }
+        //        }
+        //    }
+        //}
+#endif
+        // it used to be that RR only put non-canonical records in the lookup table.  
+        // But that was when RR populated the formula table in a pre-defined order,
+        // so it could immediately know which formulas are canonical and which were not.   
+        // But the formula db is no longer populated in any particular order.
+        // Now, all formulas (canonical and mostly canonical) are added to the lookup db, because...
+        //  - if a mostly-canonical formula matches a non-canonical lookup value then
+        //      RR knows immediately that the formula may be reduced
+        //      using the non-canonical and its canonical as a reduction rule.
+        //  - if a mostly-canonical formula matches a canonical lookup value then
+        //      RR knows immediately that the formula is not totally reducible.
+        await db.AddGeneralizationAsync(record);
+
+        // NOTE...
+        // Groundings are calculated when a formula is inserted because wildcard analysis requires the 'proof tree' to be complete.  
+        // In other words, groundings *will* eventually be calculated, so there's no benefit to calculating them lazily.  
+        // And for many formulas, RR currently calculates groundings for a formula more than once, so there's benefit to saving them.  
+        // And calculating them here makes RR's logic simpler.
+        await db.AddGroundings(record);
     }
 
 
-
-    public static async Task<ReductionRecord> GetReductionRecordAsync(this ReRiteDbContext db, Formula startingFormula)
+    /// <summary>
+    /// Returns a formula that is reduced as much as possible using just the reduction rules produced by first reducing sub-formulas.
+    /// The idea is that reducing sub-terms first, and applying resulting reduction rules to the outmost formula represents 
+    /// a starting formula that should have a corresponding record in the rule DB since it can't be reduced by any of the current 
+    /// reduction rules.
+    /// </summary>
+    public static async Task<ReductionRecord> GetMostlyCanonicalRecordAsync(this ReRiteDbContext db, Formula startingFormula)
     {
         var reductionRecord = await db.Formulas.Where(_ => _.Text == startingFormula.Text).FirstOrDefaultAsync();
         if (reductionRecord == null)
         {
-            // todo: records should not be added without verifying that they are not already reducible.
             bool isCanonical = false;
-            var reducedFormula = reductionRecord.Formula;
+            var mostlyCanonicalFormula = startingFormula;
             if (startingFormula is Nand startingNand)
             {
-                var leftRecord = await db.GetReductionRecordAsync(startingNand.Antecedent);
-                var rightRecord = await db.GetReductionRecordAsync(startingNand.Subsequent);
-                reducedFormula = Nand.NewNand(leftRecord.Formula, rightRecord.Formula);
-                reductionRecord = await db.Formulas.Where(_ => _.Text == reducedFormula.Text).FirstOrDefaultAsync();
+                // RR assumes that the 'proof tree' for shorter is always complete
+                // and that new formulas are always 'mostly canonical'.  
+                // That is, all terms in the formula are canonical except for the formula itself.  
+                // So, get the 'mostly canonical' formula from the given formula.
+                var leftRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Antecedent);
+                leftRecord = await db.GetCanonicalRecordAsync(leftRecord);
+                var rightRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Subsequent);
+                rightRecord = await db.GetCanonicalRecordAsync(rightRecord);
+
+                mostlyCanonicalFormula = Nand.NewNand(leftRecord.Formula, rightRecord.Formula);
+                reductionRecord = await db.Formulas.Where(_ => _.Text == mostlyCanonicalFormula.Text).FirstOrDefaultAsync();
+                if (reductionRecord == null)
+                {
+                    var nextReductionRecord = await db.TryLookupReductionAsync(mostlyCanonicalFormula);
+                    while (nextReductionRecord != null)
+                    {
+                        reductionRecord = nextReductionRecord;
+                        mostlyCanonicalFormula = nextReductionRecord.Formula;
+                        nextReductionRecord = await db.TryLookupReductionAsync(mostlyCanonicalFormula);
+                    }
+                }
             }
             else
             {
@@ -62,136 +123,123 @@ public static class ReRiteDbContextExtensions
 
             if (reductionRecord == null)
             {
-                reductionRecord = new(reducedFormula, isCanonical);
+                reductionRecord = new(mostlyCanonicalFormula, isCanonical);
 
-                await db.AddAsync(reductionRecord);
-                await db.SaveChangesAsync();
+                await db.InsertFormulaRecordAsync(reductionRecord);
             }
         }
         return reductionRecord;
     }
 
     /// <summary>
-    /// Returns a distinct enumeration of all the terms in a formula, including terms in all valid substitutions 
+    /// This method discovers groundings in the given formula and creates records in the db.Groundings table.
+    /// 
+    /// RR used to call this 'wildcard reduction'.  
+    /// 
+    /// This is how RR discovers wildcards/groundings...
+    ///         Let F be a formula where a term S appears in both sides of the formula
+    ///         Let V (for test value) be a constant value of T or F.
+    ///         Let C (for test case) be the formula created by replacing all instances of S, in one side of F, with V.  
+    ///         Let P (for proof) be the proof that reduces C to its canonical form.
+    ///         Then... all instances of S in C, that are inherited from F, and that are irrelevant to P, 
+    ///         may be replaced with V?F:T to create a reduced formula R.
+    ///         
     /// </summary>
-    public static async IAsyncEnumerable<ReductionRecord> GetAllDistinctReachableTermsAsync(this ReRiteDbContext db, ReductionRecord startingRecord, HashSet<long> values = null)
+    public static async Task AddGroundings(this ReRiteDbContext db, ReductionRecord startingRecord)
     {
-        if (values == null)
+        if (startingRecord.Length <= 1)
         {
-            values = new HashSet<long>();
-        }
-        var todo = new List<Formula>(startingRecord.Formula.AsFlatTerm());
-
-        while (todo.Any())
-        {
-            var term = todo.First();
-            todo.RemoveAt(0);
-
-            var record = await db.GetReductionRecordAsync(term);
-
-            if (!values.Contains(record.Id))
-            {
-                values.Add(record.Id);
-                yield return record;
-            }
-
-            var substitutionRecords = await db.Formulas.Where(_ => _.NextReductionId == record.Id).ToListAsync();
-            foreach (var substitution in substitutionRecords)
-            {
-                if (!values.Contains(substitution.Id))
+            //if (startingRecord.Formula is Variable)
+            //{
+                // A variable can be forced to T or F by setting it to T or F.
+                // So variables start with two groundings, one that compels the variable to T, 
+                // and one that compels the formula to F.
+                // Same for constants.
+                await db.Groundings.AddAsync(new()
                 {
-                    todo.Insert(0, substitution.Formula);
-                }
-            }
+                    FormulaId = startingRecord.Id,
+                    FormulaValue = true,
+                    TermId = startingRecord.Id,
+                    TermValue = true,
+                    Positions = new[] { 0 }
+                });
+                await db.Groundings.AddAsync(new()
+                {
+                    FormulaId = startingRecord.Id,
+                    FormulaValue = false,
+                    TermId = startingRecord.Id,
+                    TermValue = false,
+                    Positions = new[] { 0 }
+                });
+                await db.SaveChangesAsync();
+            //}
+
+            return;
         }
+
+        // add groundings for a nand
+        // first, add groundings to T, when either side is F.
+        // then add grounding to F when both sides are true
+
+        var startingNand = startingRecord.Formula as Nand;
+
+        var leftRecord = await db.Formulas.Where(_ => _.Text == startingNand.Antecedent.Text).FirstAsync();
+        var leftFGroundings = await db.Groundings.Where(_ => _.FormulaId == leftRecord.Id && _.FormulaValue == false).ToArrayAsync();
+
+        foreach (var leftGrounding in leftFGroundings)
+        {
+            await db.Groundings.AddAsync(new()
+            {
+                FormulaId = startingRecord.Id,
+                FormulaValue = true,
+                TermId = leftGrounding.TermId,
+                TermValue = leftGrounding.TermValue,
+                Positions = new[] { 1 }
+            });
+        }
+
+        var rightRecord = await db.Formulas.Where(_ => _.Text == startingNand.Subsequent.Text).FirstAsync();
+        var rightFGroundings = await db.Groundings.Where(_ => _.FormulaId == rightRecord.Id && _.FormulaValue == false).ToArrayAsync();
+        foreach (var rightGrounding in rightFGroundings)
+        {
+            await db.Groundings.AddAsync(new()
+            {
+                FormulaId = startingRecord.Id,
+                FormulaValue = true,
+                TermId = rightGrounding.TermId,
+                TermValue = rightGrounding.TermValue,
+                Positions = new[] { leftRecord.Length + 1 }
+            });
+        }
+
+        var leftTGroundings = await db.Groundings.Where(_ => _.FormulaId == leftRecord.Id && _.FormulaValue == true).ToArrayAsync();
+        var rightTGroundings = await db.Groundings.Where(_ => _.FormulaId == rightRecord.Id && _.FormulaValue == true).ToArrayAsync();
+        var groundingTerms = leftTGroundings.Select(_ => _.TermId).Intersect(rightTGroundings.Select(_ => _.TermId));
+        foreach (var groundingTermId in groundingTerms)
+        {
+            var groundingRecord = leftTGroundings.Where(_ => _.TermId == groundingTermId).First();
+            var positions = groundingRecord.Positions.Select(_ => _ + 1).ToArray();
+            await db.Groundings.AddAsync(new()
+            {
+                FormulaId = startingRecord.Id,
+                FormulaValue = false,
+                TermId = groundingTermId,
+                TermValue = groundingRecord.TermValue,
+                Positions = positions
+            });
+        }
+
+        await db.SaveChangesAsync();
     }
 
 
-
-
-    /// <summary>
-    /// This method is a work in progress.
-    /// When considering substitutions, a formula could be reduced to many possibilities.
-    /// Yet, this method returns just one, which indicates that I dont know what I'm doing.
-    /// It seems pretty likely that method is going to change, but I'm not sure how yet.
-    /// 
-    /// Returns a new formula that is the same as the given starting formula with 
-    /// all instances of the given target term with the given replacement term.
-    /// Also considers wildcard substitutions.  
-    /// 
-    /// </summary>
-    public static async Task<ReductionRecord> ReplaceAllReachableTermsAsync(this ReRiteDbContext db, Formula startingFormula, Formula targetTerm, Formula replacementTerm)
+    public static async Task AddCompletionMarkerAsync(this ReRiteDbContext db, ReductionRecord proof)
     {
-        var flatTerm = startingFormula.AsFlatTerm();
-        var values = new Dictionary<long, ReductionRecord>();
-        var replacements = new Dictionary<int,Formula>();
-        for (int i = 0; i < flatTerm.Length; )
-        {
-            var term = flatTerm[i];
-            if (term.Equals(targetTerm))
-            {
-                replacements.Add(i, replacementTerm);
-                goto ReplacementFound;
-            }
-            else
-            {
-                var termRecord = await db.GetReductionRecordAsync(term);
-                var substitutionRecords = await db.Formulas.Where(_ => _.NextReductionId == termRecord.Id).ToListAsync();
-                foreach (var substitution in substitutionRecords)
-                {
-                    if (substitution.Formula.Contains(targetTerm))
-                    {
-                        replacements.Add(i, substitution.Formula);
-                        goto ReplacementFound;
-                    }
-                }
-            }
-
-            // no match found, move to next term
-            i++;
-            continue;
-
-            ReplacementFound:
-                i += term.Length;
-        }
-
-        if (!replacements.Any())
-        {
-            return await db.GetReductionRecordAsync(startingFormula);
-        }
-
-        var reducedFormula = flatTerm.WithReplacements(replacements);
-        var reducedRecord = await db.GetReductionRecordAsync(reducedFormula);
-        return reducedRecord;
+        Debug.Assert(string.IsNullOrEmpty(proof.RuleDescriptor), "Cant complete a formula that's already been reduced");
+        proof.RuleDescriptor = ReductionRecord.PROOF_IS_COMPLETE;
+        await db.SaveChangesAsync();
     }
 
-
-
-    //static public async Task<ReductionRecord> FindByIdAsync(this ReRiteDbContext ctx, int id) =>
-    //    await ctx.Formulas.AsNoTracking().Where(_ => _.Id == id).FirstAsync();
-
-
-
-
-    //static public void DeleteAll(this ReRiteDbContext ctx) => 
-    //    ctx.Database.ExecuteSqlRaw($"DELETE FROM {nameof(ctx.Formulas)}");
-
-    //static public Formula GetLastGeneratedFormula(this ReRiteDbContext ctx)
-    //{
-    //    var record = ctx.Formulas.AsNoTracking()
-    //        .OrderByDescending(f => f.Id)
-    //        .FirstOrDefault();
-
-    //    var formula = record != null ? Formula.GetOrParse(record.Text) : null;
-    //    return formula;
-    //}
-
-    //static public async Task<int> GetLengthOfCanonicalFormulasAsync(this DbSet<ReductionRecord> formulas, string truthTable) => 
-    //    (await formulas.GetCanonicalRecordByTruthTable(truthTable).FirstAsync()).Length;
-
-
-    //static public async Task<int> CountNonCanonicalFormulas(this DbSet<ReductionRecord> records) => 
-    //    await records.GetAllNonCanonicalRecords().CountAsync();
 
 
 

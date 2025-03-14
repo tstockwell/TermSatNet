@@ -28,6 +28,7 @@
     <Compile Remove="NandReduction\NandReducerWildcardRules_NoConstants.cs" />
     <Compile Remove="NandReduction\Proof.cs" />
     <Compile Remove="NandReduction\Reduction.cs" />
+    <Compile Remove="NandReduction\RelevanceProofs.cs" />
     <Compile Remove="NandReduction\Scripts_RuleGenerator_KnuthBendix.cs" />
     <Compile Remove="NandReduction\WildcardAnalyzer.cs" />
     <Compile Remove="NandReduction\Workers.cs" />

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TermSAT.Formulas;
 using TermSAT.RuleDatabase;
+using static TermSAT.NandReduction.NandReducer;
 
 namespace TermSAT.NandReduction;
 
@@ -29,8 +31,8 @@ public static class WildcardReduction
     ///         Let V (for test value) be a constant value of T or F.
     ///         Let C (for test case) be the formula created by replacing all instances of S, in one side of F, with V.  
     ///         Let P (for proof) be the proof that reduces C to its canonical form.
-    ///         Then... all instances of S in C, that are inherited from F, and that are irrelevant to P, 
-    ///         may be replaced with V?F:T to create a reduced formula R.
+    ///         If there are terms in C, that are inherited from F, and that are irrelevant to P...  
+    ///         Then... those terms may be replaced with V?F:T to create a reduced formula R.
     ///         
     /// This method doesnt try to find *all* wildcards, just the first wildcard.  
     /// Because just finding the first is much easier to implement.
@@ -45,151 +47,64 @@ public static class WildcardReduction
             return null;
         }
 
-        IEnumerable<Formula> commonTerms =
-            startingNand.Antecedent.AsFlatTerm().Distinct().Where(f => !(f is Constant))
-                .Intersect(startingNand.Subsequent.AsFlatTerm().Distinct().Where(f => !(f is Constant)));
 
-        // Skip common terms that contain any other common terms as a targetTerm.  
-        // This should go away after 'term blacklisting' has been implemented, see NandSchemeReductionTests.ReduceFormulaWithDeepProof.
-        var independentTerms = commonTerms.Where(f => !commonTerms.Where(t => t.Length < f.Length && 0 <= f.PositionOf(t)).Any());
-
-        foreach (var targetTerm in independentTerms)
+        // The following sections are arranged so that...
+        //  - the left-side will be reduced before the right-side
+        //      > because any wildcardReduction in the left-side of a formula is a bigger wildcardReduction than any wildcardReduction in the right-side.  
+        //  - and terms that can be reduced to F will be reduced before terms that can be reduced to T
+        //      > because a wildcardReduction to F is guaranteed to shorten the length of the formula,
+        //      > whereas you cant say the same about a wildcardReduction to T.  
         {
-            // The following sections are arranged so that...
-            //  - the left-side will be reduced before the right-side
-            //      > because any wildcardReduction in the left-side of a formula is a bigger wildcardReduction than any wildcardReduction in the right-side.  
-            //  - and terms that can be reduced to F will be reduced before terms that can be reduced to T
-            //      > because a wildcardReduction to F is guaranteed to shorten the length of the formula,
-            //      > whereas you cant say the same about a wildcardReduction to T.  
+            var antecedentRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Antecedent);
+            var subsequentRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Subsequent);
+
+            var leftRecord = antecedentRecord;
+            var rightRecord = subsequentRecord;
+
+            RetryWildcardTest:;
+
+            var reductiveGroundings = await db.Groundings
+                .Where(_ => _.FormulaId == rightRecord.Id && _.FormulaValue == false)
+                .ToArrayAsync();
+
+            foreach (var reductiveGrounding in reductiveGroundings)
             {
-                // construct test case formula and make sure its been fully reduced.
-                var testValue = Constant.TRUE;
-                var replacedSubsequent = startingNand.Subsequent.ReplaceAll(targetTerm, testValue);
-                var replacedFormula = Nand.NewNand(startingNand.Antecedent, replacedSubsequent);
-                var replaced = await db.GetReductionRecordAsync(replacedFormula);
-                //var reduction = await db.GetCanonicalRecordAsync(replaced);
-                var wildcardReduction = await db.TryGetWildcardReductionAsync(replaced, targetTerm, testValue);
+                var replaceValue = reductiveGrounding.TermValue ? Constant.FALSE : Constant.TRUE;
+                var targetTerm = await db.Formulas.FindAsync(reductiveGrounding.TermId);
 
-                //if (reduction.CompareTo(replaced) < 0 && reduction.PositionOf(subterm) < 0)
-                if (wildcardReduction.Reduction != null)
+                // todo: using ReplaceAll will not be good enough in the long run.
+                // In the long run it will be necessary to look for terms that can be unified to targetTerm.
+                var reducedLeft = leftRecord.Formula.ReplaceAll(targetTerm.Formula, replaceValue);
+
+                var reducedFormula = (leftRecord.Id == antecedentRecord.Id) ?
+                    Nand.NewNand(reducedLeft, rightRecord.Formula) :
+                    Nand.NewNand(rightRecord.Formula, reducedLeft);
+
+                if (reducedFormula.CompareTo(startingNand) < 0) // applying the reduction doesn't always produced a 'reduced' formula 
                 {
-                    var replaceValue = testValue == Constant.TRUE ? Constant.FALSE : Constant.TRUE;
-                    // var replaced2 = replacedFormula.ReplaceAll(targetTerm, replaceValue);
-                    var replaced2 = replacedFormula.ReplaceAt(wildcardReduction.StartingPosition, replaceValue);
-                    Debug.Assert(!replaced2.Equals(replaced));
+                    Debug.Assert(startingRecord.NextReductionId <= 0, $"we should not be attempting to reduce a formula that is already reduced.");
 
-                    if (replaced2 is Nand nandReplaced2 && nandReplaced2.Subsequent.Equals(replacedFormula.Subsequent))
-                    {
-                        Debug.Assert(startingRecord.NextReductionId <= 0, $"we should not be attempting to reduce a formula that is already reduced.");
+                    // this call creates a record, AND groundings, AND completes proof tree for reducedFormula (if not already done)
+                    var nextReduction = await db.GetMostlyCanonicalRecordAsync(reducedFormula);
 
-                        var reducedFormula = Nand.NewNand(nandReplaced2.Antecedent, startingNand.Subsequent);
-                        var nextReduction = await db.GetReductionRecordAsync(reducedFormula);
+                    startingRecord.RuleDescriptor = $"wildcard in antecedent: {targetTerm}->F";
+                    startingRecord.Mapping =  Enumerable.Repeat(-1, reducedFormula.Length).ToArray();
+                    startingRecord.NextReductionId =  nextReduction.Id;
 
-                        startingRecord.RuleDescriptor = $"wildcard in antecedent: {targetTerm}->F";
-                        startingRecord.Mapping =  Enumerable.Repeat(-1, reducedFormula.Length).ToArray();
-                        startingRecord.NextReductionId =  nextReduction.Id;
+                    await db.SaveChangesAsync();
 
-                        await db.SaveChangesAsync();
-
-                        return nextReduction;
-                    }
+                    // return the first reduction found
+                    return nextReduction;
                 }
             }
 
+            // look for a reductive groundings in the right side first, and then the left.
+            // here, if we just got done with the right, we flip the record refs and retry to do the left.
+            if (leftRecord.Id == antecedentRecord.Id)
             {
-                var testValue = Constant.FALSE;
-                var replacedSubsequent = startingNand.Subsequent.ReplaceAll(targetTerm, testValue);
-                var replacedFormula = Nand.NewNand(startingNand.Antecedent, replacedSubsequent);
-                var replaced = await db.GetReductionRecordAsync(replacedFormula);
-                var wildcardReduction = await db.TryGetWildcardReductionAsync(replaced, targetTerm, testValue);
-
-                if (wildcardReduction.Reduction != null)
-                {
-                    var replaced2 = replacedFormula.ReplaceAll(targetTerm, Constant.TRUE);
-
-                    if (!replaced2.Equals(replacedFormula))
-                    {
-                        if (replaced2 is Nand nandReplaced2 && nandReplaced2.Subsequent.Equals(replacedFormula.Subsequent))
-                        {
-                            Debug.Assert(startingRecord.NextReductionId <= 0, $"we should not be reducing a formula that is already reduced.");
-
-                            var reducedFormula = Nand.NewNand(nandReplaced2.Antecedent, startingNand.Subsequent);
-                            var nextReduction = await db.GetReductionRecordAsync(reducedFormula);
-
-                            startingRecord.RuleDescriptor = $"wildcard in antecedent: {targetTerm}->T";
-                            startingRecord.Mapping =  Enumerable.Repeat(-1, reducedFormula.Length).ToArray();
-                            startingRecord.NextReductionId =  nextReduction.Id;
-
-                            await db.SaveChangesAsync();
-
-                            return nextReduction;
-                        }
-                    }
-                }
-            }
-
-            {
-                var testValue = Constant.TRUE;
-                var replacedAntecedent = startingNand.Antecedent.ReplaceAll(targetTerm, testValue);
-                var replacedFormula = Nand.NewNand(replacedAntecedent, startingNand.Subsequent);
-                var replaced = await db.GetReductionRecordAsync(replacedFormula);
-                var wildcardReduction = await db.TryGetWildcardReductionAsync(replaced, targetTerm, testValue);
-
-                if (wildcardReduction.Reduction != null)
-                {
-                    var replaced2 = replacedFormula.ReplaceAll(targetTerm, Constant.FALSE);
-
-                    if (!replaced2.Equals(replacedFormula))
-                    {
-                        Debug.Assert(startingRecord.NextReductionId <= 0, $"we should not be reducing a formula that is already reduced.");
-
-                        var nandReplaced2 = replaced2 as Nand;
-                        Debug.Assert(nandReplaced2.Antecedent.Equals(replacedFormula.Antecedent));
-
-                        var reducedFormula = Nand.NewNand(startingNand.Antecedent, nandReplaced2.Subsequent);
-                        var nextReduction = await db.GetReductionRecordAsync(reducedFormula);
-
-                        startingRecord.RuleDescriptor = $"wildcard in subsequent: {targetTerm}->F";
-                        startingRecord.Mapping =  Enumerable.Repeat(-1, reducedFormula.Length).ToArray();
-                        startingRecord.NextReductionId =  nextReduction.Id;
-
-                        await db.SaveChangesAsync();
-
-                        return nextReduction;
-                    }
-                }
-            }
-
-            {
-                var testValue = Constant.FALSE;
-                var replacedAntecedent = startingNand.Antecedent.ReplaceAll(targetTerm, testValue);
-                var replacedFormula = Nand.NewNand(replacedAntecedent, startingNand.Subsequent);
-                var replaced = await db.GetReductionRecordAsync(replacedFormula);
-                var wildcardReduction = await db.TryGetWildcardReductionAsync(replaced, targetTerm, testValue);
-
-                if (wildcardReduction.Reduction != null)
-                {
-                    var replaced2 = replacedFormula.ReplaceAll(targetTerm, Constant.TRUE);
-
-                    if (!replaced2.Equals(replacedFormula))
-                    {
-                        if (replaced2 is Nand nandReplaced2 && nandReplaced2.Antecedent.Equals(replacedFormula.Antecedent))
-                        {
-                            Debug.Assert(startingRecord.NextReductionId <= 0, $"we should not be reducing a formula that is already reduced.");
-
-                            var reducedFormula = Nand.NewNand(startingNand.Antecedent, nandReplaced2.Subsequent);
-                            var nextReduction = await db.GetReductionRecordAsync(reducedFormula);
-
-                            startingRecord.RuleDescriptor = $"wildcard in subsequent: {targetTerm}->T @ {wildcardReduction.StartingPosition}";
-                            startingRecord.Mapping =  Enumerable.Repeat(-1, reducedFormula.Length).ToArray();
-                            startingRecord.NextReductionId =  nextReduction.Id;
-
-                            await db.SaveChangesAsync();
-
-                            return nextReduction;
-                        }
-                    }
-                }
+                leftRecord = subsequentRecord; 
+                rightRecord = antecedentRecord;
+                goto RetryWildcardTest;
             }
         }
 

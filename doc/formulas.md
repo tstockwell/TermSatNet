@@ -1,6 +1,6 @@
 # Formulas
 
-All about formulas in NandSAT.
+All about formulas in RR.
 
 ## Syntax
 
@@ -8,68 +8,41 @@ Formulas are as simple as possible.
 There is one operator, nand, aka the Sheffer stroke.
 And numbered variables.
 That's it, no negation, no constants.
-The normal form uses Polish notation and the symbol '|' for the nand operator, followed by the proximal and then the distal.  
+The normal form uses Polish notation and the symbol '|' for the nand operator, followed by the left and right arguments.  
 Variables are represented by the '.' followed by an integer number greater than 0 for representing variables.
 
 Some examples of formulas...
 .1
-|.1|.1.1			;TRUE
-||.1|.1.1|.1|.1.1	;FALSE
-|.1.1				;NEGATION
-|.1|.1.2			;IMPLICATION 
-||.1.1|.2.2			;DISJUNCTION
-||.1.2|.1.2			;CONJUNCTION
+|T.1				;NEGATION
+|.1.2				;NAND
+|.1|T.2			    ;IMPLICATION 
+||T.1|T.2			;DISJUNCTION
+|T|.1.2				;CONJUNCTION
+|T||T.1|T.2			;NOR
 
-## Alternative Syntax
-
-Instead of ||.1.2|.1.2, write...
-1= |.1.2
-2= |~1~1
-where ~N is a formula number
 
 ## Ordering
 
-RuleSAT formulas are ordered.
-In RuleSAT, it's very important that there is one, and only one, **canonical** way to represent a given formula.  
+RR formulas are ordered.
+In RR, it's very important that there is one, and only one, **canonical** way to represent a given formula.  
 Such an ordering is a necessary condition for producing a **globally confluent** set of reduction rules. 
 
-This document describes a method of ordering of formulas.
-The purpose of this ordering is to provide a method of determining the 'complexity' of a formula.  
-The ultimate purpose of such an ordering is to provide the basis for 
-creating a globally confluent set of reduction rules for reducing proposition formulas.
-
-## Ordering
-
-
-Here is the ordering...
+Here are the rules...
 1) formulas that are shorter are less complex than longer formulas. 
-2) formulas that are the same length are ordered by the complexity of thier antecedent.
-	That is, formulas with less complex antecendents come before those with more complex antecedents
-3) formulas that are the same length and have the same antecedent are ordered by the complexity of thier subsequent.
-4) otherwise, formulas are ordered lexically using the following symbol order:
-	- F
-	- T
-	- variables
-	- negation
-	- nand
-	- implication
+2) constants are simpler than any other formula, T comes before F 
+3) variables are simpler than operators
+4) formulas that are the same length are ordered lexicographically.
 5) Finally, any formula, A, where N is the highest numbered variable in A, 
 	comes before any formula F where the highest numbered variable in F is greater than N.
 This rule makes it possible to assign numbers to formulas in finite models (aka real life models).
 Without this rule it would be impossible to assign numbers to formulas other than variables, 
-because there'd be infinite number of variables.
+because there'd be infinite number of variables at the beginning of the order.
 
-The order of the above rules must be respected.
+The order of the above rules is important too.
 
-Examples..
-Rule 1: .2 comes before *.2T 
-Rule 2: *T.1 comes before *.1.1 
-Rule 3: |F.1 comes before |F.2
-Rule 4: *.2|1.3 comes before *.2*1.3 
-Rule 5: |.1.2 comes before .3
 
-	
-# Enumerating Formulas
+# Example: Knuth-Bendix completion
+
 F
 T
 |FF   rule: |FF->T

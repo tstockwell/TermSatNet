@@ -5,23 +5,9 @@ VisualStudioVersion = 17.9.34518.117
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TermSAT", "TermSAT\TermSAT.csproj", "{054F8D54-81BB-4C17-8662-9B622D56449F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{5AFACEBF-9868-423F-ACD3-A738245BFE28}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{71E6E5C3-3E70-4A51-89A5-FF72A3A3064B}"
-	ProjectSection(SolutionItems) = preProject
-		doc\formulas.md = doc\formulas.md
-		doc\nand-sat.md = doc\nand-sat.md
-		doc\proofs.md = doc\proofs.md
-		doc\rule-database.md = doc\rule-database.md
-		doc\sat.md = doc\sat.md
-		doc\systemp.wiki = doc\systemp.wiki
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E509A742-D024-441A-811F-BF42E42A658C}"
-	ProjectSection(SolutionItems) = preProject
-		LICENSE = LICENSE
-		README.md = README.md
-	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReRite.Wiki", "ReRite.Wiki\ReRite.Wiki.csproj", "{E396CA76-BB52-418D-ADD7-A95B9B83129D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,13 +19,13 @@ Global
 		{054F8D54-81BB-4C17-8662-9B622D56449F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{054F8D54-81BB-4C17-8662-9B622D56449F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{054F8D54-81BB-4C17-8662-9B622D56449F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E396CA76-BB52-418D-ADD7-A95B9B83129D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E396CA76-BB52-418D-ADD7-A95B9B83129D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E396CA76-BB52-418D-ADD7-A95B9B83129D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E396CA76-BB52-418D-ADD7-A95B9B83129D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{5AFACEBF-9868-423F-ACD3-A738245BFE28} = {E509A742-D024-441A-811F-BF42E42A658C}
-		{71E6E5C3-3E70-4A51-89A5-FF72A3A3064B} = {E509A742-D024-441A-811F-BF42E42A658C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00720F28-EE2D-4887-9D7E-C942801ED5FE}

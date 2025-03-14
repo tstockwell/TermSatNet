@@ -105,8 +105,7 @@ public static class Scripts
      */
     public static async Task<bool> FormulaCanBeReducedAsync(this ReRiteDbContext ctx, Formula formula)
     {
-        var searchResults = await ctx.Lookup.FindGeneralizationsAsync(formula, maxMatchCount: 1);
-        foreach (var searchResult in searchResults)
+        await foreach (var searchResult in ctx.Lookup.FindGeneralizationsAsync(formula))
         {
             // This check is required because applying reduction rules without checking that formulas
             // respect the record order doesn't necessarily produce shorter formulas.  
@@ -463,17 +462,18 @@ public static class Scripts
                                                 var nextFormulaId = Interlocked.Increment(ref lastFormulaId);
                                                 var nextRecord = new ReductionRecord(derivedFormula, variableNumber, truthValue);
 
-                                                // before adding the record, check to see if a shorter record with the same truth value is already present.
-                                                // if so, then this record can be indexed immediately
-                                                var proofNotCanonical = await _ruleDb.Formulas
-                                                    .Where(_ => _.TruthValue == truthValue && _.Length < iTotalLength)
-                                                    .FirstOrDefaultAsync();
+                                                ////// 3/7/2025 new rule, *always* add all rules, and always apply all matching rules, then ignore results that are not valid.  
+                                                ////// Because every non-reducible, non-canonical expression *is a* rule.  
+                                                //// before adding the record, check to see if a shorter record with the same truth value is already present.
+                                                //// if so, then this record can be indexed immediately
+                                                //var proofNotCanonical = await _ruleDb.Formulas
+                                                //    .Where(_ => _.TruthValue == truthValue && _.Length < iTotalLength)
+                                                //    .FirstOrDefaultAsync();
                                                 var msg = $"Adding formula          : {derivedFormula}";
-                                                if (proofNotCanonical != null)
-                                                {
-                                                    nextRecord.IsIndexed = 1;
-                                                    msg = $"Adding non-canonical    : {derivedFormula}";
-                                                }
+                                                //if (proofNotCanonical != null)
+                                                //{
+                                                //    nextRecord.IsIndexed = 1; // setting to 1 causes nextRecord to be excluded from the LOOKUP table
+                                                //}
                                                 Trace.WriteLine(msg);
 
                                                 await _ruleDb.Formulas.AddAsync(nextRecord);

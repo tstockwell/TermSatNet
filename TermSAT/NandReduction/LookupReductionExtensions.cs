@@ -12,22 +12,26 @@ public static class LookupReductionExtensions
 {
 
     /// <summary>
-    /// The Lookup table contains a trie of all previously reduced formulas.
+    /// Returns any match of the given formula in the LOOKUP table.
+    /// Returns the reduced formula.
+    /// 
+    /// The Lookup table contains a trie of all discovered rules.
     /// If another formula is a substitution instance of one of the formulas in the Lookup  
     /// table then we already know how to reduce it.
     /// 
     /// </summary>
-    public static async Task<ReductionRecord> TryLookupReductionAsync(this ReRiteDbContext ctx, ReductionRecord startingRecord)
+    public static async Task<ReductionRecord> TryLookupReductionAsync(this ReRiteDbContext ctx, Formula startingFormula)
     {
         // if given formula is not a nand then it must be a variable or constant and is not reducible.
-        if (!(startingRecord.Formula is Nand startingNand))
+        if (!(startingFormula is Nand startingNand))
         {
             return null;
         }
 
-        var searchResults = await ctx.Lookup.FindGeneralizationsAsync(startingRecord.Formula, maxMatchCount: 1);
-        foreach (var searchResult in searchResults)
+        await foreach (var searchResult in ctx.Lookup.FindGeneralizationsAsync(startingNand))
         {
+
+
             // This check is required because rules don't necessarily produce shorter formulas if you use substitutions
             // that don't respect the order between the generalization's terms.
             // That is, a rule like |.2|.1.2 => |.2|.1.1 doesn't produce a shorter record if you use substitutions where .1 > .2.
@@ -54,16 +58,15 @@ public static class LookupReductionExtensions
             var nonCanonicalRecord = await ctx.Formulas.AsNoTracking()
                 .Where(_ => _.Id == searchResult.Node.Value)
                 .FirstAsync();
-            var canonicalRecord = await ctx.Formulas.AsNoTracking()
-                .OrderBy(_ => _.VarCount).ThenBy(_ => _.Length).ThenBy(_ => _.Text)
-                .Where(_ => _.TruthValue == nonCanonicalRecord.TruthValue)
-                .FirstAsync();
-
-            var reducedFormula = canonicalRecord.Formula.CreateSubstitutionInstance(substitutions);
-            if (reducedFormula.CompareTo(startingNand) < 0)
+            var canonicalRecord = await ctx.Formulas.GetLastReductionAsync(nonCanonicalRecord);
+            if (canonicalRecord.IsCanonical)
             {
-                var reducedRecord = await ctx.GetReductionRecordAsync(reducedFormula);
-                return reducedRecord;
+                var reducedFormula = canonicalRecord.Formula.CreateSubstitutionInstance(substitutions);
+                if (reducedFormula.CompareTo(startingNand) < 0)
+                {
+                    var reducedRecord = await ctx.GetMostlyCanonicalRecordAsync(reducedFormula);
+                    return reducedRecord;
+                }
             }
         }
 
