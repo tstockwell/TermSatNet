@@ -105,22 +105,20 @@ This section is an overview of, and guide to, the rest of this document.
 
 ### Dau
 [Mathematical Logic with Diagrams, Based on the Existential Graphs of Peirce;Dau](http://www.dr-dau.net/Papers/habil.pdf).
+Includes proofs of soundness and completeness for EGs.
 
-Includes proofs of soundness and completeness for EGs
+### Sowa
+[Peirce's Tutorial on Existential Graphs; Sowa](https://www.jfsowa.com/pubs/egtut.pdf)
 
 ### Linear Cofactors
 [Linear Cofactor Relationships in Boolean Functions; Zhang, Chrzanowska-Jeske, Mishchenko, Burch](https://people.eecs.berkeley.edu/~alanmi/publications/2005/tcad05_lcr.pdf)
-
-### Rewriting Logic 
-[Rewriting Logic as a Logical and Semantic Framework; Mart�-Oliet, LEseguer](https://www.sciencedirect.com/science/article/pii/S1571066104000404)
-
-### Cut Elimination
-[Confluence as a cut elimination property; Dowek](https://inria.hal.science/hal-04103228v1/document)
-
-I'm not the first person to notice that cut elimination is a problem.  
 
 ### Orderings
 [Orderings for term-rewriting systems; Dershowitz](https://www.computer.org/csdl/proceedings-article/focs/1979/542800123/12OmNqBbI2S)
 
 ### Existential Graphs of Peirce
 [Mathematical Logic with Diagrams, Based on the Existential Graphs of Peirce;Dau](http://www.dr-dau.net/Papers/habil.pdf).
+
+### Term Indexing
+[Term Indexing; Sekar; Ramakrishnan; Voronkov; in Handbook of Automated Reasoning; Robinson and Voronkov editors]()
+I can't overstate how useful the Handbook has been to me.  Especially the section on Term Indexing.  
