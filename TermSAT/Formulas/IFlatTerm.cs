@@ -5,7 +5,7 @@ namespace TermSAT.Formulas
 {
     /// <summary>
     /// 
-    /// This source module defines an API that represents Formulas as an array of all the 
+    /// This source module defines an API that represents Expressions as an array of all the 
     /// subformulas in the formula, ordered from the leftmost subformula (the formula itself) to the rightmost 
     /// subformula (the last constant or variable that appears in the formula).
     /// The name FlatTerm comes from the chapter on Term Indexing in the book 

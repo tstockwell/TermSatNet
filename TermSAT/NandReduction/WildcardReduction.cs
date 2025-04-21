@@ -39,7 +39,7 @@ public static class WildcardReduction
     /// 
     /// 
     /// </summary>
-    public static async Task<ReductionRecord> TryGetWildcardReductionAsync(this ReRiteDbContext db, ReductionRecord startingRecord)
+    public static async Task<ReductionRecord> TryGetWildcardReductionAsync(this LucidDbContext db, ReductionRecord startingRecord)
     {
         // if given formula is not a nand then it must be a variable or constant and is not reducible.
         if (!(startingRecord.Formula is Nand startingNand))
@@ -63,14 +63,14 @@ public static class WildcardReduction
 
             RetryWildcardTest:;
 
-            var reductiveGroundings = await db.Groundings
-                .Where(_ => _.FormulaId == rightRecord.Id && _.FormulaValue == false)
+            var reductiveGroundings = await db.Cofactors
+                .Where(_ => _.ExpressionId == rightRecord.Id && _.Conclusion == false)
                 .ToArrayAsync();
 
             foreach (var reductiveGrounding in reductiveGroundings)
             {
-                var replaceValue = reductiveGrounding.TermValue ? Constant.FALSE : Constant.TRUE;
-                var targetTerm = await db.Formulas.FindAsync(reductiveGrounding.TermId);
+                var replaceValue = reductiveGrounding.Replacement ? Constant.FALSE : Constant.TRUE;
+                var targetTerm = await db.Expressions.FindAsync(reductiveGrounding.SubtermId);
 
                 // todo: using ReplaceAll will not be good enough in the long run.
                 // In the long run it will be necessary to look for terms that can be unified to targetTerm.

@@ -20,7 +20,7 @@ public static class LookupReductionExtensions
     /// table then we already know how to reduce it.
     /// 
     /// </summary>
-    public static async Task<ReductionRecord> TryLookupReductionAsync(this ReRiteDbContext ctx, Formula startingFormula)
+    public static async Task<ReductionRecord> TryLookupReductionAsync(this LucidDbContext ctx, Formula startingFormula)
     {
         // if given formula is not a nand then it must be a variable or constant and is not reducible.
         if (!(startingFormula is Nand startingNand))
@@ -48,17 +48,17 @@ public static class LookupReductionExtensions
                 {
                     throw new TermSatException($"not a valid formula id:{searchResult.Node.Value}");
                 }
-                if (await ctx.Formulas.FindAsync(searchResult.Node.Value) == null)
+                if (await ctx.Expressions.FindAsync(searchResult.Node.Value) == null)
                 {
                     throw new TermSatException($"not a valid formula id:{searchResult.Node.Value}");
                 }
             }
 #endif
             Debug.Assert(0 < searchResult.Node.Value, "not a valid formula id");
-            var nonCanonicalRecord = await ctx.Formulas.AsNoTracking()
+            var nonCanonicalRecord = await ctx.Expressions.AsNoTracking()
                 .Where(_ => _.Id == searchResult.Node.Value)
                 .FirstAsync();
-            var canonicalRecord = await ctx.Formulas.GetLastReductionAsync(nonCanonicalRecord);
+            var canonicalRecord = await ctx.Expressions.GetLastReductionAsync(nonCanonicalRecord);
             if (canonicalRecord.IsCanonical)
             {
                 var reducedFormula = canonicalRecord.Formula.CreateSubstitutionInstance(substitutions);

@@ -61,6 +61,8 @@ which eventually results in deducing new equivalences.
 A *Grounding(E,S,PN,G)* is a cofactor E(S->PN) of an expression, where PN is a constant and E's canonical form is a constant G.  
 Meaning that when sub-expression S of E has the value PN then the entire formula has the value G.  
 Put another way, a grounding represents uno of these implications; S->E, ~S->E, S->~E, ~S->~E.
+	(S == T)	->	(E == T)
+	(S == PN)	->	(E == G)
 
 Grounding are used to compute erasures and de-iterations.  
 When uno side of an expression contains a negative grounding then it can be erased from the other side. 

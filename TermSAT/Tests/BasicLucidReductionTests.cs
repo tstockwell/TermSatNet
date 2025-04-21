@@ -1,5 +1,6 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility.Implementation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Npgsql;
 using System.Data;
@@ -16,7 +17,7 @@ namespace TermSAT.Tests
     public class NandSchemeReductionTests
     {
 
-        ReRiteDbContext ReRite { get; set; }
+        LucidDbContext Lucid { get; set; }
 
         [TestInitialize]
         public async Task InitializeTest()
@@ -31,31 +32,32 @@ namespace TermSAT.Tests
                 //.UseSqlite("Data Source=file:rules?mode=memory&cache=shared;Pooling=False;")
                 //.UseSqlite("Data Source=file:rules?mode=memory&cache=shared")
                 .Options;
-            ReRite = new ReRiteDbContext(options);
+            Lucid = new LucidDbContext(options);
 
             {
 #if DEBUG
                 try
                 {
-                    await ReRite.Database.EnsureDeletedAsync();
+                    await Lucid.Database.EnsureDeletedAsync();
                 }
                 catch { }
 #endif
             }
 
-            if (!(await ReRite.Database.EnsureCreatedAsync()))
+            if (!(await Lucid.Database.EnsureCreatedAsync()))
             {
                 throw new TermSatException("!ruleDb.Database.EnsureCreatedAsync()");
             }
 
             {
-                await ReRite.Lookup.AddRootAsync();
+                await Lucid.BootstrapAsync();
+
 
                 //await foreach (var nonCanonical in ruleDb.FormulaRecords.AsNoTracking().GetAllNonCanonicalRecords().AsAsyncEnumerable())
                 //{
                 //    await ruleDb.AddGeneralizationAsync(nonCanonical);
                 //}
-                await ReRite.SaveChangesAsync();
+                await Lucid.SaveChangesAsync();
             }
 
 
@@ -64,7 +66,7 @@ namespace TermSAT.Tests
         [TestCleanup]
         public void CleanupTest()
         {
-            ReRite.Dispose();
+            Lucid.Dispose();
         }
 
 
@@ -127,9 +129,9 @@ namespace TermSAT.Tests
                         "|.1|T|.2.3"
                     };
                     var reductionFormulas = reductionSteps
-                        .Select(async s => await ReRite.GetMostlyCanonicalRecordAsync(s))
+                        .Select(async s => await Lucid.GetMostlyCanonicalRecordAsync(s))
                         .ToArray();
-                    await ReRite.SaveChangesAsync();
+                    await Lucid.SaveChangesAsync();
                     Task.WaitAll(reductionFormulas);
                     var truthTables = reductionFormulas.Select(f => TruthTable.GetTruthTable(f.Result.Formula).ToString()).Distinct().ToArray();
                     Assert.IsTrue(truthTables.Length == 1);
@@ -141,26 +143,26 @@ namespace TermSAT.Tests
                         "|||TT|.2.3||.1.2|.1.3",
                     };
                     var reductionFormulas = reductionSteps
-                        .Select(async s => await ReRite.GetMostlyCanonicalRecordAsync(s))
+                        .Select(async s => await Lucid.GetMostlyCanonicalRecordAsync(s))
                         .ToArray();
                     Task.WaitAll(reductionFormulas);
                     var truthTables = reductionFormulas.Select(f => TruthTable.GetTruthTable(f.Result.Formula).ToString()).Distinct().ToArray();
                     Assert.IsTrue(truthTables.Length == 1);
                 }
 
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|||T.1|.2.3||.1.2|.1.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1.2|.1.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|||T.1|.2.3||.1.2|.1.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1.2|.1.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
             // |T||.1|T.2|.3|T.1 => ||.1.2||T.1|T.3
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1|T.2|.3|T.1");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2||T.1|T.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1|T.2|.3|T.1");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2||T.1|T.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -170,71 +172,65 @@ namespace TermSAT.Tests
         {
 
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.1T");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|T.1");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1T");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T.1");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|TT");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("F");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|TT");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("F");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.2.1");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.1.2");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.2.1");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1.2");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|T|T.1");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync(".1");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|T|T.1");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync(".1");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.1T");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|T.1");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1T");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T.1");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             await SimplestWildcardFormula();
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.2|.1T");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.2|T.1");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.2|.1T");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.2|T.1");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
-            {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.2|.3|.1T");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.2|.3|T.1");
-                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
-                Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
-            }
+            await SlightlyDeepReorderingReduction();
             await SlightlyDeepWildcardReduction();
 
             await SimpleWildcardSwappingExample();
 
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|.1T");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|T.1");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|.1T");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|T.1");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||T.2||T.3|.1F");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.3|T.2");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||T.2||T.3|.1F");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.3|T.2");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             // ||.2.3||T.3|.1.2, is canonical
@@ -274,56 +270,115 @@ namespace TermSAT.Tests
             //  => ||.2.3|T|.1.2
             //  => |.1|T|.2|T.3 canonical
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.2.3||T.3|.1.2");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.2.3||T.3|.1.2");
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.2.3||T.3|.1.2");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.2.3||T.3|.1.2");
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
 
 
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.1||.2.3||T.3|.1.2");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.1||.2.3||T.2|T.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1||.2.3||T.3|.1.2");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1||.2.3||T.2|T.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
+
+            // The secret to minimizing this expression is to understand that
+            // the concept of *irrelevance* is what drives minimization.
+            // In this expression the T and the 2 can be swapped because when 2 == F then
+            // the T is irrelevant and may therefore be replaced with 2.
+            // And the reverse is true, when the last 2 in ||.1|.2.3|.3|2.1 == F then 
+            // the first 2 is irrelevant and may therefore be replaced with T.
+            //
+            // That is....
+            // 
+            // ||.1|.2.3|.3|T.1 => ||.1|.2.3|.3|2.1, proof....
+            //      ||.1|F.3|.3|T.1 ; test lhs 
+            //      ||.1T|.3|T.1    ; empty-cut elimination
+            //      ||T.1|.3|T.1    ; ordering
+            //      ||T.1|.3T       ; deiteration, removed T identified as wildcard
+            //      ||T.1|T.3       ; ordering
+            //
+            // and....
+            // ||.1|.2.3|.3|.1.2 => ||.1|T.3|.3|.1.2 => , proof....
+            //      ||.1|.2.3|.3|.1F    ; test rhs
+            //      ||.1|.2.3|.3T       ; empty-cut elimination
+            //      ||.1|.2F|.3T        ; deiteration
+            //      ||.1T|.3T           ; empty-cut elimination, removed .2 identified as wildcard
+            //      ||T.1|T.3           ; ordering
+            //
+            // Note that both cofactors have the same conclusion,  
+            // and that swapping the cofactor terms (.2 and T) produces a reduction.  
+            //
+            // The above proofs could be implemented using cofactors by....
+            // - extending the set of cofactors to all cofactors computable
+            //      using T & F for Cofactor.Replacement and thus computing this cofactor...  
+            //          |.1|.2.3[.2<-F] =>* |T.1  , and
+            //          |.3|T.1[T<-F] =>* |T.3
+            // - Noticing that |T.1 is a term in the rhs, |.3|T.1, and thus   
+            //      the T's in any instances of |T.1 in the rhs are irrelevant with respect to .2
+            //      and may be replaced with .2.
+            // - AND noticing that, if we were to do so, then the resulting expression has the cofactor...
+            //      |.3|.1.2[.2<-F] =>* |T.3, and thus...
+            //      the .3's in the lhs may be replaced with F, thus making .2 irrelevant, 
+            //      and thus the .2 in the lhs may then be replaced with T.
+            // - AND noticing that, the T<-F cofactor of the minimized expression says the same thing...  
+            //      |.3|T.1[T<-F] =>* |T.3, and thus...
+            //      the .3's in the lhs may be replaced with F, thus making .2 irrelevant, 
+            //      and thus the .2 in the lhs may then be replaced with T.
+            // In short, the .2 in |.1|.2.3 and the T in |.3|T.1 may be swapped,
+            // and thus ||.1|.2.3|.3|T.1 =>* ||.1|T.3|.3|.1.2
+            //
+            // INSIGHT...
+            // This expression can be reduced by...   
+            // - for all terms in an expression, cofactors using T & F for Cofactor.Replacement.
+            // - for all pairs of cofactors of an expression with the same replacement and the same conclusion,  
+            //      check if swapping the cofactor terms produces a reduced expression.
+            //      BTW, these cofactors are guaranteed to be in opposite sides of the containing expression.  
+            // This extension is a generalization of the current method.  
+            // 
+            // Theorem: All these new cofactors can be computed in linear time from the cofactors of sub-expressions.  
+            // Theorem: The worst-case total # of cofactors generated is polynomial.  
+            //      
+            //
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.1|.2.3|.3|T.1");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1|T.3|.3|.1.2");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1|.2.3|.3|T.1");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.3|.3|.1.2");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.1|.2.3|.2|T.1");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1|.2.3|.2|T.1");
                 // => 
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|.1.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|.1.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.2.3||T.3|.1T");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.2.3||T.1|T.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.2.3||T.3|.1T");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.2.3||T.1|T.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.3||.1.2||T.1|.2.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.3||.1.2||T.1|T.2");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.3||.1.2||T.1|.2.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.3||.1.2||T.1|T.2");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.2|T|.1.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.1|T|.2.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.2|T|.1.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1|T|.2.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -349,24 +404,24 @@ namespace TermSAT.Tests
                 //  => |.3||.1.3|.2.3
                 //  => |.3||.1T|.2T
                 //  => |.3||T.1|T.2
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|||T.1|T.3||.1.3|.2.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1.3|.2.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|||T.1|T.3||.1.3|.2.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1.3|.2.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             // |||T.2|T.3|.3|T||T.1|T.2
             {
-                //var nonCanonicalFormula = (Formulas.Nand)StartingReRite.GetMostlyCanonicalRecordAsync("|||T.2|T.3|.3|T||T.1|T.2");
-                //var nonCanonicalFormula = (Formulas.Nand)StartingReRite.GetMostlyCanonicalRecordAsync("|||T.2|T.3|T|T||T.1|T.2");
-                //var nonCanonicalFormula = (Formulas.Nand)StartingReRite.GetMostlyCanonicalRecordAsync("|||T.2|T.3||T.1|T.2");
-                //var nonCanonicalFormula = (Formulas.Nand)StartingReRite.GetMostlyCanonicalRecordAsync("|||T.2|T.3||T.1|T.2");
-                //var nonCanonicalFormula = (Formulas.Nand)StartingReRite.GetMostlyCanonicalRecordAsync("|T||T.2||T.3|T.1");
-                var nonCanonicalFormula = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1.3|T.2");
+                //var nonCanonicalFormula = (Expressions.Nand)StartingReRite.GetMostlyCanonicalRecordAsync("|||T.2|T.3|.3|T||T.1|T.2");
+                //var nonCanonicalFormula = (Expressions.Nand)StartingReRite.GetMostlyCanonicalRecordAsync("|||T.2|T.3|T|T||T.1|T.2");
+                //var nonCanonicalFormula = (Expressions.Nand)StartingReRite.GetMostlyCanonicalRecordAsync("|||T.2|T.3||T.1|T.2");
+                //var nonCanonicalFormula = (Expressions.Nand)StartingReRite.GetMostlyCanonicalRecordAsync("|||T.2|T.3||T.1|T.2");
+                //var nonCanonicalFormula = (Expressions.Nand)StartingReRite.GetMostlyCanonicalRecordAsync("|T||T.2||T.3|T.1");
+                var nonCanonicalFormula = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1.3|T.2");
                 var nonCanonicalTT = TruthTable.GetTruthTable(nonCanonicalFormula.Formula).ToString();
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|T||T.2|.1.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T||T.2|.1.3");
                 var canonicalTT = TruthTable.GetTruthTable(canonicalRecord.Formula).ToString();
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalFormula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalFormula);
                 Assert.AreEqual(nonCanonicalTT, canonicalTT);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
@@ -398,10 +453,10 @@ namespace TermSAT.Tests
                 // => |||.1.2|.1.3|.3|T.2
                 //      test => |||.1.2|.1.3|.3|T.2 ;wildcard .2->F 
 
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|||.1.2|.1.3|.3|T||T.1|T.2");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1.2|.1.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|||.1.2|.1.3|.3|T||T.1|T.2");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1.2|.1.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -414,10 +469,10 @@ namespace TermSAT.Tests
             //                  => ||.1.2|.3|.1T
             //                  => ||.1.2|.3|T.1
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2|.3|.1|T.2");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2|.3|T.1");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2|.3|.1|T.2");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2|.3|T.1");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -426,34 +481,34 @@ namespace TermSAT.Tests
             //  => ||.2.3|T.1, since  |T||.1.2|.2 => |T||T.1|.2
             //  => ||T.1|.2.3
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.2.3|.1|.2.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||T.1|.2.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.2.3|.1|.2.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||T.1|.2.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
             // |T||.1|.2.3|.2.3
             //  => |T||T.1|.2.3, since  |T||.1.2|.2 => |T||T.1|.2
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1|.2.3|.2.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|T||T.1|.2.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1|.2.3|.2.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T||T.1|.2.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
             // ||.1.2|.3|T.2 is not a valid reduction for ||.1.2|.3|.1.2
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2|.3|.1.2");
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
-                Assert.AreNotEqual(reducedRecord, await ReRite.GetMostlyCanonicalRecordAsync("||.1.2|.3|T.2"));
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2|.3|.1.2");
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
+                Assert.AreNotEqual(reducedRecord, await Lucid.GetMostlyCanonicalRecordAsync("||.1.2|.3|T.2"));
             }
             // error: ||.1.2|.2.3 is not a valid reduction for ||.1.2|T||.1|.2.3|.2.3
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2|T||.1|.2.3|.2.3");
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
-                Assert.AreNotEqual(reducedRecord, await ReRite.GetMostlyCanonicalRecordAsync("||.1.2|.2.3"));
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2|T||.1|.2.3|.2.3");
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
+                Assert.AreNotEqual(reducedRecord, await Lucid.GetMostlyCanonicalRecordAsync("||.1.2|.2.3"));
             }
 
             // error...  |||T.1|T.3||T.2|.1.3 is not a valid reduction for |||T.1|T.3||.1.3|.2.3
@@ -476,10 +531,10 @@ namespace TermSAT.Tests
             //  => |||T.1|T.3||F.3|.2.3 
             //  => |||T.1|T.3|T|.2.3 
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|||T.1|T.3||.1.3|.2.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1.3|.2.3");
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
-                Assert.AreNotEqual(reducedRecord, await ReRite.GetMostlyCanonicalRecordAsync("|||T.1|T.3||T.2|.1.3"));
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|||T.1|T.3||.1.3|.2.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1.3|.2.3");
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
+                Assert.AreNotEqual(reducedRecord, await Lucid.GetMostlyCanonicalRecordAsync("|||T.1|T.3||T.2|.1.3"));
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -521,9 +576,9 @@ namespace TermSAT.Tests
             //  when in fact it should be the .1 in the last instance of |.1.3
 
             {
-                var nonCanonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1.3||.2.3||.1.2|.1.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2|.1.3");
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalRecord);
+                var nonCanonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1.3||.2.3||.1.2|.1.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2|.1.3");
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalRecord);
                 Assert.AreNotEqual(reducedRecord.Formula, Formula.GetOrParse("|T|.1.3"));
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
@@ -537,9 +592,9 @@ namespace TermSAT.Tests
             //      => |T||.2|T.1|.3|T.1
             //      => |T||T.1||T.2|T.3,  ||ba|ca -> |T|a||Tb|Tc -> *
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|T||T.1||T.2|T.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.2|T.1|.3|T.1");
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|T||T.1||T.2|T.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.2|T.1|.3|T.1");
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -550,10 +605,10 @@ namespace TermSAT.Tests
             //  => |.1||T.2T
             //  => |.1.2
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.1||T.2||T.1|T.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.1.2");
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
-                Assert.AreNotEqual(reducedRecord, await ReRite.GetMostlyCanonicalRecordAsync("||.1|T.2|.3|T.2"));
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1||T.2||T.1|T.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1.2");
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
+                Assert.AreNotEqual(reducedRecord, await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.2|.3|T.2"));
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             // ||.2|.1.3|.3|T.2 => ||.2|T.3|.3|.1.2
@@ -592,10 +647,10 @@ namespace TermSAT.Tests
             // This is the first rule that I ever took the time to actually prove
             // cannot be implemented via wildcard analysis.
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.2|.1.3|.3|T.2");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.2|T.3|.3|.1.2");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.2|.1.3|.3|T.2");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.2|T.3|.3|.1.2");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -611,10 +666,10 @@ namespace TermSAT.Tests
             //  => ||.1.2||.1.3|T.2
             //  => ||.1.2||T.2|.1.3
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2||.1.3|.2|T.1");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2||T.2|.1.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2||.1.3|.2|T.1");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2||T.2|.1.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -646,10 +701,10 @@ namespace TermSAT.Tests
             //      => ||F|T.3||.1.2|.1.3
             //      => |T||.1.2|.1.3, verified canonical
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.2|T.3||.1.2|.1.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.1.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.2|T.3||.1.2|.1.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -690,10 +745,10 @@ namespace TermSAT.Tests
             //  => |T|T|.1.3
             //  => |.1.3
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|||.1.2|.1.3|.1|T|.2|T.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.1.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|||.1.2|.1.3|.1|T|.2|T.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -704,10 +759,10 @@ namespace TermSAT.Tests
             // therefore
             // => |.1||.2|T.3|.3|T.2 
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.1||.2|T.3|.3|.1.2"); // id=484
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.2.3||.1.2|.1.3"); //id=483
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1||.2|T.3|.3|.1.2"); // id=484
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.2.3||.1.2|.1.3"); //id=483
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -718,10 +773,10 @@ namespace TermSAT.Tests
             //  => ||.1|T.2||.2|.1T
             //  => ||.1|T.2||.2|T.1
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1.2||T.1|T.2");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|T.1");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1.2||T.1|T.2");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|T.1");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -740,29 +795,29 @@ namespace TermSAT.Tests
             // In order to to be able to check the value of the replacement against the value of the test value the test value 
             // had to be added to the ReductionTargetFinder proof tracer class.
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|||T.2|T.3||.2.3|.1|T.2");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1.3|.2.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|||T.2|T.3||.2.3|.1|T.2");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1.3|.2.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
 
             // tossed an error
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.2.3||.1.2|.3|T.1");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1.3||.1.2|.3|T.2");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.2.3||.1.2|.3|T.1");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1.3||.1.2|.3|T.2");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
 
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1|T.2|.1|T.3");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.1|.2.3");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1|T.2|.1|T.3");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1|.2.3");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             // |.3||.1|T.2|.2|.1.T => ||.1.2||.1.3|.2.3
@@ -770,10 +825,10 @@ namespace TermSAT.Tests
             // => |T||.3|T|.1|T.2|.2|T|.3|.1T 
             // => |T| |.1|T|.3|T.2 |.2|T|.3|.1T 
             {
-                var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.3||.1|T.2|.2|T.1");
-                var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2||.1.3|.2.3"); // verified canonical
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.3||.1|T.2|.2|T.1");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2||.1.3|.2.3"); // verified canonical
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
@@ -782,12 +837,39 @@ namespace TermSAT.Tests
         }
 
         [TestMethod]
+        public async Task SlightlyDeepReorderingReduction()
+        {
+            {
+                var trueId = await Lucid.GetConstantExpressionIdAsync(true);
+                var subRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1T");
+                var fgfCofactors = await Lucid.GetFGroundingFCofactorsAsync(subRecord.Id);
+                var IsTrueFgfCofactor = fgfCofactors.Where(_ => _.SubtermId == trueId).Any();
+                Assert.IsFalse(IsTrueFgfCofactor);
+            }
+            {
+                var trueId = await Lucid.GetConstantExpressionIdAsync(true);
+                var subRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.3|.1T");
+                var fgfCofactors = await Lucid.GetFGroundingFCofactorsAsync(subRecord.Id);
+                var IsTrueFgfCofactor = fgfCofactors.Where(_ => _.SubtermId == trueId).Any();
+                Assert.IsFalse(IsTrueFgfCofactor);
+            }
+
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.2|.3|.1T");
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.2|.3|T.1");
+
+            Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
+            Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(reducedRecord.Formula).ToString());
+            Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
+        }
+
+        [TestMethod]
         public async Task SimplestWildcardFormula()
         {
-            var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.1|.1.2");
-            var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.1|T.2");
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1|.1.2");
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1|T.2");
             Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-            var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
             Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
         }
 
@@ -860,14 +942,14 @@ namespace TermSAT.Tests
         [TestMethod]
         public async Task ReduceFormulaWithManyTargetsUNOWildcard()
         {
-            var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("||.1|.2.3||.1.2|.3|T.1");
-            var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.3|.1|T.2");
-            var testFormula = await ReRite.GetMostlyCanonicalRecordAsync("||.1|.2.3||F.2|.3|TF");
-            var testFormula2 = await ReRite.GetMostlyCanonicalRecordAsync("||.1|.2.3||.1.2|.3|TF");
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1|.2.3||.1.2|.3|T.1");
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.3|.1|T.2");
+            var testFormula = await Lucid.GetMostlyCanonicalRecordAsync("||.1|.2.3||F.2|.3|TF");
+            var testFormula2 = await Lucid.GetMostlyCanonicalRecordAsync("||.1|.2.3||.1.2|.3|TF");
             Assert.AreEqual(TruthTable.GetTruthTable(testFormula2.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
             Assert.AreEqual(TruthTable.GetTruthTable(testFormula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
             Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-            var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
             Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
         }
 
@@ -921,10 +1003,10 @@ namespace TermSAT.Tests
         [TestMethod]
         public async Task ReduceFormulaWithDeepProof()
         {
-            var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|||.1.2|.3|T.2||.2.3|.1|T.2");
-            var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.1.3");
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|||.1.2|.3|T.2||.2.3|.1|T.2");
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1.3");
             Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-            var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
             Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
         }
 
@@ -939,6 +1021,11 @@ namespace TermSAT.Tests
         ///         #1: |1||1.2|1.3 => |1||T.2|T.3, or
         ///         #2: |1||1.2|1.3 => |T||1.2|1.3
         ///     RR would use rule #2 since |T||1.2|1.3 is lexicographically simpler.
+        ///     
+        /// ##### 4/5/25
+        /// Now easily solvable using cofactors.
+        /// Since 1 is a FGF-cofactor of the lhs then paste-and-cut yields |T||.1.2|.1.3.
+        /// 
         /// 
         /// ###### 1/24/25
         /// Note: just now getting around to implementing wildcard swapping.
@@ -965,20 +1052,20 @@ namespace TermSAT.Tests
         [TestMethod]
         public async Task SimpleWildcardSwappingExample()
         {
-            var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.1||T.2|T.3");
-            var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1.2|.1.3");
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1||T.2|T.3");
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1.2|.1.3");
             Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-            var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
             Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
         }
 
         [TestMethod]
         public async Task SlightlyDeepWildcardReduction()
         {
-            var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|.2|.3|.1.2");
-            var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("|.2|.3|T.1");
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.2|.3|.1.2");
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.2|.3|T.1");
             Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-            var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
             Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
         }
 
@@ -1001,6 +1088,34 @@ namespace TermSAT.Tests
         /// Therefore, these two terms form a new rule.
         /// The [Knuth-Bendix](https://en.wikipedia.org/wiki/Knuth%E2%80%93Bendix_completion_algorithm) way of 
         /// extending the current system would be to add this production rule to the set of rules in our system.  
+        /// 
+        /// ########### UPDATE 3/28/25
+        /// Btw, the lhs above says "1->2 and 2->1", and the rhs says "1 == 2"
+        /// The secret is to be able to recognize that this... 
+        ///     (T ((1 (T 2)) ((T 1) 2))) ; note that the rhs has no obvious f-grounding f-cofactor
+        /// is equivalent to this...
+        ///     (T ((1 (1 2)) (2 (1 2)))) ; note that (1 2) is an easily, mechanically identifiable f-grounding f-cofactor
+        ///     
+        /// ### Proof using cofactors
+        /// 
+        /// Must Find fgf-cofactor of ((1 (T 2)) ((T 1) 2)))	
+        /// Must find common tgf-cofactor of both sides.  
+        /// tgf-cofactors of left side are 1, and (T 2)  
+        /// tgf-cofactors of right side are 2, (T 1)
+        /// No obvious common cofactor :-(.
+        /// 
+        /// The LE documentation documents how to use cofactors to identify opportunities for deiteration. 
+        /// The documentation also defines a standard functional API, and pseudo code, 
+        /// for computing cofactors and reducing expressions.
+        /// 
+        /// Example...
+        /// Let allLHS = Cofactors((1 (T 2))).Where(_ => _.R == F && _.C == T)
+        /// Let allrHS = Cofactors(((T 1) 2)).Where(_ => _.R == F && _.C == T)
+        /// // KA-BLAM, there is a common tgf-cofactors where _.S is (1 2) with conclusions of (T 1) and (T 2).
+        /// Let (leftCofactor, rightCofactor) = Join(allLHS, allRHS, _ => _.S).FirstOrDefault()
+        /// // equal to ((1 2) ((T 1) (T 2)))
+        /// Let reducedE = (leftCofactor.S, (leftCofactor.C rightCofactor.C))
+        /// 
         /// 
         /// ########### UPDATE 2/2/25
         /// I implemented 'wildcard swapping' and then it didn't work right, 
@@ -1141,10 +1256,17 @@ namespace TermSAT.Tests
         [TestMethod]
         public async Task SimpleWildcardSwapRequiringUnification()
         {
-            var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1|T.2|.2|T.1"); // id=456
-            var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2||T.1|T.2");
-            Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-            var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1|T.2|.2|T.1"); // id=456
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2||T.1|T.2");
+            Assert.AreEqual(
+                TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), 
+                TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
+
+            //var falseId = await Lucid.GetConstantExpressionIdAsync(false);
+            //var subsequentRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|T.1"); 
+            //Lucid.Cofactors.Where(_ => _.ExpressionId == subsequentRecord.Id && _.ConclusionId == falseId);
+
             Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
         }
 
@@ -1268,10 +1390,10 @@ namespace TermSAT.Tests
         [TestMethod]
         public async Task BIHSchoolProblem()
         {
-            var nonCanonicalformula = await ReRite.GetMostlyCanonicalRecordAsync("|T||.1|T.2|.2|T.1"); // id=456
-            var canonicalRecord = await ReRite.GetMostlyCanonicalRecordAsync("||.1.2||T.1|T.2");
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1|T.2|.2|T.1"); // id=456
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2||T.1|T.2");
             Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-            var reducedRecord = await ReRite.GetCanonicalRecordAsync(nonCanonicalformula);
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
             Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
         }
     }

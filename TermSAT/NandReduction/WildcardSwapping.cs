@@ -28,7 +28,7 @@ public static class WildcardSwapping
     ///     S.Length == 1, and is covered by some hard-coded rules in NandReducerCommutativeRules.
     /// 
     /// </summary>
-    public static async Task<ReductionRecord> TryGetSwappedWildcardReductionAsync(this ReRiteDbContext db, ReductionRecord startingRecord)
+    public static async Task<ReductionRecord> TryGetSwappedWildcardReductionAsync(this LucidDbContext db, ReductionRecord startingRecord)
     {
         // if given formula is not a nand then it must be a variable or constant and is not reducible.
         if (!(startingRecord.Formula is Nand startingNand))
@@ -40,14 +40,14 @@ public static class WildcardSwapping
         {
             var rightRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Subsequent);
 
-            var reductiveGroundings = await db.Groundings
-                .Where(_ => _.FormulaId == rightRecord.Id && _.FormulaValue == false)
+            var reductiveGroundings = await db.Cofactors
+                .Where(_ => _.ExpressionId == rightRecord.Id && _.Conclusion == false)
                 .ToArrayAsync();
 
             foreach (var reductiveGrounding in reductiveGroundings)
             {
-                var replaceValue = reductiveGrounding.TermValue ? Constant.FALSE : Constant.TRUE;
-                var targetTerm = await db.Formulas.FindAsync(reductiveGrounding.TermId);
+                var replaceValue = reductiveGrounding.Replacement ? Constant.FALSE : Constant.TRUE;
+                var targetTerm = await db.Expressions.FindAsync(reductiveGrounding.SubtermId);
 
                 // todo: using ReplaceAll will not be good enough in the long run.
                 // In the long run it will be necessary to look for terms that can be unified to targetTerm.
@@ -78,14 +78,14 @@ public static class WildcardSwapping
         {
             var rightRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Subsequent);
 
-            var reductiveGroundings = await db.Groundings
-                .Where(_ => _.FormulaId == rightRecord.Id && _.FormulaValue == false)
+            var reductiveGroundings = await db.Cofactors
+                .Where(_ => _.ExpressionId == rightRecord.Id && _.Conclusion == false)
                 .ToArrayAsync();
 
             foreach (var reductiveGrounding in reductiveGroundings)
             {
                 var replaceValue = startingNand.Antecedent;
-                var targetTerm = await db.Formulas.FindAsync(reductiveGrounding.TermId);
+                var targetTerm = await db.Expressions.FindAsync(reductiveGrounding.SubtermId);
 
                 // todo: using ReplaceAll will not be good enough in the long run.
                 // In the long run it will be necessary to look for terms that can be unified to targetTerm.

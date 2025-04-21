@@ -87,7 +87,7 @@ public static class ReductionRecordExtensions
 
 
     /**
-     * Formulas longer than this length are guaranteed to be reducible with rules,
+     * Expressions longer than this length are guaranteed to be reducible with rules,
      * generated from previous formulas. 
      * Therefore processing can stop when formulas get this long.
      */

@@ -15,7 +15,7 @@ namespace TermSAT.Tests
     public class BasicReductionAlogorthmTests
     {
         /// <summary>
-        /// Formulas are ordered.
+        /// Expressions are ordered.
         /// When generating rules, it's important that the generated formulas were generated in formula order.
         /// Therefore the formula id column in the database 
         /// </summary>

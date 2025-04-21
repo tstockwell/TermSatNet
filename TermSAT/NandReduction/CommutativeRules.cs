@@ -14,7 +14,7 @@ public static class CommutativeRules
     /// <summary>
     /// 'Commutative' rules are rules where the length doesn't change, just the symbols are rearranged.  
     /// </summary>
-    public static async Task<ReductionRecord> TryReduceCommutativeFormulas(this ReRiteDbContext db, ReductionRecord startingRecord)
+    public static async Task<ReductionRecord> TryReduceCommutativeFormulas(this LucidDbContext db, ReductionRecord startingRecord)
     {
         // if given formula is not a nand then it must be a variable or constant and is not reducible.
         if (!(startingRecord.Formula is Nand startingNand))
@@ -38,8 +38,7 @@ public static class CommutativeRules
             if (startingNand.Subsequent.CompareTo(startingNand.Antecedent) < 0)
             {
                 var reducedFormula = Formulas.Nand.NewNand(startingNand.Subsequent, startingNand.Antecedent);
-                var nextReduction = new ReductionRecord(reducedFormula);
-                await db.InsertFormulaRecordAsync(nextReduction); // need to save and populate id
+                var nextReduction = await db.GetMostlyCanonicalRecordAsync(reducedFormula);
 
                 startingRecord.RuleDescriptor = "|.2.1 => |.1.2";
                 startingRecord.Mapping =  Enumerable.Repeat(-1, 1)
@@ -65,9 +64,9 @@ public static class CommutativeRules
         // NOTE!!!!!!: This rule could be subsumed by wildcard analysis if wildcard analysis is extended to discover 
         // when two terms are wildcards for each other and swapping them reduces the formula.
         {
-            if (startingNand.Subsequent is Formulas.Nand nand
+            if (startingNand.Subsequent is Expressions.Nand nand
                 && nand.Antecedent == Constant.TRUE
-                && nand.Subsequent is Formulas.Nand nandSubNand
+                && nand.Subsequent is Expressions.Nand nandSubNand
                 && nandSubNand.Antecedent.CompareTo(startingNand.Antecedent) < 0)
             {
                 var reducedFormula = Formulas.Nand.NewNand(
@@ -117,10 +116,10 @@ public static class CommutativeRules
         // An example of a 'T-slider' rule.
         // NOTE: Can be subsumed by wildcard analysis after extending for 'swappable terms'.
         {
-            if (startingNand.Antecedent is Formulas.Nand nandAnt
-                && nandAnt.Subsequent is Formulas.Nand nandAntSub
-                && startingNand.Subsequent is Formulas.Nand nandSub
-                && nandSub.Subsequent is Formulas.Nand nandSubSub
+            if (startingNand.Antecedent is Expressions.Nand nandAnt
+                && nandAnt.Subsequent is Expressions.Nand nandAntSub
+                && startingNand.Subsequent is Expressions.Nand nandSub
+                && nandSub.Subsequent is Expressions.Nand nandSubSub
                 && nandAntSub.Antecedent.Equals(nandSub.Antecedent)
                 && nandAnt.Antecedent.Equals(nandSubSub.Subsequent)
                 && nandSubSub.Antecedent.Equals(Constant.TRUE)
@@ -166,10 +165,10 @@ public static class CommutativeRules
         // An example of a 'T-slider' rule.
         // NOTE: Can be subsumed by wildcard analysis after extending for 'swappable terms'.
         {
-            if (startingNand.Antecedent is Formulas.Nand nandAnt
-                && nandAnt.Subsequent is Formulas.Nand nandAntSub
-                && startingNand.Subsequent is Formulas.Nand nandSub
-                && nandSub.Subsequent is Formulas.Nand nandSubSub
+            if (startingNand.Antecedent is Expressions.Nand nandAnt
+                && nandAnt.Subsequent is Expressions.Nand nandAntSub
+                && startingNand.Subsequent is Expressions.Nand nandSub
+                && nandSub.Subsequent is Expressions.Nand nandSubSub
                 && nandAntSub.Subsequent.Equals(nandSub.Antecedent)
                 && nandAnt.Antecedent.Equals(nandSubSub.Subsequent)
                 && nandSubSub.Antecedent.Equals(Constant.TRUE)

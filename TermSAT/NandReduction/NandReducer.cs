@@ -36,7 +36,7 @@ namespace TermSAT.NandReduction;
 /// That is, any substitution instance of |||.1.2|.3|T.2||.2.3|.1|T.2 can be immediately reduced 
 /// using the previously built proof.
 /// Basically reusing the work we did to reduce |||.1.2|.3|T.2||.2.3|.1|T.2 to reduce another formula.
-/// NandReducer can do this efficiently, see TermSAT.Formulas.InstanceRecognizer.
+/// NandReducer can do this efficiently, see TermSAT.Expressions.InstanceRecognizer.
 /// 
 /// </summary>
 public static class NandReducer
@@ -47,10 +47,10 @@ public static class NandReducer
     }
 
     /// <summary>
-    /// Returns the first nextReduction that can be produced by all of NandReducers' internal rules (like wildcard analysis or proof-rules).
+    /// Returns the first reduction that can be produced by all of NandReducers' internal rules (like wildcard analysis or proof-rules).
     /// Returns null if no next Reduction can be produced, in which case the given formula is canonical.  
     /// </summary>
-    public static async Task<ReductionRecord> TryGetNextReductionAsync(this ReRiteDbContext db, ReductionRecord startingRecord)
+    public static async Task<ReductionRecord> TryGetNextReductionAsync(this LucidDbContext db, ReductionRecord startingRecord)
     {
 #if DEBUG
         //Debug.Assert(!reductionProof.HasReduced(startingFormula), $"reductionProof has already reduced formula {startingFormula}");
@@ -62,7 +62,7 @@ public static class NandReducer
 
         if (0 < startingRecord.NextReductionId)
         {
-            var nextReduction = await db.Formulas.TryGetReductionRecordAsync(startingRecord.NextReductionId);
+            var nextReduction = await db.Expressions.TryGetReductionRecordAsync(startingRecord.NextReductionId);
             Debug.Assert(nextReduction != null, $"internal error: formula not found {startingRecord.NextReductionId}");
             return nextReduction;
         }
@@ -71,14 +71,11 @@ public static class NandReducer
         ReductionRecord result= null;
         if (startingRecord.Formula is Nand lastNand)
         {
-#if DEBUG
             result= await db.TryLookupReductionAsync(lastNand);
             if (result != null)
             {
-                throw new TermSatException($"Invalid argument: {nameof(startingRecord)} should have already been reduced to a 'mostly canonical' formula that is not reducible via an existing reduction rule.");
+                goto FoundReduction;
             }
-#endif
-
 
             result= await db.TryReduceDescendantsAsync(startingRecord);
             if (result != null) 
@@ -98,17 +95,24 @@ public static class NandReducer
                 goto FoundReduction;
             }
 
-            result = await db.TryGetWildcardReductionAsync(startingRecord);
+            result = await db.TryGetCofactorReductionAsync(startingRecord);
             if (result != null)
             {
                 goto FoundReduction;
             }
 
-            result = await db.TryGetSwappedWildcardReductionAsync(startingRecord);
-            if (result != null)
-            {
-                goto FoundReduction;
-            }
+            //result = await db.TryGetWildcardReductionAsync(startingRecord);
+            //if (result != null)
+            //{
+            //    goto FoundReduction;
+            //}
+
+            //result = await db.TryGetSwappedWildcardReductionAsync(startingRecord);
+            //if (result != null)
+            //{
+            //    goto FoundReduction;
+            //}
+
             //if (lastNand.TryReduceWildcards_NoConstants(out result))
             //{
             //    return true;
@@ -132,66 +136,6 @@ public static class NandReducer
     /// The process stops when no more reductions can be made.
     /// Always returns a logically equivalent formula in canonical form.  
     /// </summary>
-    public static async Task<ReductionRecord> GetCanonicalRecordAsync(this ReRiteDbContext db, ReductionRecord reductionRecord)
-    {
-        if (0 < reductionRecord.CanonicalReductionId)
-        {
-            var canonicalRecord = await db.Formulas.TryGetReductionRecordAsync(reductionRecord.CanonicalReductionId);
-            Debug.Assert(canonicalRecord != null, $"Failed to find canonical formula: {reductionRecord.CanonicalReductionId}");
-            return canonicalRecord;
-        }
-
-        var mostReducedRecord = await db.Formulas.GetLastReductionAsync(reductionRecord); 
-
-        // Repeatedly reduce formulas, depth-first, until starting formula is complete
-        Stack<ReductionRecord> todo = new Stack<ReductionRecord>();
-        todo.Push(mostReducedRecord);
-
-        while (todo.Any())
-        {
-            var todoProof = todo.Pop();
-            mostReducedRecord = todoProof;
-
-            if (!(await db.Formulas.IsCompleteAsync(todoProof)))
-            {
-                // handle an empty proof
-                if (todoProof.NextReductionId <= 0)
-                {
-                    var nextReduction = await db.TryGetNextReductionAsync(todoProof);
-                    if (nextReduction != null)
-                    {
-                        //await db.InsertFormulaRecordAsync(nextReduction);
-                        todo.Push(nextReduction);
-                    }
-                    else
-                    {
-                        // the given formula is canonical
-                        await db.AddCompletionMarkerAsync(todoProof);
-                    }
-
-                    continue;
-                }
-
-                // if last formula is not yet complete then complete it first.
-                var lastProof = await db.Formulas.GetLastReductionAsync(todoProof);
-                if (!(await db.Formulas.IsCompleteAsync(todoProof)))
-                {
-                    todo.Push(lastProof);
-                    continue;
-                }
-                Debug.Assert(lastProof.Formula.CompareTo(mostReducedRecord.Formula) <= 0);
-                mostReducedRecord = lastProof; // lastProof is the canonical form of todoProof
-
-                // all that's missing is a completion marker, add it
-                await db.AddCompletionMarkerAsync(todoProof);
-            }
-        }
-
-        return mostReducedRecord;
-    }
-
-    
-
 
     /// <summary>
     /// Returns a tuple of...
@@ -207,7 +151,7 @@ public static class NandReducer
     /// 
     /// </summary>
     /// <param name="targetTerm">any sub-term of the starting formula that's not a constant</param>
-    public static async Task<WildcardReduction> TryGetWildcardReductionAsync(this ReRiteDbContext db, ReductionRecord startingRecord, Formula targetTerm, Constant testValue)
+    public static async Task<WildcardReduction> TryGetWildcardReductionAsync(this LucidDbContext db, ReductionRecord startingRecord, Formula targetTerm, Constant testValue)
     {
         // constants cant be reduced
         if (startingRecord.VarCount == 0)

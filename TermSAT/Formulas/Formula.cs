@@ -28,7 +28,7 @@ namespace TermSAT.Formulas
      *  considered formulas in a hashmap and then quickly identifying previously 
      *  considered formulas by their hashcode.
      *  Caching Formula instances also reduces memory use.
-     *  Formulas are cached using weak references so it's possible that 
+     *  Expressions are cached using weak references so it's possible that 
      *  a previously created formula is recreated with a different hashcode, but 
      *  that should only happen if there are no objects holding any references to 
      *  any previously created instance.
@@ -42,7 +42,7 @@ namespace TermSAT.Formulas
     {
 
         /// <summary>
-        /// Provide implicit cast from strings to Formulas.
+        /// Provide implicit cast from strings to Expressions.
         /// 
         /// I'm on the fence about whether this is a good idea or not.
         /// All formula classes have these implicit casts defined, they make writing tests *very* readable.
@@ -186,7 +186,7 @@ namespace TermSAT.Formulas
         }
 
         /// Implement IEquatable<Formula>.Equals
-        /// Formulas are singletons, ie formula references are equal when they reference the same object.
+        /// Expressions are singletons, ie formula references are equal when they reference the same object.
         public bool Equals(Formula other)
         {
             return base.Equals(other);
@@ -243,17 +243,17 @@ namespace TermSAT.Formulas
         public static T GetOrCreate<T>(string formulaText, Func<T> provider) where T:Formula => 
             FormulaParser.GetOrCreate(formulaText, provider);
 
-        /**
-         * Returns substitutions that will convert the given formulas into a single formula 
-         * that is also substitution instance of both formulas.
-         * The goal of unification is to find a substitution instance which demonstrates 
-         * that two seemingly different terms are in fact either identical or just equal.
-         * 
-         * @return null if no such substitution exists otherwise, 
-         * 		an empty map if the formulas are equal, 
-         * 		else returns a map of substitutions for each formula.
-         */
-        public static IDictionary<Variable, Formula> Unify(Formula left, Formula right)
+        /// <summary>
+        /// Returns substitutions that will convert the given formulas into a single formula 
+        /// that is also substitution instance of both formulas.
+        /// The goal of unification is to find a substitution instance which demonstrates
+        /// that two seemingly different terms are in fact either identical or just equal.
+        ///  
+        /// @return null if no such substitution exists otherwise,
+        /// an empty map if the formulas are equal,
+        /// else returns a map of substitutions for each formula.
+        /// </summary>
+        public static IDictionary<Variable, Formula> TryUnify(Formula left, Formula right)
         {
             if (left is Constant)
             {
@@ -285,10 +285,45 @@ namespace TermSAT.Formulas
                     return null;
                 return new Dictionary<Variable, Formula>() { [(Variable)right] = left };
             }
+            else if (left is Nand)
+            {
+                if (!(right is Nand))
+                    return null;
+                Formula la = ((Nand)left).Antecedent;
+                Formula ra = ((Nand)right).Antecedent;
+                var ua = TryUnify(la, ra);
+                if (ua == null)
+                    return null;
+
+                Formula lc = ((Nand)left).Subsequent;
+                Formula rc = ((Nand)right).Subsequent;
+                Formula lu = lc.CreateSubstitutionInstance(ua);
+                Formula ru = rc.CreateSubstitutionInstance(ua);
+
+                var uc = TryUnify(lu, ru);
+                if (uc == null)
+                    return null;
+
+                var map = new Dictionary<Variable, Formula>();
+
+                foreach (var v in ua.Keys)
+                {
+                    // must create composition of substitutions
+                    Formula f = ua[v];
+                    f = f.CreateSubstitutionInstance(uc);
+                    map[v] = f;
+                }
+                foreach (Variable v in uc.Keys)
+                {
+                    map[v] = uc[v];
+                }
+
+                return map;
+            }
             else if (left is Negation)
             {
                 if (right is Negation)
-                    return Unify(((Negation)left).Child, ((Negation)right).Child);
+                    return TryUnify(((Negation)left).Child, ((Negation)right).Child);
                 return null;
             }
             else if (right is Negation)
@@ -301,7 +336,7 @@ namespace TermSAT.Formulas
                     return null;
                 Formula la = ((Implication)left).Antecedent;
                 Formula ra = ((Implication)right).Antecedent;
-                var ua = Unify(la, ra);
+                var ua = TryUnify(la, ra);
                 if (ua == null)
                     return null;
 
@@ -310,7 +345,7 @@ namespace TermSAT.Formulas
                 Formula lu = lc.CreateSubstitutionInstance(ua);
                 Formula ru = rc.CreateSubstitutionInstance(ua);
 
-                var uc = Unify(lu, ru);
+                var uc = TryUnify(lu, ru);
                 if (uc == null)
                     return null;
 
@@ -394,7 +429,7 @@ namespace TermSAT.Formulas
             if (left == right)
                 return true;
 
-            var unification = Formula.Unify(left, right);
+            var unification = Formula.TryUnify(left, right);
             if (unification == null)
                 return false;
             foreach (Formula f in unification.Values)
@@ -431,7 +466,7 @@ namespace TermSAT.Formulas
                         if (subTerm is Variable)
                             return;
 
-                        var unification = Formula.Unify(subTerm, right);
+                        var unification = Formula.TryUnify(subTerm, right);
                         if (unification != null && 0 < unification.Count)
                         {
                             Formula criticalTerm = left.CreateSubstitutionInstance(unification);
@@ -450,7 +485,7 @@ namespace TermSAT.Formulas
                         if (subTerm is Variable)
                             return;
 
-                        var unification = Formula.Unify(subTerm, left);
+                        var unification = Formula.TryUnify(subTerm, left);
                         if (unification != null && 0 < unification.Count)
                         {
                             Formula criticalTerm = right.CreateSubstitutionInstance(unification);

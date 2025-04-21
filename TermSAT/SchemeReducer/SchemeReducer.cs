@@ -51,7 +51,7 @@ public static class SchemeReducer
     //        return formula;
     //    }
 
-    //    if (formula is Formulas.Nand nand)
+    //    if (formula is Expressions.Nand nand)
     //    {
     //        return NandReducer.GetCanonicalRecordAsync(nand);
     //    }

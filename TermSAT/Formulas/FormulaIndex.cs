@@ -84,7 +84,7 @@ public static partial class FormulaIndex
         ctx.Database.ExecuteSqlRaw($"DELETE FROM {nameof(NodeContext.Nodes)}");
 
 
-    static public async Task AddGeneralizationAsync(this ReRiteDbContext ctx, ReductionRecord formulaRecord)
+    static public async Task AddGeneralizationAsync(this LucidDbContext ctx, ReductionRecord formulaRecord)
     {
         var nodeSet = ctx.Lookup;
 

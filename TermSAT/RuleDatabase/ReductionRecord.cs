@@ -39,7 +39,7 @@ namespace TermSAT.RuleDatabase;
 /// A reduction is an asymmetric operation because there may be new subterms in the reduced startingFormula that 
 /// do not exist in the starting startingFormula.
 /// 
-/// ReRite creates and reuses a database of reduction rules that reduce a given startingFormula to it canonical form.  
+/// Lucid creates and reuses a database of reduction rules that reduce a given startingFormula to it canonical form.  
 /// These proofs are called 'reduction proofs'.
 /// Initially a startingFormula will have a reduction proof that has no reductions.
 /// If a startingFormula can no longer be reduced then it 

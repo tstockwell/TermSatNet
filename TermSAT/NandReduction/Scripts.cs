@@ -38,12 +38,12 @@ public static class Scripts
         bool isEquivalent = true;
         try
         {
-            using (var generatedRulesDb = ReRiteDbContext.GetDatabaseContext("ruledb"))
+            using (var generatedRulesDb = LucidDbContext.GetDatabaseContext("ruledb"))
             {
-                await foreach (var record in generatedRulesDb.Formulas.GetAllNonCanonicalRecords().AsAsyncEnumerable())
+                await foreach (var record in generatedRulesDb.Expressions.GetAllNonCanonicalRecords().AsAsyncEnumerable())
                 {
                     var truthTable = TruthTable.GetTruthTable(record.Formula).ToString();
-                    var canonicalFormulas = await generatedRulesDb.Formulas.GetAllCanonicalRecords().Where(_ => _.TruthValue ==  truthTable).ToListAsync();
+                    var canonicalFormulas = await generatedRulesDb.Expressions.GetAllCanonicalRecords().Where(_ => _.TruthValue ==  truthTable).ToListAsync();
                     Debug.Assert(canonicalFormulas.Count == 1, "there is never more than 1 canonical formula");
                     var canonicalFormula = canonicalFormulas[0];
 
@@ -103,7 +103,7 @@ public static class Scripts
      * formulas all subformulas of the given record are guaranteed
      * to be non-reducible.   
      */
-    public static async Task<bool> FormulaCanBeReducedAsync(this ReRiteDbContext ctx, Formula formula)
+    public static async Task<bool> FormulaCanBeReducedAsync(this LucidDbContext ctx, Formula formula)
     {
         await foreach (var searchResult in ctx.Lookup.FindGeneralizationsAsync(formula))
         {
@@ -123,17 +123,17 @@ public static class Scripts
                 {
                     throw new TermSatException($"not a valid formula id:{searchResult.Node.Value}");
                 }
-                if (await ctx.Formulas.FindAsync(searchResult.Node.Value) == null)
+                if (await ctx.Expressions.FindAsync(searchResult.Node.Value) == null)
                 {
                     throw new TermSatException($"not a valid formula id:{searchResult.Node.Value}");
                 }
             }
 #endif
             Debug.Assert(0 < searchResult.Node.Value, "not a valid formula id");
-            var nonCanonicalRecord = await ctx.Formulas.AsNoTracking()
+            var nonCanonicalRecord = await ctx.Expressions.AsNoTracking()
                 .Where(_ => _.Id == searchResult.Node.Value)
                 .FirstAsync();
-            var canonicalRecord = await ctx.Formulas.AsNoTracking()
+            var canonicalRecord = await ctx.Expressions.AsNoTracking()
                 .OrderBy(_ => _.VarCount).ThenBy(_ => _.Length).ThenBy(_ => _.Text)
                 .Where(_ => _.TruthValue == nonCanonicalRecord.TruthValue)
                 .FirstAsync();
@@ -215,7 +215,7 @@ public static class Scripts
         int startingLength = 3;
 
         {   // initialization
-            using (var ruleDb = new ReRiteDbContext(ruleOptions))
+            using (var ruleDb = new LucidDbContext(ruleOptions))
             {
                 {
 #if DEBUG
@@ -230,7 +230,7 @@ public static class Scripts
                 int varCount = -1;
                 try
                 {
-                    varCount = await ruleDb.Formulas
+                    varCount = await ruleDb.Expressions
                         .OrderByDescending(_ => _.VarCount)
                         .Select(_ => _.VarCount)
                         .FirstOrDefaultAsync();
@@ -241,7 +241,7 @@ public static class Scripts
                 {
                     startingVariable = varCount;
 
-                    var length = await ruleDb.Formulas
+                    var length = await ruleDb.Expressions
                         .Where(_ => _.VarCount == varCount)
                         .OrderByDescending(_ => _.Length)
                         .Select(_ => _.Length)
@@ -269,9 +269,9 @@ public static class Scripts
                     }
                 }
 
-                if (await ruleDb.Formulas.AsNoTracking().AnyAsync())
+                if (await ruleDb.Expressions.AsNoTracking().AnyAsync())
                 {
-                    lastFormulaId = ruleDb.Formulas.AsNoTracking().OrderByDescending(_ => _.Id).First().Id;
+                    lastFormulaId = ruleDb.Expressions.AsNoTracking().OrderByDescending(_ => _.Id).First().Id;
                 }
             }
         }
@@ -285,12 +285,12 @@ public static class Scripts
             Trace.WriteLine($"Start generating all rules with exactly {variableNumber} variables.");
 
             {   // start by adding variable record to database
-                using (var ruleDb = new ReRiteDbContext(ruleOptions))
+                using (var ruleDb = new LucidDbContext(ruleOptions))
                 {
                     Trace.WriteLine($"Start by adding a new variable, {variableNumber}.");
 
                     var variableFormula = Variable.NewVariable(variableNumber);
-                    var varRecord = ruleDb.Formulas.AsNoTracking().Where(_ => _.Text == variableFormula.ToString()).FirstOrDefault();
+                    var varRecord = ruleDb.Expressions.AsNoTracking().Where(_ => _.Text == variableFormula.ToString()).FirstOrDefault();
                     if (varRecord != null)
                     {
                         Trace.WriteLine($"Skipping, variable already exists: {variableFormula}");
@@ -301,7 +301,7 @@ public static class Scripts
                         {
                             TruthValue = TruthTable.GetTruthTable(variableFormula).ToString(),
                         };
-                        ruleDb.Formulas.Add(record);
+                        await ruleDb.InsertFormulaRecordAsync(record);
                         ruleDb.SaveChanges();
                         ruleDb.ChangeTracker.Clear();
                         Trace.WriteLine($"New variable added: {variableFormula}");
@@ -331,7 +331,7 @@ public static class Scripts
                     {
                         try
                         {
-                            using (var ruleDb = new ReRiteDbContext(ruleOptions))
+                            using (var ruleDb = new LucidDbContext(ruleOptions))
                             {
                                 for (int iInnerLength = 1; iInnerLength < iTotalLength; iInnerLength += 2)
                                 {
@@ -346,7 +346,7 @@ public static class Scripts
                                                    $") AS t " +
                                                    $"WHERE t.\"VarCount\" = {variableNumber} AND t.\"Length\" = {iInnerLength} " + 
                                                    $"ORDER BY t.\"VarCount\", t.\"Length\", t.\"Text\"";
-                                    var innerFormulas = await ruleDb.Formulas
+                                    var innerFormulas = await ruleDb.Expressions
                                         .FromSqlRaw(innerSql)
                                         .ToFormulas()
                                         .ToListAsync();
@@ -359,7 +359,7 @@ public static class Scripts
                                                    $") AS t " +
                                                    $"WHERE t.\"Length\" = {iOuterLength} " + 
                                                    $"ORDER BY t.\"VarCount\", t.\"Length\", t.\"Text\" ";
-                                    var outerFormulas = await ruleDb.Formulas
+                                    var outerFormulas = await ruleDb.Expressions
                                         .FromSqlRaw(outerSql)
                                         .ToFormulas()
                                         .ToListAsync();
@@ -444,7 +444,7 @@ public static class Scripts
                             {
                                 try
                                 {
-                                    using (var _ruleDb = new ReRiteDbContext(ruleOptions))
+                                    using (var _ruleDb = new LucidDbContext(ruleOptions))
                                     using (var transaction = _ruleDb.Database.BeginTransaction())
                                     {
                                         foreach (var derivedFormula in _nextChunk)
@@ -462,26 +462,17 @@ public static class Scripts
                                                 var nextFormulaId = Interlocked.Increment(ref lastFormulaId);
                                                 var nextRecord = new ReductionRecord(derivedFormula, variableNumber, truthValue);
 
-                                                ////// 3/7/2025 new rule, *always* add all rules, and always apply all matching rules, then ignore results that are not valid.  
-                                                ////// Because every non-reducible, non-canonical expression *is a* rule.  
-                                                //// before adding the record, check to see if a shorter record with the same truth value is already present.
-                                                //// if so, then this record can be indexed immediately
-                                                //var proofNotCanonical = await _ruleDb.Formulas
-                                                //    .Where(_ => _.TruthValue == truthValue && _.Length < iTotalLength)
-                                                //    .FirstOrDefaultAsync();
-                                                var msg = $"Adding formula          : {derivedFormula}";
-                                                //if (proofNotCanonical != null)
-                                                //{
-                                                //    nextRecord.IsIndexed = 1; // setting to 1 causes nextRecord to be excluded from the LOOKUP table
-                                                //}
-                                                Trace.WriteLine(msg);
+                                                Trace.WriteLine($"Adding formula          : {derivedFormula}");
+                                                Task.WaitAll
+                                                (
+                                                    _ruleDb.Expressions.AddAsync(nextRecord).AsTask(),
 
-                                                await _ruleDb.Formulas.AddAsync(nextRecord);
+                                                    // 3/7/2025 new rule, *always* add all rules, and always apply all matching rules, then ignore results that are not valid.  
+                                                    // Because every non-reducible, non-canonical expression *is a* rule.  
+                                                    _ruleDb.AddGeneralizationAsync(nextRecord)
+                                                );
 
-                                                if (proofNotCanonical != null)
-                                                {
-                                                    await _ruleDb.AddGeneralizationAsync(nextRecord);
-                                                }
+
                                                 await _ruleDb.SaveChangesAsync();
 
 
@@ -514,7 +505,7 @@ public static class Scripts
                     // BUT the formulas must be indexed sequentially.  
                     // This is because there will be formulas that are subsumed by formulas of the same length.  
                     Trace.WriteLine($"Mark canonical formulas of length {iTotalLength}...");
-                    using (var ruleDb = new ReRiteDbContext(ruleOptions))
+                    using (var ruleDb = new LucidDbContext(ruleOptions))
                     {
                         var updateCanonicalSql = 
                             $"UPDATE public.\"FormulaRecords\" AS u " +
@@ -532,12 +523,12 @@ public static class Scripts
                         Trace.WriteLine($"...updated {count} records");
                     }
 
-                    using (var indexingCtx = new ReRiteDbContext(ruleOptions))
+                    using (var indexingCtx = new LucidDbContext(ruleOptions))
                     using (var transaction = indexingCtx.Database.BeginTransaction())
                     {
 
                         Trace.WriteLine($"Index all remaining un-indexed formulas of length {iTotalLength}...");
-                        var unindexedRecords = await indexingCtx.Formulas
+                        var unindexedRecords = await indexingCtx.Expressions
                             .WhereCanonical()
                             .Where(_ => _.IsIndexed != 1)
                             .OrderBy(_ => _.VarCount).ThenBy(_ => _.Length).ThenBy(_ => _.Text)
@@ -561,7 +552,7 @@ public static class Scripts
                     }
 
                     Trace.WriteLine($"Finally, delete any un-indexed, non-canonical formulas still remaining...");
-                    using (var ruleDb = new ReRiteDbContext(ruleOptions))
+                    using (var ruleDb = new LucidDbContext(ruleOptions))
                     {
                         var deleteSql =
                             $"DELETE FROM public.\"FormulaRecords\" AS d " +

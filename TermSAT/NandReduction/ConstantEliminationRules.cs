@@ -11,7 +11,7 @@ namespace TermSAT.NandReduction;
 public static class ConstantEliminationRules
 {
 
-    public static async Task<ReductionRecord> TryReduceConstantsAsync(this ReRiteDbContext db, ReductionRecord startingRecord)
+    public static async Task<ReductionRecord> TryReduceConstantsAsync(this LucidDbContext db, ReductionRecord startingRecord)
     {
         // if given formula is not a nand then it must be a variable or constant and is not reducible.
         if (!(startingRecord.Formula is Nand startingNand))

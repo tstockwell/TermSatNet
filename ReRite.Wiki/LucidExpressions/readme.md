@@ -80,22 +80,27 @@ This section is an overview of, and guide to, the rest of this document.
 
 
 	
-- [Reduction Algorithm](implementation.md)
+- [Reduction Algorithm](reduction.md)
 
-	This section provides pseudo code for the reduction algorithm and some examples.
+This section describes the reduction method.  
 
+The LE system's rewrite rule are complete, so theoretically, expressions can be 
+reduced by applying the rules in any sequence.  
+
+However, expression are reduced far more efficiently when 
+the rules are applied from the bottom-up as described in this section.
 
 - [Conclusion](conclusion.md)
 
-	It's been shown that LEs  provide a tractable form of automated reasoning.  
+It's been shown that LEs provide a tractable form of automated reasoning.  
 
-- [Appendix: Completeness](appendix-completness.md)
+- [Appendix: Soundness and Completeness](appendix-soundness-an-completness.md)
 
-	This section proves that the ME rules of inference are complete.  
+This section shows that LEs' rules of inference are sound and complete.  
 
 - [Appendix: Computational Complexity](appendix-complexity.md)
 
-	This section proves that the computational complexity of reduction is O(n4) in the very worst case.
+This section proves that the computational complexity of reduction is O(n4) in the very worst case.
 
 
 ## References

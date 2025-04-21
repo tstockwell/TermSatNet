@@ -1,4 +1,4 @@
-﻿## LE Soundness and Completeness 
+﻿# LE Soundness and Completeness 
 
 This document presents proofs that the LE system is sound and complete.  
 
@@ -20,16 +20,9 @@ If the Deduction Theorem is valid then LE is complete because...
 - when P == Q then T =>* (P (T Q) and T =>* (Q (T P)), 
 - and therefore, by the Deduction Theorem, P =>* Q, and Q =>* P.  
 
-### Soundness
-#### Semantic vs Syntactic Entailment
+## Soundness
 
-- the symbol |- means syntactic entailment.  
-> That is, if A |- B then B is syntactically derivable from A using the inference rules of the LE system.
-
-- the symbol |= means semantic entailment.
-> That is, if A |= B then any valuation that forces A to T also forces B to T.  
-
-#### Order Reduction 
+### Order Reduction 
 
 The order reduction rules...
 
@@ -48,7 +41,7 @@ Rule 0 is sound because the only way that Compare(P,Q) == 0 is if P and Q are th
 In this case (P Q) is equivalent to (Q Q), which by deiteration, is equivalent to (T Q).  
 
 
-#### Constant Introduction/Elimination
+### Constant Introduction/Elimination
 These rules introduce or eliminate constants from expressions.  
 These rules are bidirectional.
 
@@ -65,7 +58,7 @@ And they are, here are the formulas...
 3. !(false && Q) == true        ; always evaluates to true
 4. !(true && !(true && Q)) == Q ; always evaluates to true
 
-#### Generalized Iteration
+### Generalized Iteration
 
 Rule: Given a subterm S of an expression E of the form (L R),  
 	where S is a left or right, F-grounding F-cofactor of E then 
@@ -82,7 +75,7 @@ Therefore, the right-hand sides of the iteration rules always evaluate to the sa
 In other words, the two sides of the iteration rewrite rules are semantically equivalent and the rules are sound.  
 
 
-#### Generalized Deiteration
+### Generalized Deiteration
 
 Rule: Given a subterm S of an expression E of the form (L R),  
 	where S is a left or right, F-grounding F-cofactor of E then 
@@ -99,7 +92,7 @@ Therefore, the right-hand sides of the iteration rules always evaluate to the sa
 In other words, the two sides of the deiteration rewrite rules are semantically equivalent and the rules are sound.  
 
 
-#### Insertion
+### Insertion
 
 Insertion is like a special case of generalized iteration where one side of an expression E is F.  
 
@@ -114,7 +107,7 @@ Therefore, the left and right sides of the rewrite rules are semantically equiva
 since both sides will always evaluate to true.  
 And therefore the insertion rules are sound.  
 	
-#### Erasure
+### Erasure
 
 Erasure is like a special case of generalized deiteration where one side of an expression E is F.  
 
@@ -133,23 +126,72 @@ And therefore the erasure rules are sound.
 
 ## Deduction Theorem 
 
-The Deduction Theorem for LE is...  
+This section presents to two proofs that together prove the Deduction Theorem.  
 
-	if T =>* (P (T Q)) then P =>* Q, for any two expressions P and Q
+If ((...)) =>* ((..., P->Q))  
+Then ((..., P->Q, P)) =>* ((..., P->Q, P, ..., Q))
+Proof...  
 
-### Proof
+	...						; some set of consistent axioms
+	(P (T Q))				; axiom, P->Q
+	P						; hypothesis
+	(T (T Q))				; substitution: (P (T Q))[P<-T]
+	Q						; dbl-cut elim 
 
-A proof that if P->Q is valid (ie T =>* (P (T Q))) then P =>* Q.  
-<table>
-<tr><td>(P (T Q))			</td><td>; axiom  </td></tr>
-<tr><td>P					</td><td>; hypothesis  </td></tr>
-<tr><td>(P F)				</td><td>; empty-cut intro  </td></tr>
-<tr><td>(P (T (P (T Q)))	</td><td>; substitution, F == (T axiom)  </td></tr>
-<tr><td>(P (T (T (T Q)))	</td><td>; deiteration  </td></tr>
-<tr><td>(P (T Q))			</td><td>; dbl-neg elim  </td></tr>
-<tr><td>(T (T Q))			</td><td>; substitution, P == hypothesis == T  </td></tr>
-<tr><td>Q					</td><td>; dbl-neg elim; conclusion  </td></tr>
-</table>
+If ((...)) =>* ((..., P->Q)) 
+Then ((..., P->Q, (T Q))) =>* ((..., P->Q, (T Q), ..., (T P)))  
+Proof...  
+
+	...						; some set of consistent axioms
+	(P (T Q))				; axiom, P->Q
+	(T Q)					; hypothesis
+	(P T)					; substitution: (P (T Q))[(T Q)<-T>]
+	(T P)					; ordering
+
+
+We humans don't have to use our eyeballs and our brains to build proofs, machines can do it.  
+The LE 
+ 
+## Mechanical Proof of Deduction Theorem using Cofactors
+
+Calculating cofactors as we go guides substitution.
+
+In this se
+
+If ((...)) =>* ((..., P->Q))  
+Then ((..., P->Q, P)) =>* ((..., P->Q, P, ..., Q))
+Proof...  
+
+	...						; some set of consistent axioms
+	(P (T Q))				; axiom, P->Q
+	P						; hypothesis
+	(T (T Q))				; substitution: (P (T Q))[P<-T]
+	Q						; dbl-neg elim
+
+
+Find fgf-cofactor of ((1 (T 2)) ((T 1) 2)))	
+Must find common tgf-cofactor of both sides
+tgf-cofactors of left side are 1, and (T 2)
+tgf-cofactors of right side are 2, (T 1)
+No common cofactor :-(.
+
+What we need are valid substitutions for each side that have a common tgf-cofactor.  
+Both sides are canonical, so we can iterate all possible substitutions for those expressions, 
+from the simplest to the most complex, 
+using LE's rules of inference.  
+
+So let's try that...
+
+Let allLHS = Concat([(1 (T 2))], Increment((1 (T 2))))
+	.Where(_ => Cofactors(_).Where(_ => _.R == T && _.C == F).Any())
+
+Let allrHS = Concat([((T 1) 2)], Increment(((T 1) 2))))
+	.Where(_ => Cofactors(_).Where(_ => _.R == T && _.C == F).Any())
+
+// KA-BLAM, there's a common tgf-cofactor where _.S is (1 2)
+Let commonFactor  = Join(allLHS, allRHS, _ => _.S).FirstOrDefault()
+
+
 
 ## References
 

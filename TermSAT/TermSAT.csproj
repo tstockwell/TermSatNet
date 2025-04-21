@@ -31,6 +31,8 @@
     <Compile Remove="NandReduction\RelevanceProofs.cs" />
     <Compile Remove="NandReduction\Scripts_RuleGenerator_KnuthBendix.cs" />
     <Compile Remove="NandReduction\WildcardAnalyzer.cs" />
+    <Compile Remove="NandReduction\WildcardReduction.cs" />
+    <Compile Remove="NandReduction\WildcardSwapping.cs" />
     <Compile Remove="NandReduction\Workers.cs" />
     <Compile Remove="RuleDatabase\DatabaseReport.cs" />
     <Compile Remove="RuleDatabase\FormulaConstructor.cs" />

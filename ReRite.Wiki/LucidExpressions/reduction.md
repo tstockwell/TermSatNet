@@ -1,176 +1,274 @@
-## Reduction 
+# Insight : Unification of cofactors can identify a reduction in polytime.
 
-### Example
+Given an expression, the # of cofactors that can be directly computed from the expression is polynomial.  
 
-Reducing an expression removes all the inferences embedded in an expression and strips it down to its axiomatic, canonical form.  
+We could use deiteration and iteration to expand the set of cofactors until we found a reduction (if one exists).  
+However, there are a potentially exponential # of such cofactors.  
+Instead, we can use unification to quickly deduce common tgf-cofactors that we can use to reduce the expression.  
+
+Which seems doable, since....
+- to minimize we need to find an fgf-cofactor of (T ((1 (T 2)) (2 (T 1)))) 
+- computing deductive closure of cofactors does not yield a reduction
+- Must find common tgf-cofactor of both sides.  
+	- tgf-cofactors of left side are 1, and (T 2)  
+	- tgf-cofactors of right side are 2, (T 1)
+- unifying (T 2) and (T 1) is easy, but must do unification correctly  
+	> ie dont use the standard Robinson unification algorithm which is exponential, see Handbook.  
+- we need to retain the unifying substitution so that we can actually perform the rewrite.  
+	That is, given that (1 2) is a fgf-cofactor of ((1 (T 2)) (2 (T 1))), how do we rewrite it?  
+	By applying the unifying substitution and reordering to get ((1 (1 2)) (2 (1 2))).  
+	Then we apply the substitution (1 2)<-T to get ((1 T) (2 T)), and therefore  
+	(T ((1 (T 2)) (2 (T 1)))) => ((1 2) ((1 T) (2 T))) => ((1 2) ((T 1) (T 2))) 
+
+Here are some of the cofactors calculated for the above expression, note the last two...
+
+	Cofactors
+	(S	==	R) -> (	E ==	C)
+	2		F		2		F
+	2		T		2		T
+	2		F		(T 2)	T
+	2		T		(T 2)	F
+	(T 1)	F		(2 (T 1))	T	; rhs of (2 (T 1))
+	(T 2)	F		(1 (T 2))	T	; rhs of (1 (T 2))
+
+if we can unify (T 1) and (T 2) then we can create a common fgt-cofactor of both sides 
+and thus a fgf-cofactor that we can use to reduce the expression.  
+
+Still one issue... how to actually make the rewrite that reduces the expression?
+That is, we know that (1 2)
+
+
+
+	(1 (T 2)) == (1 (1 2))			; iteration
+	(2 (T 1)) == (2 (1 2))			; iteration
+	(1 2)	F		(2 (1 2))	T	; rhs of (2 (1 2))
+	(1 2)	F		(2 (T 1))	T	; from previous two lines
+
+	(1 2)	F		(2 (T 1))	T
+	(1 2)	F		((1 (T 2)) (2 (T 1))))  F
+	(1 2)	F		(1 (T 2))	T	; 
+
+	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2 ; eq to (1->2 && 2->1) => (2 == 1)
+	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2 ; eq to (1->2 && 2->1) => (2 == 1)
+
+This is an example of an expression that can't be reduced by directly computing cofactors of the terms in the expression.  
+
+	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2
+
+
+# Insight : Add an ordering rule that expressions with fewer unique terms are less than expressions with more terms.  
+This new rule is applied before the length ordering rule, giving it a higher priority than the length rule.  
+ 
+The effect would be this...  
+Instead of this rule (which is quite difficult to implement)...  
+
+	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2 ; eq to (1->2 && 2->1) => (2 == 1)
+
+the system would generate these rules, which are easier to implement...  
+
+	|T||1|T.2|2|T.1 => 
+	|T||1|1.2|2|1.2 => ; simple unification to find form that's reducible, using cofactor calculations?
+	||1.2||T.1|T.2 ; paste-and-cut (iteration followed by deiteration), 
+
+	|T||1|1.2|2|T.2 => 
+	|T||1|1.2|2|1.2 => ; simple unification that finds common terms
+
+PS:  Minimizing the unique terms makes more sense as a measure of 'simple' than the length of the expression.  
+That's because when you think about the 'size' of the expression, the LE implementation can usually store 
+expressions with fewer terms more efficiently than expressions that are 'shorter'.  
+This is because, in a computer's memory, it's possible to reuse an expression as a pointer, 
+which doesn't require the expression to be duplicated.  
+
+
+
+# Insight : A generalization of rewrite rules : logical interpretation of rewrite rules
+Consider the rule (a a) => (T a)...  
+
+Rewrite rules are syntactic, that is, they work based on the structure of the expression, not what the expression means.  
+As a rewrite rule the variables in the above rule are treated as Expressions.  
+So, given an expression where the antecedent and subsequent are the exact same expression  
+then the given expression can be reduced to (T a)
+
+Consider a different interpretation based on logical rules.  
+As a logical rule the variables in the rule are interpreted as fgf-cofactors.  
+The above rule says that an expression with a common cofactor (a) can be reduced by replacing (a) with T.  
+So, given an expression where the the antecedent and the subsequent have a command cofactor (a),  
+then the given expression can be reduced by replacing a in the antecedent with a (T a).  
+
+## Proof
+        /// |T||1|T.2|2|T.1 => ||1.2||T.1|T.2 : Some kind of DeMorgan's law for nand systems? 
+Need to prove that (a b) is equivalent to an expression with a 
+A grounding cofactor represents one of these implications; S->E, ~S->E, S->~E, ~S->~E,  
+Or more generally, for all cofactors: (S == R) -> (E == C), where S,R,E,C must all appear in E, or be a constant.  
+For a given expression E, there are at most pow(N,4) cofactors, where N == Length(E)
+Using a rewrite system that is complete for four variables, th
+<p>Grounding are used to compute erasures and de-iterations.<br>
+When one side of an expression contains a negative grounding then it can be erased from the other side (deiteration).<br>
+If the other side of the formula is empty (T) then the term is iterated to one side (replacing the T) and then erased/deiterated.</p>
+
+
+# Reduction 
+
+
+
+> It is assumed that the reader has already read the [introduction to EG](existential-expressions.md) and to [LE](lucid-expressions.md).  
+> It's especially import to understand the LE concept of *cofactors*.  
+
+In the LE system, reduction is the process of minimizing an expression to its canonical form.  
+
+One can think of reduction as *unwinding* the derivation of an expression to it's axiomatic, canonical form.  
+Because LEs' rules of inference are complete, symmetric, and confluent, we can reduce expression by repeatedly 
+applying rules to an expression, but only in ways that produce simpler expressions.  
 If an expression reduces to T/F then the expression is a tautology/contradiction.  
 If an expression reduces to anything but F then the expression is satisfiable.  
 
-For instance, the expression...  
- ```A and (if A then B)```  
- ...is written as an LE like so...  
-```(T (a (a (T b))))```  
-...and, using deiteration, can be reduced to...
-```(T (a (T (T b))))```  
-...and using double-cut elimination, reduces to...  
-```(T (a b))```  
-...which is equivalent to...  
-```A and B```  
+The reduction process proceeds from the bottom up.  
+This is because the cofactors of subterms must be known in order to compute reductions of higher order expressions.   
+The only way to accomplish this is to start at the deepest parts of the starting expression, 
+where the terms are atomic and canonical, and build up to more complex canonical expressions.
 
-The reduction process produces a simpler expression that is logically equivalent to the starting expression.  
-
-### Overview
-
-Expressions are reduced by looking for opportunities to rewind/reverse an application of one of the LE rewrite rules.  
-Completely reversing all the inferences embedded in an expression produces an expression that is canonical.  
+As reduction proceeds an indexed table of cofactors is built.  
+The cofactors of simpler expressions are used to identify opportunities for reduction of the more complex expressions built from them.  
 
 The reduction method performs three fundamental forms of inference...  
 - Induction : LE always reduces an expression by first reducing the simplest subterm that's not already known to be canonical.  
+
 	> Thus, LE is always working from simpler expressions to more complex expressions, and 
-	> thus knows a lot about an expressions' subterms when reducing more complex expressions.  
-- Deduction : Grounding Terms (represented as 2-variable Krom clauses) are calculated for every canonical subterm of an expression.  
-	> When a clauses is added to the set of all groundings then resolution is used to deduce any new grounding terms, in polytime.  
-	> Clauses are added when canonical subterms are discovered.  
-	> Thus, discovering canonical subterms results in more opportunities to reduce more complex expressions.  
-- Abduction : Grounding terms guide the application of reduction rules, and only those results that are simpler are valid reductions.  
+	> thus LE knows a lot about an expressions' subterms when reducing more complex expressions.  
 
-### Cofactors and Reduction
+- Deduction : Grounding Cofactors (a kind of 2-variable Krom clause over expressions) are 
+	calculated for every canonical subterm of a mostly-canonical  expression.  
 
-#### Definition: Cofactor
-A *term cofactor*, or just *cofactor*, of an expression E is an expression that is derived from E 
-by replacing all instances of a given term S in F with a constant value C (T or F).  
-Put another way, Cofactor(F,S) = F(S->C).  
+	> When a cofactor or clause is added to the set of all cofactors then resolution is used to deduce any new cofactors.
+	> Resolution is polytime since cofactors are also a kind of 2-variable Krom clause.  
+	> Clauses are discovered as the reduction process proceeds, which results in more opportunities to reduce more complex expressions.  
 
-#### Definition: Grounding Cofactor
-A *grounding cofactor* is a cofactor that's logically equivalent to T or F.  
-That is, if IsConstant(Reduce(Cofactor(E,S))) then Cofactor(E,S) is a grounding cofactor.
+- Abduction : Based on cofactors, inference rules are applied to deduce equivalent expressions, and only those that are simpler are valid.  
 
-#### Definition: Grounding Term
-If Cofactor(E,S) is a grounding cofactor then S is called a *grounding term* of E.  
-When Cofactor(E,S) is logically equivalent to F/T then S is called a *negative/positive grounding term*.  
-A grounding term S of E is subterm that, when all instances of S in E are replaced with a given constant, 
-**forces or grounds** E to a constant value.
+## Example
 
+Consider the lucid expression...  
+```(T (a (a (T b))))```  
+which means...  
+```A and (if A then B)```.  
 
-There's a relationship between grounding terms and the iteration/deiteration rules...  
-the iteration/deiteration rules may be applied to expressions where on side of the expression 
-has a negative 
-An expression produced by an application of iteration or deiteration produces an expression where 
-one side of the expression is a grothe positive cofactor of the other.  
-Just take a look at LE's four iteratation/deiteration rules...
-			- (L(T) R(S)) => (L(T->S) R(S)),     
-			- (L(S) R(T)) => (L(S) R(T->L)),  
-			- (L(S) R(S)) => (L(S->T) R)      
-			- (L(S) R(S)) => (L(S) R(L->T)),  
-- E[(L X(T))] => E[(L X(T->L))] ; ignore, not a reductive rule
-- E[(L X(L))] => E[(L X(L->T))] ; L's sibling is replaced with L's positive cofactor
-- E[(X(T) R)] => E[(X(T->R) R)] ; ignore, not a reductive rule
-- E[(X(R) R)] => E[(X(R->T) R)] ; R's sibling is replaced with R's positive cofactor
+(a (a (T b))) is the simplest non-canonical subterm of the starting expression.  
+Using deiteration, it can be reduced to...  
+```(a (T (T b)))```  
+which, using double-cut elimination can can be reduced to...
+```(a b)```.  
+thus reducing the starting expression to...  
+```(T (a b))```  
+which is canonical and equivalent to...  
+```A and B```  
 
 
+### Mostly-Canonical Expressions
 
-Note that applying the iteration rule to an expression produces a term cofactor.  
-Note that applying the deiteration rule to an expression produces a term cofactor.  
-
-The reduction method computes, and remembers, all grounding cofactors of all subterms in a *mostly-canonical* expression.  
-
-
-The reduction method uses grounding cofactors to discover opportunities to apply the rules in a way that reduces an expression.  
-
-A grounding cofactor can be represented by a tuple *Grounding(E,S,PN,G)*,  
-where Grounding(E,S,PN,G) represents a cofactor E(S->PN) of an expression,  
-where PN is a constant and E(S->PN)'s canonical form is a constant G.  
-Meaning that when sub-expression S of E has the value PN then E reduces to G.  
-Put another way, a grounding represents one of these implications; S->E, ~S->E, S->~E, ~S->~E.
-
-Grounding are used to compute erasures and de-iterations.  
-When one side of an expression contains a negative grounding then it can be erased from the other side (deiteration).  
-If the other side of the formula is empty (T) then the term is iterated to one side (replacing the T) and then erased/deiterated.
-	
-Note that a grounding can be written in CNF form with clauses of size <= 2.  
-Meaning that new groundings can be derived from existing grounding in polytime (aka krom logic).  
-Also meaning that it's also easy to keep the set of groundings transitively, or maximally, complete.  
-Think of all the cofactors discovered in an expression stored as a set of clauses. 
-Then, whenever this set is expanded, resolution is performed until complete (in polytime) in order to derive any newly implied grounding and equivalences.
-
-Groundings are conditional equivalences.  
-Or, equivalences are 2 groundings where PN == G and PN != G.
-
-If an expression has no grounding cofactors then an expression is canonical.  
-
-### Mostly Canonical Expressions
-
-An expression E = (x y) is a *mostly-canonical* expression if x and y are canonical but E is not.  
-There's a big difference between mostly-canonical and all-canonical.  
-With all-canonical, well, with all-canonical there's usually only one thing you can do :-).
+An expression E = (P Q) is a *mostly-canonical* expression if P and Q are canonical but E is not.  
 
 ### Reduction
 
 This section contains a pseudo-code description of the Reduce function.   
-The Reduce function accepts an expression and returns the canonical form of the expression.
+The Reduce function accepts a mostly-canonical expression and returns the next reduction.
+
 
 ```
-Let CANONICAL = a global table of expressions known to be canonical.
-Let GROUNDINGS = a global table of tuples that represent all known grounding cofactors and all derivable cofactors.
+/// A reduced expression and proof (either a subtitution or a cofactor)
+record ReduceResult(Expression Reduction, SubstitutionResult? Substitution, Cofactor? Cofactor)  
 
-Function Reduce
+Let COFACTORS = a global table of tuples that represent all known grounding cofactors and all derivable cofactors of canonical expressions.  
+Let SUBSTITUTIONS = a fixed, global table of rewrite rules, includes rewrite rules for cut elimination.  
+
+ReduceResult? Function Reduce (Expression mostlyCanonical)
 {
-	Let START = the expression to be reduced.
-	Let NEXT =  the current reduction of START, initialized to START.
-	While NEXT has terms not in CANONICAL
+	// if the expression is already known to be canonical then we're done
+	if (Contains(CANONICAL, mostlyCanonical))
 	{
-		Let SMALLEST = the simplest term in NEXT that's not known to be canonical.  
-
-		Compute and add all groundings of SMALLEST to GRONUDINGS.
-			if SMALLEST is 
-
-		if (SMALLEST == NEXT) // true when NEXT is mostly-canonical
-		{
-			For terms S that are common to both sides of an expression
-			{
-				If S is a negative cofactor of one side of NEXT then 
-				{
-					S can be erased from the other side of NEXT.  
-					That is...  
-					Let L and R be terms such that NEXT = (L R)
-					If S is a negative cofactor of L then let NEXT = (L R(S->T))
-					If S is a negative cofactor of R then let NEXT = (L(S->T) R)
-				}
-			}
-
-			If one side of NEXT is empty (T) then 
-				for any positive cofactor of the other side
-					the cofactor is iterated to the empty side (replacing the T) and   then erased/deiterated.
-
-			
-		}
-		else 
-			Let REDUCED = Reduce(SMALLEST);
-			Replace all instances of SMALLEST in NEXT with REDUCED.
+		return null
 	}
 
-	Add NEXT to CANONICAL, if not already there.
+	Let substitutionResult = TryFindGeneralization(SUBSTITUTIONS, mostlyCanonical)
+	if (substitutionResult && ) 
+	{
+		// only use the substitution if the conclusion is simpler
+		if (Compare(substitutionResult.Conclusion, mostlyCanonical) < 0)
+		{
+			return (substitutionResult.Conclusion, substitutionResult, null)
+		}
+	}
 
-	return NEXT
+	// no substitutions found, that leaves deiteration or paste-and-cut.
+
+	if (mostlyCanonical.RHS == T)
+	{ 
+		// paste into rhs and cut from lhs
+		Let fGroundingfCofactors = Cofactors(mostlyCanonical.LHS).Where(_ => _.R == F && _.C == F)
+		foreach (fGroundingfCofactor in fGroundingfCofactors)
+		{
+			Let reducedE = (mostlyCanonical.LHS[fGroundingfCofactor.S<-T] fGroundingfCofactor.S)
+			if (Compare(reducedE, mostlyCanonical) < 0)
+			{
+				return (reducedE, null, fGroundingfCofactor)
+			}
+		}
+	}
+	else if (mostlyCanonical.LHS == T) 
+	{ 
+		// paste into lhs and cut from rhs
+		Let fGroundingfCofactors = Cofactors(mostlyCanonical.RHS).Where(_ => _.R == F && _.C == F)
+		foreach (fGroundingfCofactor in fGroundingfCofactors)
+		{
+			Let reducedE = (fGroundingfCofactor.S  mostlyCanonical.RHS[fGroundingfCofactor.S<-T])
+			if (Compare(reducedE, mostlyCanonical) < 0)
+			{
+				return (reducedE, null, fGroundingfCofactor)
+			}
+		}
+	}
+	else 
+	{  
+		// deiterate, look for f-groundings f-cofactors of either side 
+        Let rhsGroundings = Cofactors(mostlyCanonical.RHS).Where(_ => _.R == F && _.C == F)
+		foreach (rhsGrounding in rhsGroundings)
+		{
+			Let reducedE = (rhsGrounding.S  mostlyCanonical.RHS[rhsGrounding.S<-T])
+			if (Compare(reducedE, mostlyCanonical) < 0)
+			{
+				return (reducedE, null, rhsGrounding)
+			}
+		}
+
+		Let lhsGroundings = Cofactors(mostlyCanonical.LHS).Where(_ => _.R == F && _.C == F)
+        Let commonGroundings = Join(lhsGroundings, rhsGroundings, _ => _.S).FirstOrDefault()
+        Let (leftCofactor, rightCofactor) = Join(lhsGroundings, rhsGroundings, _ => _.S).FirstOrDefault()
+		if (leftCofactor != null)
+		{
+			Let reducedE = (leftCofactor.S, (leftCofactor.C rightCofactor.C))
+		}
+		
+	}
+
+	// the given expression is canonical
+	return null
 }
 ```
 
-#### Equivalence
+## Complexity
 
-After computing groundings UKS can use them to discover erasures and de-iterations that can simplify an expression.  
-When a simplification is discovered the fact is record in the ABOUT table as an equivalence between two expressions.   
+LEs can be reduced to their canonical form in polynomial time.  
 
-A clause that records an equivalence between two formulas AND proof that its valid.
-The 'proof' also provides the necessary data to reverse the operation.
-Is equivalent to a line of identity in an existential graph.  
-UKS computes several types; constant reductions, erasures, de-iterations.
+The steps that the LE reduction method performs can be categorized into two types...  
+- The number of times the starting expression is reduced.
+	> In other words, the number of steps in the equivalence proof from the starting expression to its canonical form.   
+- The number of steps in each reduction.
+	> The number of steps in each reduction is proportional to the number of cofactor records created during each reduction, or 1 if substitution occurred.   
 
+It will be shown that the maximum size of any equivalence/reduction proof is at most Pow(N,2), where N is the length of the expression to reduce.  
 
+And it will be shown that the maximum number of cofactor records computed during a proof is limited to Pow(2N,2)
 
-### Complexity
-- LEs can be reduced in polynomial time.  
-	> The satisfiability of LEs can also be determined in polynomial time.  
-
+That makes LE's time complexity on the order of O(Pow(N,2) * Pow(2N,2)) = O(4Pow(N,4)).  
 
 
 
