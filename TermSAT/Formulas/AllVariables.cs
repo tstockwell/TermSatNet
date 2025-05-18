@@ -20,10 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using TermSAT.Common;
-using TermSAT.Tests;
 
 namespace TermSAT.Formulas
 {
@@ -51,18 +47,43 @@ namespace TermSAT.Formulas
      */
     abstract public partial class Formula 
     {
+        private static readonly MemoryCacheOptions cacheOptions = new MemoryCacheOptions();
+        private static readonly MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
+        private static readonly MemoryCache __varListCache = new(cacheOptions);
+
+        public int VarCount
+        {
+            get
+            {
+                int count;
+                if (__varListCache.TryGetValue(this, out count))
+                    return count;
+                lock (__varListCache)
+                {
+                    if (__varListCache.TryGetValue(this, out count))
+                        return count;
+                    count = 0;
+                    if (AllVariables.Any())
+                        count= AllVariables.Select(_ => _.Number).Max();
+                    __varListCache.Set(this, count, cacheEntryOptions);
+                }
+                return count;
+            }
+        }
+
+
         /**
          * Returns an ordered list of the variable that occur in this formula.
          * The returned list may be empty.
          */
         abstract public IList<Variable> AllVariables { get; }
-
     }
 
 
     public partial class Constant 
     {
-        public override IList<Variable> AllVariables { get => ImmutableList<Variable>.Empty; }
+        private static readonly ImmutableList<Variable> EMPTY_LIST = ImmutableList<Variable>.Empty;
+        public override IList<Variable> AllVariables => EMPTY_LIST;
     }
 
     public partial class Variable : Formula

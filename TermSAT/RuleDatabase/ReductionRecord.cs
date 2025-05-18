@@ -1,13 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
 using TermSAT.Formulas;
-using TermSAT.NandReduction;
 
 namespace TermSAT.RuleDatabase;
 
@@ -120,7 +116,21 @@ public partial class ReductionRecord
     /// This property is write-once, once the first reduction is found this property will never change.
     /// <see cref="IsComplete"/>
     /// </summary>
-    public long NextReductionId {  get; set; }
+    public long NextReductionId 
+    {  
+        get => _nextReductionId; 
+        set
+        {
+#if DEBUG
+            if (value == 0 || value == Id)
+            {
+                throw new TermSatException($"invalid {nameof(NextReductionId)}:{value}");
+            }
+#endif
+            _nextReductionId = value;
+        }
+    }
+    private long _nextReductionId= 0;
 
     /// <summary>
     /// Set to a description of the rule used to deduce the reduction from the starting startingFormula to the next startingFormula.
@@ -132,7 +142,8 @@ public partial class ReductionRecord
     /// 
     /// todo: maybe instead of using a string to identify reduction types use objects instead.  
     /// </summary>
-    public string RuleDescriptor { 
+    public string RuleDescriptor 
+    { 
         get => _ruleDescriptor;
             
         set
@@ -173,7 +184,7 @@ public partial class ReductionRecord
     /// </summary>
     public bool IsCanonical
     {
-        get => RuleDescriptor?.Equals(ReductionRecord.PROOF_IS_COMPLETE)??false;
+        get => RuleDescriptor == ReductionRecord.PROOF_IS_COMPLETE;
         set
         {
             RuleDescriptor = ReductionRecord.PROOF_IS_COMPLETE;

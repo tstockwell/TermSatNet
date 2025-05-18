@@ -8,11 +8,16 @@ public partial class FormulaIndex
     public class SearchResult
     {
         public Node Node { get; }
-        public IDictionary<int, Formula> Substitutions { get; }
+        public IReadOnlyDictionary<Variable, Formula> Substitutions => _substitutions;
+        private Dictionary<Variable, Formula> _substitutions = new ();
+
         public SearchResult(Node node, IDictionary<int, Formula> substitutions)
         {
             Node = node;
-            Substitutions = substitutions;
+            foreach (var substitution in substitutions)
+            {
+                _substitutions.Add(Variable.NewVariable(substitution.Key), substitution.Value);
+            }
         }
     }
 

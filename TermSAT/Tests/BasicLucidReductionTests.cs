@@ -1,10 +1,7 @@
-﻿using Microsoft.ApplicationInsights.Extensibility.Implementation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Npgsql;
 using System.Data;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using TermSAT.Formulas;
@@ -67,6 +64,13 @@ namespace TermSAT.Tests
         public void CleanupTest()
         {
             Lucid.Dispose();
+        }
+
+        public async Task<ReductionRecord> GetMostlyCanonicalRecordAsync(Formula startingFormula)
+        {
+            var rr = await Lucid.GetMostlyCanonicalRecordAsync(startingFormula);
+            Assert.AreEqual(startingFormula.Text, rr.Text);
+            return rr;
         }
 
 
@@ -286,71 +290,7 @@ namespace TermSAT.Tests
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
-            // The secret to minimizing this expression is to understand that
-            // the concept of *irrelevance* is what drives minimization.
-            // In this expression the T and the 2 can be swapped because when 2 == F then
-            // the T is irrelevant and may therefore be replaced with 2.
-            // And the reverse is true, when the last 2 in ||.1|.2.3|.3|2.1 == F then 
-            // the first 2 is irrelevant and may therefore be replaced with T.
-            //
-            // That is....
-            // 
-            // ||.1|.2.3|.3|T.1 => ||.1|.2.3|.3|2.1, proof....
-            //      ||.1|F.3|.3|T.1 ; test lhs 
-            //      ||.1T|.3|T.1    ; empty-cut elimination
-            //      ||T.1|.3|T.1    ; ordering
-            //      ||T.1|.3T       ; deiteration, removed T identified as wildcard
-            //      ||T.1|T.3       ; ordering
-            //
-            // and....
-            // ||.1|.2.3|.3|.1.2 => ||.1|T.3|.3|.1.2 => , proof....
-            //      ||.1|.2.3|.3|.1F    ; test rhs
-            //      ||.1|.2.3|.3T       ; empty-cut elimination
-            //      ||.1|.2F|.3T        ; deiteration
-            //      ||.1T|.3T           ; empty-cut elimination, removed .2 identified as wildcard
-            //      ||T.1|T.3           ; ordering
-            //
-            // Note that both cofactors have the same conclusion,  
-            // and that swapping the cofactor terms (.2 and T) produces a reduction.  
-            //
-            // The above proofs could be implemented using cofactors by....
-            // - extending the set of cofactors to all cofactors computable
-            //      using T & F for Cofactor.Replacement and thus computing this cofactor...  
-            //          |.1|.2.3[.2<-F] =>* |T.1  , and
-            //          |.3|T.1[T<-F] =>* |T.3
-            // - Noticing that |T.1 is a term in the rhs, |.3|T.1, and thus   
-            //      the T's in any instances of |T.1 in the rhs are irrelevant with respect to .2
-            //      and may be replaced with .2.
-            // - AND noticing that, if we were to do so, then the resulting expression has the cofactor...
-            //      |.3|.1.2[.2<-F] =>* |T.3, and thus...
-            //      the .3's in the lhs may be replaced with F, thus making .2 irrelevant, 
-            //      and thus the .2 in the lhs may then be replaced with T.
-            // - AND noticing that, the T<-F cofactor of the minimized expression says the same thing...  
-            //      |.3|T.1[T<-F] =>* |T.3, and thus...
-            //      the .3's in the lhs may be replaced with F, thus making .2 irrelevant, 
-            //      and thus the .2 in the lhs may then be replaced with T.
-            // In short, the .2 in |.1|.2.3 and the T in |.3|T.1 may be swapped,
-            // and thus ||.1|.2.3|.3|T.1 =>* ||.1|T.3|.3|.1.2
-            //
-            // INSIGHT...
-            // This expression can be reduced by...   
-            // - for all terms in an expression, cofactors using T & F for Cofactor.Replacement.
-            // - for all pairs of cofactors of an expression with the same replacement and the same conclusion,  
-            //      check if swapping the cofactor terms produces a reduced expression.
-            //      BTW, these cofactors are guaranteed to be in opposite sides of the containing expression.  
-            // This extension is a generalization of the current method.  
-            // 
-            // Theorem: All these new cofactors can be computed in linear time from the cofactors of sub-expressions.  
-            // Theorem: The worst-case total # of cofactors generated is polynomial.  
-            //      
-            //
-            {
-                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1|.2.3|.3|T.1");
-                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.3|.3|.1.2");
-                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
-                Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
-            }
+            await SlightlyDeeperWildcardReduction();
 
             {
                 var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1|.2.3|.2|T.1");
@@ -836,6 +776,118 @@ namespace TermSAT.Tests
 
         }
 
+
+        // ||.1|.2.3||T.1.3 =>* ||.1|T.3||.1.2.3
+        // This is an example of swapping mutually irrelevant terms.
+        //
+        // ########### UPDATE 4/28/2025
+        //
+        // The secret to minimizing this expression is to understand that
+        // the concept of *irrelevance* is what drives minimization.
+        // In this expression the T and the 2 can be swapped because when 2 == F then
+        // the T is proof irrelevant and may therefore be replaced with 2.
+        // And the reverse is true, when the last 2 in ||.1|.2.3|.3|2.1 == F then 
+        // the first 2 is irrelevant and may therefore be replaced with T.
+        //
+        // That is....
+        // 
+        // ||.1|.2.3|.3|T.1 => ||.1|.2.3|.3|2.1, proof....
+        //      ||.1|F.3|.3|T.1 ; test lhs [2<-F]
+        //      ||.1T|.3|T.1    ; empty-cut elimination
+        //      ||T.1|.3|T.1    ; ordering
+        //      ||T.1|.3T       ; deiteration, removed T identified as wildcard
+        //      ||T.1|T.3       ; ordering
+        // ||.1|.2.3|.3|T.1     ; ||.1|.2.3|.3|T.1[T<-.2] by previous test proof
+        //
+        // and....
+        // ||.1|.2.3|.3|.1.2 => ||.1|T.3|.3|.1.2 => , proof....
+        //      ||.1|.2.3|.3|.1F    ; test rhs
+        //      ||.1|.2.3|.3T       ; empty-cut elimination
+        //      ||.1|.2F|.3T        ; deiteration
+        //      ||.1T|.3T           ; empty-cut elimination, removed .2 identified as wildcard
+        //      ||T.1|T.3           ; ordering
+        // ||.1|.2.3|.3|.1T         ; ||.1|.2.3|.3|.1.2[.2<-T] by previous test proof
+        //
+        // Note that both cofactors have the same conclusion,  
+        // and that swapping the cofactor terms (.2 and T) produces a reduction.  
+        // The 'test' proofs above are how I think about 'relevance theory' and how to minimize
+        // expressions by discovering relevance relationships between terms.  
+        // 
+        // However, I don't know how to prove complexity limits using these test proofs.  
+        // Instead, LE uses cofactors because I can prove complexity limits when using cofactors.
+        // Cofactors capture the essence of 'test proofs' by capturing the relevant parts of such proofs...
+        //  - the tested expression
+        //  - the test value
+        //  - the test term
+        //  - the conclusion
+        // The basic rule for 'cofactor swapping' is...  
+        //  If
+        //      E[A<-F] =>* X and
+        //      E[B<-F] =>* X
+        //  Then
+        //      We can swap A with B without changing RHS's truth function.
+        //  Because
+        //      When one or both of A and B are false then E =>* X
+        //      and swapping the positions of A and B not change E's truth function.  
+        //      When A and B are both true then
+        //      obviously, swapping the positions of A and B not change E's truth function.  
+        //
+        //  We can constrain this rule to only instances when A and be exist in different sides of an expression.  
+        //  Because if A and B were on the same side then that side would be reducible, 
+        //  which they can't because E is mostly canonical.  
+        //  LE can look at the cofactors of its sides to detect these cofactors.
+        //  The relevant cofactors are...  
+        //      LHS[A<-F] =>* X
+        //      RHS[B<-F] =>* Y
+        //      LHS[Y<-T] =>* X
+        //      RHS[X<-T] =>* Y
+        //  Given the previous cofactors...
+        //  - when A<-F then LHS =>* X, RHS =>* Y, and E =>* (X Y), and
+        //  - when B<-F then E =>* (X Y)
+        //
+        // For this expression the relevant cofactors are...
+        //      |.1|.2.3[.2<-F] =>* |T.1
+        //      ||T.1.3[T<-F] =>* |T.3
+        //      |.1|.2.3[|T.1<-T] =>* ???
+        //      ||T.1.3[|T.3<-T] =>* ???
+        // Note that minimizing this expression also illustrates the need for the following rule...
+        // Given the cofactor E[(T A)<-T] =>* X then E[A<-F] =>* X is also a cofactor.  
+        // Given this rule, the relevant cofactors are...
+        //      |.1|.2.3[.2<-F] =>* |T.1
+        //      ||T.1.3[T<-F] =>* |T.3
+        //      |.1|.2.3[|T.3<-T] =>* T
+        //          |.1|.2.3[.3<-F] =>* |T.1
+        //      ||T.1.3[|T.1<-T] =>* |T.3
+        //          ||T.1.3[.1<-F] =>* |T.3
+        //
+        [TestMethod]
+        public async Task SlightlyDeeperWildcardReduction()
+        {
+            var trueId = await Lucid.GetConstantExpressionIdAsync(true);
+            var falseId = await Lucid.GetConstantExpressionIdAsync(false);
+            {
+                var lhs = await Lucid.GetMostlyCanonicalRecordAsync("|.1|.2.3");
+                await Lucid.GetMostlyCanonicalRecordAsync("|T.1");
+                var rhs = await Lucid.GetMostlyCanonicalRecordAsync("||T.1.3");
+
+                //          ||T.1.3[T<-F] =>* |T.3              ; RHS[C<-F] =>* Y     
+                var rCofactors = Lucid.Cofactors
+                    .Where(_ => _.ExpressionId == rhs.Id 
+                            && _.ReplacementId == falseId 
+                            && _.SubtermId == trueId)
+                    .ToArray();
+                Assert.IsTrue(rCofactors.Any());
+
+                //          |.1|.2.3[.2<-F] =>* |T.1,           ; LHS[A<-F] =>* X     
+                //          ||T.1.3[|T.1<-T] =>* |T.3, and      ; RHS[X<-T] =>* Y
+            }
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("||.1|.2.3||T.1.3");
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.3||.1.2.3");
+            Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
+            Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
+        }
+
         [TestMethod]
         public async Task SlightlyDeepReorderingReduction()
         {
@@ -1020,19 +1072,16 @@ namespace TermSAT.Tests
         ///     It can be reduced two ways....
         ///         #1: |1||1.2|1.3 => |1||T.2|T.3, or
         ///         #2: |1||1.2|1.3 => |T||1.2|1.3
-        ///     RR would use rule #2 since |T||1.2|1.3 is lexicographically simpler.
         ///     
-        /// ##### 4/5/25
+        /// ##### 4/28/25
         /// Now easily solvable using cofactors.
-        /// Since 1 is a FGF-cofactor of the lhs then paste-and-cut yields |T||.1.2|.1.3.
+        /// Since...
+        ///     1[1<-F] =>* F, and 
+        ///     ||T.2|T.3[T<-F] =>* F 
+        /// then .1 in the lhs may be swapped for T in the rhs.
         /// 
         /// 
         /// ###### 1/24/25
-        /// Note: just now getting around to implementing wildcard swapping.
-        /// Theoretically, wildcard swapping is chiral, 
-        /// uno form replaces many terms with constants and the other form replaces many constants with terms.
-        /// This formula represents the form that replaces constants,  
-        /// and is only useful when S has length == 1.
         /// For now, this rule is just hardcoded, see NandReducerCommutativeRules.
         /// It might be necessary to implement a generalized form of this type of wildcard swapping 
         /// in order for the reduction algorithm to cover all the formulas in the base RR rule database
@@ -1052,7 +1101,22 @@ namespace TermSAT.Tests
         [TestMethod]
         public async Task SimpleWildcardSwappingExample()
         {
+            {
+//                if (reducedFormula.CompareTo(startingNand) < 0)
+
+                var noncanonical = await Lucid.GetMostlyCanonicalRecordAsync("|.3|T.2");
+                var ordered = await Lucid.GetMostlyCanonicalRecordAsync("||T.2.3");
+                Assert.AreEqual(ordered.Formula.Text, "||T.2.3");
+                var canonical = await Lucid.GetCanonicalRecordAsync(noncanonical);
+                Assert.AreEqual(ordered.Formula.Text, canonical.Formula.Text);
+            }
+            {
+                var ifNotTwoThenThree = await Lucid.GetMostlyCanonicalRecordAsync("||T.2|T.3");
+                var canonical = await Lucid.GetCanonicalRecordAsync(ifNotTwoThenThree);
+                Assert.AreEqual(ifNotTwoThenThree.Formula.Text, canonical.Formula.Text);
+            }
             var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1||T.2|T.3");
+            Assert.AreEqual("|.1||T.2|T.3", nonCanonicalformula.Formula.Text);
             var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1.2|.1.3");
             Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
             var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
@@ -1089,32 +1153,63 @@ namespace TermSAT.Tests
         /// The [Knuth-Bendix](https://en.wikipedia.org/wiki/Knuth%E2%80%93Bendix_completion_algorithm) way of 
         /// extending the current system would be to add this production rule to the set of rules in our system.  
         /// 
-        /// ########### UPDATE 3/28/25
+        /// ########### 
+        ///     (T ((1 (T 2)) ((T 1) 2))) ; note that the rhs has no obvious f-grounding f-cofactor
+        ///     (1 (T 2))   [1<-T]  =>* 2
+        ///     (1 (T 2))   [2<-F]  =>* (T 1)
+        ///     (1 (T 2))   [2<-T]  =>* T
+        ///     (1 (T 2))   [T<-F]  =>* (T 1)
+        ///     ((T 1) 2)   [2<-T]  =>* 1
+        ///     ((T 1) 2)   [1<-F]  =>* (T 2)
+        ///     ((T 1) 2)   [1<-T]  =>* T
+        ///     ((T 1) 2)   [T<-F]  =>* (T 2)
+        ///     (T ((1 (T 2)) ((T 1) 2)))   [1<-T]  =>* 2
+        ///     (T ((1 (T 2)) ((T 1) 2)))   [1<-F]  =>* (T 2)
+        ///     (T ((1 (T 2)) ((T 1) 2)))   [2<-T]  =>* 1
+        ///     (T ((1 (T 2)) ((T 1) 2)))   [2<-F]  =>* (T 1)
+        /// 
+        /// 
         /// Btw, the lhs above says "1->2 and 2->1", and the rhs says "1 == 2"
         /// The secret is to be able to recognize that this... 
         ///     (T ((1 (T 2)) ((T 1) 2))) ; note that the rhs has no obvious f-grounding f-cofactor
         /// is equivalent to this...
         ///     (T ((1 (1 2)) (2 (1 2)))) ; note that (1 2) is an easily, mechanically identifiable f-grounding f-cofactor
-        ///     
-        /// ### Proof using cofactors
         /// 
-        /// Must Find fgf-cofactor of ((1 (T 2)) ((T 1) 2)))	
-        /// Must find common tgf-cofactor of both sides.  
-        /// tgf-cofactors of left side are 1, and (T 2)  
-        /// tgf-cofactors of right side are 2, (T 1)
-        /// No obvious common cofactor :-(.
         /// 
-        /// The LE documentation documents how to use cofactors to identify opportunities for deiteration. 
-        /// The documentation also defines a standard functional API, and pseudo code, 
-        /// for computing cofactors and reducing expressions.
+        /// ########### UPDATE 4/28/2025
         /// 
-        /// Example...
-        /// Let allLHS = Cofactors((1 (T 2))).Where(_ => _.R == F && _.C == T)
-        /// Let allrHS = Cofactors(((T 1) 2)).Where(_ => _.R == F && _.C == T)
-        /// // KA-BLAM, there is a common tgf-cofactors where _.S is (1 2) with conclusions of (T 1) and (T 2).
-        /// Let (leftCofactor, rightCofactor) = Join(allLHS, allRHS, _ => _.S).FirstOrDefault()
-        /// // equal to ((1 2) ((T 1) (T 2)))
-        /// Let reducedE = (leftCofactor.S, (leftCofactor.C rightCofactor.C))
+        /// Now easily solvable using cofactors.
+        /// Since...
+        ///     T[T<-F] =>* F, and 
+        ///     ||.1|T.2|.2|T.1[(1 2)<-F] =>* F 
+        /// then T in the lhs may be swapped for (1 2) in the rhs.
+        /// Since...
+        ///     (1 (T 2))[(T 2)<-F] =>* T
+        ///     (1 (1 2))[(1 2)<-F] =>* T
+        ///         and
+        ///     (2 (T 1))[(T 1)<-F] =>* T
+        ///     (2 (1 2))[(1 2)<-F] =>* T
+        /// then deiterating (1 2) is equivalent to deiterating (T 1) and (T 2) 
+        /// 
+        /// 
+        /// ### Notes
+        /// 
+        /// After extending LE with 'cofactor unification' then LE computes the following tgf-cofactors...
+        ///     (1 (T 2))[(1 2)<-F] =>* T
+        ///     (2 (T 1))[(1 2)<-F] =>* T
+        /// in addition to....
+        ///     (1 (T 2))[(T 2)<-F] =>* T
+        ///     (2 (T 1))[(T 1)<-F] =>* T
+        /// 
+        /// LE currently does this by adding a 'UnifiedSubtermId field to cofactor records.
+        /// I dont like this, at some point I' just add new records, like above.  
+        /// Programatically it's possible to discover that (1 (T 2))[(1 2)<-F] =>* T 
+        /// is a 'unified' or 'derived' cofactor because of the existence of (1 (T 2))[T<-F] =>* T, 
+        /// which is the exact same cofactor except that subterm == (T 2) instead of (1 2).  
+        /// Meaning, if (1 2) can be deiterated then (T 2) can be deiterated.  
+        /// 
+        /// Pretty sure, but not 100%, that its possible to prove that # of computed cofactors is still polynomial.  
+        /// Theorem: There's at most Ne2 cofactors for any expression E, when N is the length of E
         /// 
         /// 
         /// ########### UPDATE 2/2/25
@@ -1142,7 +1237,6 @@ namespace TermSAT.Tests
         ///     > the more towards the head of the formula the better, 
         ///     > because replacing it will reduce the formula more.
         /// RR only tracks the most relevant terms.
-        /// RR 
         /// RR reduces formulas by repeatedly, when possible,...
         /// - making terms irrelevant by replacing them with constants. aka wildcard reduction.
         /// - making a term more relevant by reducing the number of term instances. aka wildcard swapping.
@@ -1249,15 +1343,68 @@ namespace TermSAT.Tests
         /// Everything else will work the same.
         /// Problem solved.
         /// ### NOTE (1/7/25) : There's a contradiction in the above paragraph.
-        /// ### I say that constants are to be removed, then use the wildcard substitution |.1.2 <-> T to reduce a formula.  
-        /// ### Duh.  
+        /// ### I said that constants are to be removed, then used the wildcard substitution |.1.2 <-> T to reduce a formula.  
+        /// ### duh doy.  
         /// 
         /// </summary>
         [TestMethod]
         public async Task SimpleWildcardSwapRequiringUnification()
         {
-            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1|T.2|.2|T.1"); // id=456
-            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1.2||T.1|T.2");
+            {
+                var trueId = await Lucid.GetConstantExpressionIdAsync(true);
+                var falseId = await Lucid.GetConstantExpressionIdAsync(false);
+                var nandOneTwo = await GetMostlyCanonicalRecordAsync("|.1.2");
+                var ifOneThenTwo = await GetMostlyCanonicalRecordAsync("|.1|T.2");
+                var ifNotOneThenNotTwo = await GetMostlyCanonicalRecordAsync("||T.1.2");
+
+                // replacing T with F in |.1|T.2 does NOT reduce the expression to T
+                {
+                    var invalidCofactors = await Lucid.Cofactors
+                        .Where(_ => _.ExpressionId == ifOneThenTwo.Id
+                                    && _.SubtermId == trueId
+                                    && _.ReplacementId == falseId
+                                    && _.ConclusionId == trueId)
+                        .ToArrayAsync();
+                    Assert.IsFalse(invalidCofactors.Any());
+                }
+
+
+                // (1 2) should be a tgf-cofactor of (1 (T 2)) and ((T 1) 2)
+                {
+                    var matches = await Lucid.Cofactors
+                        .Where(_ => _.ExpressionId == ifOneThenTwo.Id && _.UnifiedSubtermId == nandOneTwo.Id)
+                        .Where(_ => _.ReplacementId == falseId)
+                        .Where(_ => _.ConclusionId == trueId)
+                        .ToArrayAsync();
+                    Assert.IsTrue(matches.Any());
+
+                    matches = await Lucid.Cofactors
+                        .Where(_ => _.ExpressionId == ifNotOneThenNotTwo.Id && _.UnifiedSubtermId == nandOneTwo.Id)
+                        .Where(_ => _.ReplacementId == falseId)
+                        .Where(_ => _.ConclusionId == trueId)
+                        .ToArrayAsync();
+                    Assert.IsTrue(matches.Any());
+                }
+
+
+                var subRecord = await GetMostlyCanonicalRecordAsync("||.1|T.2||T.1.2");
+                var canonicalSubRecord = await Lucid.GetCanonicalRecordAsync(subRecord);
+                Assert.AreEqual(TruthTable.GetTruthTable(subRecord.Formula).ToString(), TruthTable.GetTruthTable(canonicalSubRecord.Formula).ToString());
+                Assert.AreEqual(subRecord, canonicalSubRecord);
+
+                // (1 2) should be a fgf-cofactor of ((1 (T 2)) ((T 1) 2))
+                {
+                    var matches = await Lucid.Cofactors
+                        .Where(_ => _.ExpressionId == subRecord.Id && _.UnifiedSubtermId == nandOneTwo.Id)
+                        .Where(_ => _.ReplacementId == falseId)
+                        .Where(_ => _.ConclusionId == falseId)
+                        .ToArrayAsync();
+                    Assert.IsTrue(matches.Any());
+                }
+            }
+
+            var nonCanonicalformula = await GetMostlyCanonicalRecordAsync("|T||.1|T.2||T.1.2"); // id=456
+            var canonicalRecord = await GetMostlyCanonicalRecordAsync("||.1.2||T.1|T.2");
             Assert.AreEqual(
                 TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), 
                 TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());

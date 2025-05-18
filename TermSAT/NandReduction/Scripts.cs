@@ -112,11 +112,6 @@ public static class Scripts
             // That is, a rule like |.2|.1.2 => |.2|.1.1 doesn't produce a shorter record if you use formulas where .1 > .2.
             // Instead of only applying the rule when the formulas respect the record order,
             // Its easier (I think) to just apply the rule and then confirm that the result is reduced.  
-            var substitutions = new Dictionary<Variable, Formula>();
-            foreach (var substitution in searchResult.Substitutions)
-            {
-                substitutions.Add(Variable.NewVariable(substitution.Key), substitution.Value);
-            }
 #if DEBUG
             {
                 if (searchResult.Node.Value <= 0)
@@ -139,7 +134,7 @@ public static class Scripts
                 .FirstAsync();
 
             Formula canonicalFormula = Formula.GetOrParse(canonicalRecord.Text);
-            var reducedFormula = canonicalFormula.CreateSubstitutionInstance(substitutions);
+            var reducedFormula = canonicalFormula.CreateSubstitutionInstance(searchResult.Substitutions);
             if (formula.CompareTo(reducedFormula) <= 0)
                 return false;
 

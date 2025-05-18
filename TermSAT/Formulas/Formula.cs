@@ -74,6 +74,13 @@ namespace TermSAT.Formulas
             if (this.Equals(other))
                 return 0;
 
+            // normalized (variables numbered from 1 to n) expressions with less variables 
+            // are simpler than expressions with more variables
+            if (this.VarCount < other.VarCount)
+                return -1;
+            if (other.VarCount < this.VarCount)
+                return 1;
+
             // shorter formulas are simpler than longer formulas
             if (Length < other.Length)
                 return -1;
@@ -125,34 +132,21 @@ namespace TermSAT.Formulas
 
             if (this is Nand nandThis)
             {
-                if (other is Nand impOther) 
+                if (other is Nand nandOther) 
                 {
-
-                    // if we get to here then the formulas have the same length and are *not* equal.
-                    // return the lexicographical comparison
-                    var thisEnum = new FormulaDFSEnumerator(this);
-                    var otherEnum = new FormulaDFSEnumerator(other);
-                    while (otherEnum.MoveNext())
                     {
-                        thisEnum.MoveNext();
-                        if (thisEnum.Current is Nand)
+                        var lhsCompare = nandThis.Antecedent.CompareTo(nandOther.Antecedent);
+                        if (lhsCompare != 0)
                         {
-                            if (!(otherEnum.Current is Nand))
-                            {
-                                return 1;
-                            }
+                            return lhsCompare;
                         }
-                        else if (otherEnum.Current is Nand)
+                    }
+
+                    {
+                        var rhsCompare = nandThis.Subsequent.CompareTo(nandOther.Subsequent);
+                        if (rhsCompare != 0)
                         {
-                            return -1;
-                        }
-                        else
-                        {
-                            var value = thisEnum.Current.CompareTo(otherEnum.Current);
-                            if (value != 0)
-                            {
-                                return value;
-                            }
+                            return rhsCompare;
                         }
                     }
 
@@ -253,7 +247,7 @@ namespace TermSAT.Formulas
         /// an empty map if the formulas are equal,
         /// else returns a map of substitutions for each formula.
         /// </summary>
-        public static IDictionary<Variable, Formula> TryUnify(Formula left, Formula right)
+        public static Dictionary<Variable, Formula> TryUnify(Formula left, Formula right)
         {
             if (left is Constant)
             {

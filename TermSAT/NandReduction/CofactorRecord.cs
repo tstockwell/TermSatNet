@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using System.Diagnostics;
 using TermSAT.Formulas;
-using TermSAT.RuleDatabase;
 
 namespace TermSAT.NandReduction;
 
@@ -52,6 +51,12 @@ public record CofactorRecord
         ReplacementId = replacementId;
         ConclusionId = conclusionId;
         UnifiedSubtermId = subtermId;
+
+        Debug.Assert(0 < ExpressionId);
+        Debug.Assert(0 < SubtermId);
+        Debug.Assert(0 < ReplacementId);
+        Debug.Assert(0 < ConclusionId);
+        Debug.Assert(0 < UnifiedSubtermId);
     }
     public CofactorRecord(long expressionId, long subtermId, long replacementId, long conclusionId, long unifiedSubtermId)
     {
@@ -60,6 +65,24 @@ public record CofactorRecord
         ReplacementId = replacementId;
         ConclusionId = conclusionId;
         UnifiedSubtermId = unifiedSubtermId;
+
+#if DEBUG
+
+        if (0 >= ExpressionId) 
+            throw new TermSatException("invalid cofactor");
+        if (0 >= SubtermId)
+            throw new TermSatException("invalid cofactor");
+        if (0 >= ReplacementId)
+            throw new TermSatException("invalid cofactor");
+        if (0 >= ConclusionId)
+            throw new TermSatException("invalid cofactor");
+        if (0 >= UnifiedSubtermId)
+            throw new TermSatException("invalid cofactor");
+        if (ExpressionId == ConclusionId)
+            throw new TermSatException("invalid cofactor");
+        if (SubtermId == ReplacementId)
+            throw new TermSatException("invalid cofactor");
+#endif
     }
 
     /// <summary>

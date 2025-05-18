@@ -30,38 +30,18 @@ public static class LookupReductionExtensions
 
         await foreach (var searchResult in ctx.Lookup.FindGeneralizationsAsync(startingNand))
         {
-
-
-            // This check is required because rules don't necessarily produce shorter formulas if you use substitutions
-            // that don't respect the order between the generalization's terms.
-            // That is, a rule like |.2|.1.2 => |.2|.1.1 doesn't produce a shorter record if you use substitutions where .1 > .2.
-            // Instead of checking that the substitutions respect this order,
-            // its easier (I think) to just apply the rule and then confirm that the result is reduced.  
-            var substitutions = new Dictionary<Variable, Formula>();
-            foreach (var substitution in searchResult.Substitutions)
-            {
-                substitutions.Add(Variable.NewVariable(substitution.Key), substitution.Value);
-            }
-#if DEBUG
-            {
-                if (searchResult.Node.Value <= 0)
-                {
-                    throw new TermSatException($"not a valid formula id:{searchResult.Node.Value}");
-                }
-                if (await ctx.Expressions.FindAsync(searchResult.Node.Value) == null)
-                {
-                    throw new TermSatException($"not a valid formula id:{searchResult.Node.Value}");
-                }
-            }
-#endif
-            Debug.Assert(0 < searchResult.Node.Value, "not a valid formula id");
-            var nonCanonicalRecord = await ctx.Expressions.AsNoTracking()
-                .Where(_ => _.Id == searchResult.Node.Value)
-                .FirstAsync();
+            var nonCanonicalRecord = await ctx.Expressions.FindAsync(searchResult.Node.Value);
+            Debug.Assert(nonCanonicalRecord != null, $"not a valid formula id:{searchResult.Node.Value}");
             var canonicalRecord = await ctx.Expressions.GetLastReductionAsync(nonCanonicalRecord);
-            if (canonicalRecord.IsCanonical)
+            if (nonCanonicalRecord.Id != canonicalRecord.Id)
             {
-                var reducedFormula = canonicalRecord.Formula.CreateSubstitutionInstance(substitutions);
+                var reducedFormula = canonicalRecord.Formula.CreateSubstitutionInstance(searchResult.Substitutions);
+
+                // This check is required because rules don't necessarily produce shorter formulas if you use substitutions
+                // that don't respect the order between the generalization's terms.
+                // That is, a rule like |.2|.1.2 => |.2|.1.1 doesn't produce a shorter record if you use substitutions where .1 > .2.
+                // Instead of checking that the substitutions respect this order,
+                // its easier (I think) to just apply the rule and then confirm that the result is reduced.  
                 if (reducedFormula.CompareTo(startingNand) < 0)
                 {
                     var reducedRecord = await ctx.GetMostlyCanonicalRecordAsync(reducedFormula);

@@ -126,7 +126,7 @@ And therefore the erasure rules are sound.
 
 ## Deduction Theorem 
 
-This section presents to two proofs that together prove the Deduction Theorem.  
+This section presents two proofs that together prove the Deduction Theorem.  
 
 If ((...)) =>* ((..., P->Q))  
 Then ((..., P->Q, P)) =>* ((..., P->Q, P, ..., Q))

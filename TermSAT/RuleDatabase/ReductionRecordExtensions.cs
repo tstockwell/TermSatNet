@@ -15,25 +15,9 @@ public static class ReductionRecordExtensions
     public static IQueryable<ReductionRecord> InFormulaOrder(this IQueryable<ReductionRecord> dbset) => 
         dbset.OrderBy(_ => _.VarCount).ThenBy(_ => _.Length).ThenBy(_ => _.Text);
 
-    public static async Task<bool> IsCompleteAsync(this DbSet<ReductionRecord> db, ReductionRecord proof)
-    {
-        var lastReduction = await db.GetLastReductionAsync(proof);
-
-        return lastReduction.IsCanonical;
-    }
     public static IQueryable<ReductionRecord> WhereCanonical(this IQueryable<ReductionRecord> db) => 
         db.Where(_ => _.RuleDescriptor == ReductionRecord.PROOF_IS_COMPLETE);
 
-    public static async Task<ReductionRecord> TryGetReductionRecordAsync(this DbSet<ReductionRecord> db, long id)
-    {
-        return await db.Where(_ => _.Id == id).FirstOrDefaultAsync();
-    }
-
-    public static async Task<ReductionRecord> TryGetReductionRecordAsync(this DbSet<ReductionRecord> db, Formula startingFormula)
-    {
-        var reductionRecord = await db.Where(_ => _.Text == startingFormula.Text).FirstOrDefaultAsync();
-        return reductionRecord;
-    }
 
 
     /// <summary>
@@ -47,15 +31,15 @@ public static class ReductionRecordExtensions
         var nextProof = proof;
         while (nextProof != null)
         {
-            if (nextProof.RuleDescriptor?.Equals(ReductionRecord.PROOF_IS_COMPLETE)??false)
+            if (nextProof.RuleDescriptor == ReductionRecord.PROOF_IS_COMPLETE)
             {
-                return nextProof;
+                break;
             }
             if (nextProof.NextReductionId <= 0)
             {
                 break;
             }
-            nextProof = await db.TryGetReductionRecordAsync(nextProof.NextReductionId);
+            nextProof = await db.FindAsync(nextProof.NextReductionId);
         }
         return nextProof;
     }

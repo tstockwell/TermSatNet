@@ -37,7 +37,7 @@ namespace TermSAT.Formulas
         private Formula substitutionInstance= null;
         public Formula Generalization { get; }
 
-        public IDictionary<Variable, Formula> Substitutions { get; }
+        public IReadOnlyDictionary<Variable, Formula> Substitutions { get; }
 
         public SubstitutionInstance(Formula generalization, IDictionary<Variable, Formula> substitutions)
         {
@@ -67,7 +67,7 @@ namespace TermSAT.Formulas
          * Creates a new formula by making the given substitutions for the 
          * variables in the given formula.  
          */
-        abstract public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions);
+        abstract public Formula CreateSubstitutionInstance(IReadOnlyDictionary<Variable, Formula> substitutions);
 
         /**
          * Creates a new formula by replacing all occurrences of the 'target' formula with the 'replacement' formula.
@@ -82,7 +82,7 @@ namespace TermSAT.Formulas
 
     public partial class Constant : Formula
     {
-        override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions) => this;
+        override public Formula CreateSubstitutionInstance(IReadOnlyDictionary<Variable, Formula> substitutions) => this;
         override public Formula ReplaceAll(Formula target, Formula replacement)
         {
             if (target.Equals(this))
@@ -103,7 +103,7 @@ namespace TermSAT.Formulas
 
     public partial class Variable
     {
-        override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        override public Formula CreateSubstitutionInstance(IReadOnlyDictionary<Variable, Formula> substitutions)
         {
             if (!substitutions.TryGetValue(this, out Formula f))
                 f= this;
@@ -129,7 +129,7 @@ namespace TermSAT.Formulas
 
     public partial class Negation
     {
-        override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        override public Formula CreateSubstitutionInstance(IReadOnlyDictionary<Variable, Formula> substitutions)
         {
             Formula child = this.Child;
             Formula f = Child.CreateSubstitutionInstance(substitutions);
@@ -175,7 +175,7 @@ namespace TermSAT.Formulas
 
     public partial class Implication
     {
-        override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        override public Formula CreateSubstitutionInstance(IReadOnlyDictionary<Variable, Formula> substitutions)
         {
             var newAntecedent = Antecedent.CreateSubstitutionInstance(substitutions);
             var newConsequent = Consequent.CreateSubstitutionInstance(substitutions);
@@ -226,7 +226,7 @@ namespace TermSAT.Formulas
 
     public partial class Nand
     {
-        override public Formula CreateSubstitutionInstance(IDictionary<Variable, Formula> substitutions)
+        override public Formula CreateSubstitutionInstance(IReadOnlyDictionary<Variable, Formula> substitutions)
         {
             var newAntecedent = Antecedent.CreateSubstitutionInstance(substitutions);
             var newConsequent = Subsequent.CreateSubstitutionInstance(substitutions);

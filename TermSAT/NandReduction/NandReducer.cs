@@ -62,7 +62,7 @@ public static class NandReducer
 
         if (0 < startingRecord.NextReductionId)
         {
-            var nextReduction = await db.Expressions.TryGetReductionRecordAsync(startingRecord.NextReductionId);
+            var nextReduction = await db.Expressions.FindAsync(startingRecord.NextReductionId);
             Debug.Assert(nextReduction != null, $"internal error: formula not found {startingRecord.NextReductionId}");
             return nextReduction;
         }
