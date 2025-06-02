@@ -31,12 +31,12 @@ public static class LucidDbContextExtensions
         Debug.Assert(trueRecord.Id == 2);
 
 
-        await lucid.Cofactors.AddAsync(
-            new CofactorRecord(
-                expressionId: trueRecord.Id, 
-                subtermId: trueRecord.Id,
-                replacementId: trueRecord.Id,
-                conclusionId: trueRecord.Id));
+        //await lucid.Cofactors.AddAsync(
+        //    new CofactorRecord(
+        //        expressionId: trueRecord.Id, 
+        //        subtermId: trueRecord.Id,
+        //        replacementId: trueRecord.Id,
+        //        conclusionId: trueRecord.Id));
         await lucid.Cofactors.AddAsync(
             new CofactorRecord(
                 expressionId: trueRecord.Id,
@@ -49,12 +49,12 @@ public static class LucidDbContextExtensions
                 subtermId:  falseRecord.Id,
                 replacementId: trueRecord.Id,
                 conclusionId: trueRecord.Id));
-        await lucid.Cofactors.AddAsync(
-            new CofactorRecord(
-                expressionId: falseRecord.Id,
-                subtermId:  falseRecord.Id,
-                replacementId: falseRecord.Id,
-                conclusionId: falseRecord.Id));
+        //await lucid.Cofactors.AddAsync(
+        //    new CofactorRecord(
+        //        expressionId: falseRecord.Id,
+        //        subtermId:  falseRecord.Id,
+        //        replacementId: falseRecord.Id,
+        //        conclusionId: falseRecord.Id));
 
         await lucid.Meta.AddAsync(new MetaRecord(KEY_TRUE, trueRecord.Id.ToString()));
         await lucid.Meta.AddAsync(new MetaRecord(KEY_FALSE, falseRecord.Id.ToString()));

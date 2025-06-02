@@ -1,12 +1,14 @@
 # Lucid Expressions: Boolean Expressions That Reduce to Canonical Form in Polynomial Time
 
-Lucid Expressions are a form of textual, binary, ordered, [existential graph](https://en.wikipedia.org/wiki/Existential_graph),  
-with symmetric rules of inference, 
+Lucid Expressions are a textual and ordered, form of [existential graph](https://en.wikipedia.org/wiki/Existential_graph) 
 that can be reduced to their canonical form in polynomial time.  
 
-This document describes Lucid Expressions and a method for reducing them to their simplest, canonical form.  
-It is shown that the LE system's reduction method is sound, complete, confluent, and terminates.  
-It is also shown that LEs can be completely reduced, and their satisfiability determined, in polynomial time.  
+This document describes Lucid Expressions and a method for reducing them.  
+It is shown that...
+- the LE system of logic is sound and complete.  
+- the LE system's reduction method is sound, complete, confluent, and terminates.  
+
+It is also shown that a satisfying valuation of an expression can be determined in polynomial time.  
 
 ## Cheet Sheet
 

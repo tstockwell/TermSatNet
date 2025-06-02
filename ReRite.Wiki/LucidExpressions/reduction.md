@@ -81,30 +81,6 @@ which doesn't require the expression to be duplicated.
 
 
 
-# Insight : A generalization of rewrite rules : logical interpretation of rewrite rules
-Consider the rule (a a) => (T a)...  
-
-Rewrite rules are syntactic, that is, they work based on the structure of the expression, not what the expression means.  
-As a rewrite rule the variables in the above rule are treated as Expressions.  
-So, given an expression where the antecedent and subsequent are the exact same expression  
-then the given expression can be reduced to (T a)
-
-Consider a different interpretation based on logical rules.  
-As a logical rule the variables in the rule are interpreted as fgf-cofactors.  
-The above rule says that an expression with a common cofactor (a) can be reduced by replacing (a) with T.  
-So, given an expression where the the antecedent and the subsequent have a command cofactor (a),  
-then the given expression can be reduced by replacing a in the antecedent with a (T a).  
-
-## Proof
-        /// |T||1|T.2|2|T.1 => ||1.2||T.1|T.2 : Some kind of DeMorgan's law for nand systems? 
-Need to prove that (a b) is equivalent to an expression with a 
-A grounding cofactor represents one of these implications; S->E, ~S->E, S->~E, ~S->~E,  
-Or more generally, for all cofactors: (S == R) -> (E == C), where S,R,E,C must all appear in E, or be a constant.  
-For a given expression E, there are at most pow(N,4) cofactors, where N == Length(E)
-Using a rewrite system that is complete for four variables, th
-<p>Grounding are used to compute erasures and de-iterations.<br>
-When one side of an expression contains a negative grounding then it can be erased from the other side (deiteration).<br>
-If the other side of the formula is empty (T) then the term is iterated to one side (replacing the T) and then erased/deiterated.</p>
 
 
 # Reduction 

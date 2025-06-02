@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System.Diagnostics;
 using TermSAT.Formulas;
 
@@ -52,11 +53,9 @@ public record CofactorRecord
         ConclusionId = conclusionId;
         UnifiedSubtermId = subtermId;
 
-        Debug.Assert(0 < ExpressionId);
-        Debug.Assert(0 < SubtermId);
-        Debug.Assert(0 < ReplacementId);
-        Debug.Assert(0 < ConclusionId);
-        Debug.Assert(0 < UnifiedSubtermId);
+#if DEBUG
+        Validate();
+#endif
     }
     public CofactorRecord(long expressionId, long subtermId, long replacementId, long conclusionId, long unifiedSubtermId)
     {
@@ -65,9 +64,14 @@ public record CofactorRecord
         ReplacementId = replacementId;
         ConclusionId = conclusionId;
         UnifiedSubtermId = unifiedSubtermId;
-
 #if DEBUG
+        Validate();
+#endif
 
+    }
+#if DEBUG
+    private void Validate()
+    { 
         if (0 >= ExpressionId) 
             throw new TermSatException("invalid cofactor");
         if (0 >= SubtermId)
@@ -82,8 +86,8 @@ public record CofactorRecord
             throw new TermSatException("invalid cofactor");
         if (SubtermId == ReplacementId)
             throw new TermSatException("invalid cofactor");
-#endif
     }
+#endif
 
     /// <summary>
     /// The starting expression, 'E' in the wiki documentation.
