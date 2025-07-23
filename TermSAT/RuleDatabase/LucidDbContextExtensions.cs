@@ -140,18 +140,32 @@ public static class LucidDbContextExtensions
         // easier to create them now instead of checking everywhere.
         if (record.Formula is Nand nand)
         {
-            await db.GetMostlyCanonicalRecordAsync(nand.Antecedent);
-            await db.GetMostlyCanonicalRecordAsync(nand.Subsequent);
+            var leftRecord = await db.GetMostlyCanonicalRecordAsync(nand.Antecedent);
+#if DEBUG
+            if (leftRecord.IsCanonical != true) 
+                throw new TermSatException("Only mostly-canonical expressions are stored");
+#endif
+            var rightRecord = await db.GetMostlyCanonicalRecordAsync(nand.Subsequent);
+#if DEBUG
+            if (rightRecord.IsCanonical != true)
+                throw new TermSatException("Only mostly-canonical expressions are stored");
+#endif
         }
 
         await db.AddAsync(record);
 
-        // have to save here in order for id to be populated before calling AddGeneralizationAsync
+        // save here in order for id to be populated before calling AddGeneralizationAsync
         await db.SaveChangesAsync();
+
+        if (record.IsCanonical && record.CanonicalId <= 0)
+        {
+            record.CanonicalId = record.Id;
+            await db.SaveChangesAsync();
+        }
 
         // it used to be that RR only put non-canonical records in the lookup table.  
         // But that was when RR populated the formula table in a pre-defined order,
-        // so it could immediately know which formulas are canonical and which were not.   
+        // and it could immediately be known which formulas are canonical and which were not.   
         // But the formula db is no longer populated in any particular order.
         // Now, all formulas (canonical and mostly canonical) are added to the lookup db
         // because any match can save a lot of work...
@@ -159,17 +173,14 @@ public static class LucidDbContextExtensions
         //      RR knows immediately that the formula may be reduced
         //      using the non-canonical and canonical expressions as a reduction rule.
         //  - if a mostly-canonical formula matches a canonical lookup value then
-        //      RR knows immediately that the formula is NOT reducible and doesn't have
-        //      to bother looking for a reduction.
+        //      RR knows immediately that the expression is canonical.
         await db.AddGeneralizationAsync(record);
 
         // NOTE...
         // Cofactors are calculated when a formula is inserted
         // because wildcard analysis requires the 'proof tree' to be complete.  
         // In other words, cofactors *will* eventually be calculated, so there's no benefit to calculating them lazily.  
-        // And for many formulas, RR currently calculates cofactors for a formula more than once,
-        // so there's benefit to saving them.  
-        // And calculating them here makes RR's logic simpler.
+        // And it's simpler to do here.
         await db.AddCofactors(record);
     }
 
@@ -238,16 +249,16 @@ public static class LucidDbContextExtensions
     /// </summary>
     public static async Task<ReductionRecord> GetCanonicalRecordAsync(this LucidDbContext db, ReductionRecord reductionRecord)
     {
-        if (0 < reductionRecord.CanonicalReductionId)
-        {
-            var canonicalRecord = await db.Expressions.FindAsync(reductionRecord.CanonicalReductionId);
-            Debug.Assert(canonicalRecord != null, $"Failed to find canonical formula: {reductionRecord.CanonicalReductionId}");
-            return canonicalRecord;
-        }
-
         if (reductionRecord.IsCanonical)
         {
             return reductionRecord;
+        }
+
+        if (0 < reductionRecord.CanonicalId)
+        {
+            var canonicalRecord = await db.Expressions.FindAsync(reductionRecord.CanonicalId);
+            Debug.Assert(canonicalRecord != null, $"Failed to find canonical formula: {reductionRecord.CanonicalId}");
+            return canonicalRecord;
         }
 
         var mostReducedRecord = await db.Expressions.GetLastReductionAsync(reductionRecord);
@@ -283,10 +294,83 @@ public static class LucidDbContextExtensions
         }
 #endif
         proof.RuleDescriptor = ReductionRecord.PROOF_IS_COMPLETE;
+
+        // Record the canonicalId for all known non-canonical forms of the canonical form.
+        {
+            var todoNextReduction = new Stack<long>();
+            todoNextReduction.Push(proof.Id);
+            while (todoNextReduction.Any())
+            {
+                var nextReductionId = todoNextReduction.Pop();
+                var nonCanonicals = await db.Expressions.Where(_ => _.NextReductionId == nextReductionId).ToListAsync();
+                foreach (var nonCanonical in nonCanonicals)
+                {
+                    nonCanonical.CanonicalId = proof.Id;
+                    todoNextReduction.Push(nonCanonical.Id);
+                }
+            }
+        }
+
         await db.SaveChangesAsync();
     }
 
 
+
+
+    /// <summary>
+    /// Returns the first reduction that can be produced by all of NandReducers' internal rules (like wildcard analysis or proof-rules).
+    /// Returns null if no next Reduction can be produced, in which case the given formula is canonical.  
+    /// </summary>
+    public static async Task<ReductionRecord> TryGetNextReductionAsync(this LucidDbContext db, ReductionRecord startingRecord)
+    {
+        ReductionRecord result = null;
+
+        if (0 < startingRecord.NextReductionId)
+        {
+            result = await db.Expressions.FindAsync(startingRecord.NextReductionId);
+            Debug.Assert(result != null, $"internal error: formula not found {startingRecord.NextReductionId}");
+            goto Completed;
+        }
+
+        // if given formula is not a nand then it must be a variable or constant and is not reducible.
+        if (startingRecord.Formula is Nand lastNand)
+        {
+            result= await db.TryLookupReductionAsync(lastNand);        
+            if (result != null)
+            {
+                goto Completed;
+            }
+
+            result= await db.TryReduceDescendantsAsync(startingRecord);
+            if (result != null)
+            {
+                goto Completed;
+            }
+
+            result = await db.TryReduceConstantsAsync(startingRecord);
+            if (result != null)
+            {
+                goto Completed;
+            }
+
+            result = await db.TryReduceCommutativeFormulas(startingRecord);
+            if (result != null)
+            {
+                goto Completed;
+            }
+
+            result = await db.TryGetCofactorReductionAsync(startingRecord);
+            if (result != null)
+            {
+                goto Completed;
+            }
+        }
+
+
+Completed:;
+
+        return result;
+    }
 
 
 }

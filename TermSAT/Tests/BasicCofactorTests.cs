@@ -43,7 +43,7 @@ namespace TermSAT.Tests
             await Lucid.InsertFormulaRecordAsync(ifOneThenTwo);
             {
                 var hasUnifedCofactor = Lucid.Cofactors
-                    .Where(_ => _.ExpressionId == ifOneThenTwo.Id && _.UnifiedSubtermId == oneTwo.Id && _.ConclusionId == trueId)
+                    .Where(_ => _.ExpressionId == ifOneThenTwo.Id && _.SubtermId == oneTwo.Id && _.ConclusionId == trueId)
                     .Any();
                 Assert.IsTrue(hasUnifedCofactor);
             }
@@ -52,7 +52,7 @@ namespace TermSAT.Tests
             {
                 var hasUnifedCofactor = Lucid.Cofactors
                     .Where(_ => _.ExpressionId == ifTwoThenOne.Id 
-                            && _.UnifiedSubtermId == oneTwo.Id 
+                            && _.SubtermId == oneTwo.Id 
                             && _.ConclusionId == trueId)
                     .Any();
                 Assert.IsTrue(hasUnifedCofactor);
@@ -65,7 +65,7 @@ namespace TermSAT.Tests
                 // so |.1.2 should be a fgf-cofactor of ||.1|T.2|.2|T.1
                 var hasUnifedCofactor = Lucid.Cofactors
                     .Where(_ => _.ExpressionId == unifiable.Id 
-                            && _.UnifiedSubtermId == oneTwo.Id 
+                            && _.SubtermId == oneTwo.Id 
                             && _.ReplacementId == falseId
                             && _.ConclusionId == falseId)
                     .Any();

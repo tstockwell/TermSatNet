@@ -1,94 +1,13 @@
-# Insight : Unification of cofactors can identify a reduction in polytime.
-
-Given an expression, the # of cofactors that can be directly computed from the expression is polynomial.  
-
-We could use deiteration and iteration to expand the set of cofactors until we found a reduction (if one exists).  
-However, there are a potentially exponential # of such cofactors.  
-Instead, we can use unification to quickly deduce common tgf-cofactors that we can use to reduce the expression.  
-
-Which seems doable, since....
-- to minimize we need to find an fgf-cofactor of (T ((1 (T 2)) (2 (T 1)))) 
-- computing deductive closure of cofactors does not yield a reduction
-- Must find common tgf-cofactor of both sides.  
-	- tgf-cofactors of left side are 1, and (T 2)  
-	- tgf-cofactors of right side are 2, (T 1)
-- unifying (T 2) and (T 1) is easy, but must do unification correctly  
-	> ie dont use the standard Robinson unification algorithm which is exponential, see Handbook.  
-- we need to retain the unifying substitution so that we can actually perform the rewrite.  
-	That is, given that (1 2) is a fgf-cofactor of ((1 (T 2)) (2 (T 1))), how do we rewrite it?  
-	By applying the unifying substitution and reordering to get ((1 (1 2)) (2 (1 2))).  
-	Then we apply the substitution (1 2)<-T to get ((1 T) (2 T)), and therefore  
-	(T ((1 (T 2)) (2 (T 1)))) => ((1 2) ((1 T) (2 T))) => ((1 2) ((T 1) (T 2))) 
-
-Here are some of the cofactors calculated for the above expression, note the last two...
-
-	Cofactors
-	(S	==	R) -> (	E ==	C)
-	2		F		2		F
-	2		T		2		T
-	2		F		(T 2)	T
-	2		T		(T 2)	F
-	(T 1)	F		(2 (T 1))	T	; rhs of (2 (T 1))
-	(T 2)	F		(1 (T 2))	T	; rhs of (1 (T 2))
-
-if we can unify (T 1) and (T 2) then we can create a common fgt-cofactor of both sides 
-and thus a fgf-cofactor that we can use to reduce the expression.  
-
-Still one issue... how to actually make the rewrite that reduces the expression?
-That is, we know that (1 2)
+# LE Cofactor Reduction
 
 
+> It is assumed that the reader has already read the [Introduction to Lucid Expressions](lucid-expressions.md).  
+> It's especially important to understand the LE concept of *cofactors*.  
 
-	(1 (T 2)) == (1 (1 2))			; iteration
-	(2 (T 1)) == (2 (1 2))			; iteration
-	(1 2)	F		(2 (1 2))	T	; rhs of (2 (1 2))
-	(1 2)	F		(2 (T 1))	T	; from previous two lines
+LE Cofactor Reduction is a reduction system designed to rewrite expressions in the same way as the RR System, 
+but using dynamically computed cofactors instead of pre-generated rewrite rules.  
 
-	(1 2)	F		(2 (T 1))	T
-	(1 2)	F		((1 (T 2)) (2 (T 1))))  F
-	(1 2)	F		(1 (T 2))	T	; 
-
-	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2 ; eq to (1->2 && 2->1) => (2 == 1)
-	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2 ; eq to (1->2 && 2->1) => (2 == 1)
-
-This is an example of an expression that can't be reduced by directly computing cofactors of the terms in the expression.  
-
-	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2
-
-
-# Insight : Add an ordering rule that expressions with fewer unique terms are less than expressions with more terms.  
-This new rule is applied before the length ordering rule, giving it a higher priority than the length rule.  
- 
-The effect would be this...  
-Instead of this rule (which is quite difficult to implement)...  
-
-	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2 ; eq to (1->2 && 2->1) => (2 == 1)
-
-the system would generate these rules, which are easier to implement...  
-
-	|T||1|T.2|2|T.1 => 
-	|T||1|1.2|2|1.2 => ; simple unification to find form that's reducible, using cofactor calculations?
-	||1.2||T.1|T.2 ; paste-and-cut (iteration followed by deiteration), 
-
-	|T||1|1.2|2|T.2 => 
-	|T||1|1.2|2|1.2 => ; simple unification that finds common terms
-
-PS:  Minimizing the unique terms makes more sense as a measure of 'simple' than the length of the expression.  
-That's because when you think about the 'size' of the expression, the LE implementation can usually store 
-expressions with fewer terms more efficiently than expressions that are 'shorter'.  
-This is because, in a computer's memory, it's possible to reuse an expression as a pointer, 
-which doesn't require the expression to be duplicated.  
-
-
-
-
-
-# Reduction 
-
-
-
-> It is assumed that the reader has already read the [introduction to EG](existential-expressions.md) and to [LE](lucid-expressions.md).  
-> It's especially import to understand the LE concept of *cofactors*.  
+Like the RR SYstem
 
 In the LE system, reduction is the process of minimizing an expression to its canonical form.  
 
@@ -245,6 +164,94 @@ It will be shown that the maximum size of any equivalence/reduction proof is at 
 And it will be shown that the maximum number of cofactor records computed during a proof is limited to Pow(2N,2)
 
 That makes LE's time complexity on the order of O(Pow(N,2) * Pow(2N,2)) = O(4Pow(N,4)).  
+
+
+
+-----------------------------
+
+
+
+
+# Insight : Unification of cofactors can identify a reduction in polytime.
+
+Given an expression, the # of cofactors that can be directly computed from the expression is polynomial.  
+
+We could use deiteration and iteration to expand the set of cofactors until we found a reduction (if one exists).  
+However, there are a potentially exponential # of such cofactors.  
+Instead, we can use unification to quickly deduce common tgf-cofactors that we can use to reduce the expression.  
+
+Which seems doable, since....
+- to minimize we need to find an fgf-cofactor of (T ((1 (T 2)) (2 (T 1)))) 
+- computing deductive closure of cofactors does not yield a reduction
+- Must find common tgf-cofactor of both sides.  
+	- tgf-cofactors of left side are 1, and (T 2)  
+	- tgf-cofactors of right side are 2, (T 1)
+- unifying (T 2) and (T 1) is easy, but must do unification correctly  
+	> ie dont use the standard Robinson unification algorithm which is exponential, see Handbook.  
+- we need to retain the unifying substitution so that we can actually perform the rewrite.  
+	That is, given that (1 2) is a fgf-cofactor of ((1 (T 2)) (2 (T 1))), how do we rewrite it?  
+	By applying the unifying substitution and reordering to get ((1 (1 2)) (2 (1 2))).  
+	Then we apply the substitution (1 2)<-T to get ((1 T) (2 T)), and therefore  
+	(T ((1 (T 2)) (2 (T 1)))) => ((1 2) ((1 T) (2 T))) => ((1 2) ((T 1) (T 2))) 
+
+Here are some of the cofactors calculated for the above expression, note the last two...
+
+	Cofactors
+	(S	==	R) -> (	E ==	C)
+	2		F		2		F
+	2		T		2		T
+	2		F		(T 2)	T
+	2		T		(T 2)	F
+	(T 1)	F		(2 (T 1))	T	; rhs of (2 (T 1))
+	(T 2)	F		(1 (T 2))	T	; rhs of (1 (T 2))
+
+if we can unify (T 1) and (T 2) then we can create a common fgt-cofactor of both sides 
+and thus a fgf-cofactor that we can use to reduce the expression.  
+
+Still one issue... how to actually make the rewrite that reduces the expression?
+That is, we know that (1 2)
+
+
+
+	(1 (T 2)) == (1 (1 2))			; iteration
+	(2 (T 1)) == (2 (1 2))			; iteration
+	(1 2)	F		(2 (1 2))	T	; rhs of (2 (1 2))
+	(1 2)	F		(2 (T 1))	T	; from previous two lines
+
+	(1 2)	F		(2 (T 1))	T
+	(1 2)	F		((1 (T 2)) (2 (T 1))))  F
+	(1 2)	F		(1 (T 2))	T	; 
+
+	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2 ; eq to (1->2 && 2->1) => (2 == 1)
+	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2 ; eq to (1->2 && 2->1) => (2 == 1)
+
+This is an example of an expression that can't be reduced by directly computing cofactors of the terms in the expression.  
+
+	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2
+
+
+# Insight : Add an ordering rule that expressions with fewer unique terms are less than expressions with more terms.  
+This new rule is applied before the length ordering rule, giving it a higher priority than the length rule.  
+ 
+The effect would be this...  
+Instead of this rule (which is quite difficult to implement)...  
+
+	|T||1|T.2|2|T.1 => ||1.2||T.1|T.2 ; eq to (1->2 && 2->1) => (2 == 1)
+
+the system would generate these rules, which are easier to implement...  
+
+	|T||1|T.2|2|T.1 => 
+	|T||1|1.2|2|1.2 => ; simple unification to find form that's reducible, using cofactor calculations?
+	||1.2||T.1|T.2 ; paste-and-cut (iteration followed by deiteration), 
+
+	|T||1|1.2|2|T.2 => 
+	|T||1|1.2|2|1.2 => ; simple unification that finds common terms
+
+PS:  Minimizing the unique terms makes more sense as a measure of 'simple' than the length of the expression.  
+That's because when you think about the 'size' of the expression, the LE implementation can usually store 
+expressions with fewer terms more efficiently than expressions that are 'shorter'.  
+This is because, in a computer's memory, it's possible to reuse an expression as a pointer, 
+which doesn't require the expression to be duplicated.  
 
 
 

@@ -44,7 +44,6 @@
     <Compile Remove="RuleDatabase\RuleGenerator.cs" />
     <Compile Remove="RuleDatabase\RuleRepository.cs" />
     <Compile Remove="RuleDatabase\TruthTables.cs" />
-    <Compile Remove="SchemeReducer\Scripts.cs" />
     <Compile Remove="Scripts\Scripts.cs" />
     <Compile Remove="Solver\CompletionGenerator.cs" />
     <Compile Remove="Solver\Solver.cs" />

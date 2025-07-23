@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using System.Diagnostics;
 using TermSAT.Formulas;
 
 namespace TermSAT.NandReduction;
@@ -35,14 +33,14 @@ public record CofactorRecord
     {
         modelBuilder.Entity<CofactorRecord>(f => f.ToTable(tableName));
 
-        modelBuilder.Entity<CofactorRecord>().HasKey(f => new { f.ExpressionId, f.ConclusionId, f.SubtermId, f.ReplacementId, f.UnifiedSubtermId });
+        modelBuilder.Entity<CofactorRecord>().HasKey(_ => new { _.ExpressionId, _.ConclusionId, _.ReplacementId, _.SubtermId });
 
         modelBuilder.Entity<CofactorRecord>().Property(f => f.ExpressionId).IsRequired();
         modelBuilder.Entity<CofactorRecord>().Property(f => f.ConclusionId).IsRequired();
         modelBuilder.Entity<CofactorRecord>().Property(f => f.SubtermId).IsRequired();
         modelBuilder.Entity<CofactorRecord>().Property(f => f.ReplacementId).IsRequired();
 
-        modelBuilder.Entity<CofactorRecord>().HasIndex(_ => new { _.ExpressionId, _.ConclusionId, _.SubtermId}); 
+        modelBuilder.Entity<CofactorRecord>().HasIndex(_ => new { _.ExpressionId, _.ConclusionId, _.ReplacementId, _.SubtermId}); 
     }
 
     public CofactorRecord(long expressionId, long subtermId, long replacementId, long conclusionId)
@@ -51,24 +49,12 @@ public record CofactorRecord
         SubtermId = subtermId;
         ReplacementId = replacementId;
         ConclusionId = conclusionId;
-        UnifiedSubtermId = subtermId;
 
 #if DEBUG
         Validate();
 #endif
     }
-    public CofactorRecord(long expressionId, long subtermId, long replacementId, long conclusionId, long unifiedSubtermId)
-    {
-        ExpressionId = expressionId;
-        SubtermId = subtermId;
-        ReplacementId = replacementId;
-        ConclusionId = conclusionId;
-        UnifiedSubtermId = unifiedSubtermId;
-#if DEBUG
-        Validate();
-#endif
 
-    }
 #if DEBUG
     private void Validate()
     { 
@@ -79,8 +65,6 @@ public record CofactorRecord
         if (0 >= ReplacementId)
             throw new TermSatException("invalid cofactor");
         if (0 >= ConclusionId)
-            throw new TermSatException("invalid cofactor");
-        if (0 >= UnifiedSubtermId)
             throw new TermSatException("invalid cofactor");
         if (ExpressionId == ConclusionId)
             throw new TermSatException("invalid cofactor");
@@ -113,11 +97,11 @@ public record CofactorRecord
 
 
 
-    /// <summary>
-    /// When this cofactor is derived via unification then this references a unified version of the subterm referenced by SubtermId.  
-    /// This version of the subterm used later to derive reductions.  
-    /// Null when not a derived cofactor.  
-    /// </summary>
-    public long UnifiedSubtermId { get; set; }
+    ///// <summary>
+    ///// When this cofactor is derived via unification then this references a unified version of the subterm referenced by SubtermId.  
+    ///// This version of the subterm used later to derive reductions.  
+    ///// Null when not a derived cofactor.  
+    ///// </summary>
+    //public long UnifiedSubtermId { get; set; }
 
 }

@@ -18,11 +18,7 @@
 using TermSAT.Formulas;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using TermSAT.Common;
-using TermSAT.SchemeReducer;
 
 namespace TermSAT.Tests
 {
@@ -308,16 +304,6 @@ namespace TermSAT.Tests
             Assert.AreEqual(1, recognizer.FindAllGeneralizations("**.2.1-*.2.1").Count);
         }
 
-        [TestMethod]
-        public void TestBasicReductionScheme()
-        {
-            {
-                var formula = Formula.GetOrParse("***.3.2-*-.1**-.2.4.3-*.1-*.2.4");
-                var reducedFormula = formula.ReduceUsingBasicScheme();
-                Assert.IsTrue(reducedFormula.Length < formula.Length, $"reduced formula should be shorter.  \n{formula} ==> {reducedFormula}");
-            }
-
-        }
 
     }
 

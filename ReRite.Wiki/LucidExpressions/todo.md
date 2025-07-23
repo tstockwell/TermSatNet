@@ -10,7 +10,7 @@ Divide proof into the following sections...
 		- Charles Pierce would like how LEs use parentheses instead of operators but would hate the use of numbers for variables. 
 	- Its also important to know that, unlike EGs, LEs are *ordered*.
 		-  For example F < T < 1 < (T 1) < (1 1) < 2 < (1 2) < (2 1) < (2 2) < (1 (1 2)) < 3
-	- LE uses the same inference rules as EG plus an ordeing rule, namely...
+	- LE uses inference rules that are similar to EG, plus an ordering rule, namely...
 		- Ordering.  
 			- (1 2) => (2 1) when 2 < 1
 		- Cut Elimination/Introduction.  
@@ -20,8 +20,8 @@ Divide proof into the following sections...
 			- Insertion: T => (F 1)
 			- Erasure: (F 1) => T
 		- Iteration/Deiteration
-			- Iteration: (1 2) => (1 2[T<-1]), or (1 2) => (1[2<-T] 2)
-			- Deiteration: (1 2) => (1[2<-T] 2), or (1 2) => (1 2[1<-T])
+			- Iteration: (1 2) => (1 2[T<-3]) or (1 2) => (1[T<-3] 2), where 3 is an f-grounding, f-cofactor of 1/2.
+			- Deiteration: (1 2) => (1[3<-T] 2), or (1 2) => (1 2[3<-T]), where 3 is an f-grounding, f-cofactor of 2/1.
 	- Note that the inference rules come in pairs that are reversible.  
 - Introduction to a Knowledge Compilation System that can normalize LEs in polytime. 
 	- Compiles an infinite sequence of expressions to an infinite number of rewrite rules that are saved in an infinite database.  
@@ -52,6 +52,8 @@ Divide proof into the following sections...
 			- the rule (1 (T 1)) => T is an application of deiteration to get (1 (T T)), 
 				followed by two applications of Cut Elimination to get (1 F) and then T.
 	- We can build an equivalent system that replaces the infinite number of rewrite rules with a finite number of decision algorithms.  
+	- Cofactors are only computed for mostly-canonical expressions 
+		- Mostly-canonical expressions are expressions where both sides are canonical.
 	- These decision algorithms are designed to detect and undo applications of LEs inference rules.
 	- .
 	- Extends the knowledge compilation system by adding decision algorithms that are equivalent to classes of rewrite rules.  

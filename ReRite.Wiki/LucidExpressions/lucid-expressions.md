@@ -165,23 +165,30 @@ LE's
 
 The inference rules for LEs are sound, complete, and reversible.  
 
-#### Order Reduction
+#### Order
 These rules rearrange terms in an expression to respect LE expression ordering.  
 These rules are bidirectional.
 
 0. (P Q) <=> (T Q), if Compare(P,Q) == 0
 1. (P Q) <=> (Q P), if Compare(P,Q) > 0
-2. (Q P) <=> (P Q), if Compare(P,Q) < 0
 
-#### Cut Introduction/Elimination
-These rules introduce or eliminate cuts from expressions.  
-These rules are bidirectional.
+#### Cut Elimination/Introduction
+Eliminates/Introduces a pair of parentheses.
 
-1. (T T) <=> F		; empty-space elimination/introduction 
-2. (F Q) <=> T		; empty-cut elimination/introduction
-3. (T (T Q)) <=> Q	; double-negation elimination/introduction
+1. (T T) <=> F		
+1. F => (T T) 
 
-Note that rule .3 is the double-cut introduction/elimination rule from classic EGs.  
+#### Erasure/Insertion
+Erases/Inserts a subterm into an expression
+
+1. (F Q) <=> T		
+2. T => (F Q) 
+
+#### Double Negation Elimination/Introduction
+Removes/Introduces double negation
+
+1. (T (T Q)) <=> Q	
+2. Q => (T (T Q)) 
 
 #### Generalized Iteration
 
@@ -189,7 +196,7 @@ The LE iteration rule is a generalization of EG iteration and insertion.
 
 Rule: Given a subterm S of an expression E of the form (L R),  
 	where S is a left or right, F-grounding F-cofactor of E then 
-	all copies of T in the other side of the expression may be replaced with S.  
+	any or all copies of T in the other side of the expression may be replaced with S.  
 	 						
 Expressed as rewrite rules...  
 
@@ -208,7 +215,7 @@ Note that when R[S] == F, or L[S] == F then generalized iteration is similar to 
 
 Rule: Given a subterm S of an expression E of the form (L R),  
 	where S is an f-grounding f-cofactor of either L or R
-	then all copies of S in the other side of the expression may be replaced with T.  
+	then any or all instances of S in the other side of the expression may be replaced with T.  
 	 						
 Expressed as rewrite rules...  
 

@@ -25,10 +25,9 @@ public static class CommutativeRules
         // |.2.1 => |.1.2 
         // A pure ordering rule, because the length doesn't change, just the symbols are rearranged.
         // swap .1 <-> .2
-        // This rule will be subsumed by wildcard analysis when 'instance swapping' is implemented.
-        // Wildcard analysis does this by noting that .1 and .2 are wildcards for each other, so they
-        // can be swapped for each other.
-        // And that, swapping them actually results in a 'reduced' formula.  
+        // This rule has been implemented here even though its subsumed subsumed by paste-and-cut.   
+        // I think that the ordering reduction should be explicit because it's explicit in the proof paper.  
+        // In paste-and-cut, .1 and .2 can be swapped for each other (when the result is simpler) since both are fgf-cofactors.  
         //
         // NOTE 1/22/25...
         //  Still no such thing as 'instance swapping' in the reduction algorithm.
@@ -41,10 +40,6 @@ public static class CommutativeRules
                 var nextReduction = await db.GetMostlyCanonicalRecordAsync(reducedFormula);
 
                 startingRecord.RuleDescriptor = "|.2.1 => |.1.2";
-                startingRecord.Mapping =  Enumerable.Repeat(-1, 1)
-                    .Concat(Enumerable.Range(startingNand.Antecedent.Length + 1, startingNand.Subsequent.Length))
-                    .Concat(Enumerable.Range(1, startingNand.Antecedent.Length))
-                    .ToArray();
                 startingRecord.NextReductionId =  nextReduction.Id;
 
                 await db.SaveChangesAsync();

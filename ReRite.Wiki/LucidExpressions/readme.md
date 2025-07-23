@@ -1,22 +1,33 @@
-# Lucid Expressions: Boolean Expressions That Reduce to Canonical Form in Polynomial Time
+# Lucid Expressions: Normalizable in Polynomial Time
 
-Lucid Expressions are a textual and ordered, form of [existential graph](https://en.wikipedia.org/wiki/Existential_graph) 
-that can be reduced to their canonical form in polynomial time.  
+Lucid Expressions are a form of [Existential Graph](https://en.wikipedia.org/wiki/Existential_graph) 
+that can be reduced to their normal/canonical form in polynomial time.  
 
-This document describes Lucid Expressions and a method for reducing them.  
-It is shown that...
-- the LE system of logic is sound and complete.  
-- the LE system's reduction method is sound, complete, confluent, and terminates.  
+This document has three sections... 
+- Section 1: Introduction to Lucid Expressions
+	> Describes a system of logic based that's similar to Existential Graphs.  
+	- The LE system is shown to be sound and complete.
+- Section 2: The Rewrite Rule (RR) System : A Reduction System That Reduces LEs To Canonical Form In Polynomial Time.
+    > Describes a system with an infinite set of rewrite rules, rules generated using the Knuth-Bendix completion method.  
+	> Its shown that the rules can reduce expressions to their canonical form in polynomial time.  
+	- The generated rewrite rules are shown to terminate and to be confluent.  
+	- Each rule reduces a mostly-canonical expression to a canonical expression.
+	- Expressions are reduced from the bottom up.  
+	- Expressions can be fully reduced to their canonical form in a quadradic number of rewrites in the worst case.
+- Section 3: LE Cofactor Reduction 
+    > Describes a system that rewrites expressions in the same way as the RR System, 
+		but uses dynamically computed cofactors instead of pre-generated rewrite rules.  
+	- A cofactor is an expression produced by replacing a subterm of an expression with a constant (T or F).
+	- Expressions can be fully reduced to their canonical form by computing a polynomial number of cofactors in the worst case.
 
-It is also shown that a satisfying valuation of an expression can be determined in polynomial time.  
-
-## Cheet Sheet
+## Cheat Sheet
 
 This section is an overview of, and guide to, the rest of this document.
 
 - [Introduction](introduction.md)
-
-	 This section gives an overview of [existential graphs](https://en.wikipedia.org/wiki/Existential_graph) (EG), [abstract reduction systems](https://en.wikipedia.org/wiki/Abstract_rewriting_system), and the shortcomings of the EG system as a reduction system.  
+	> This section gives an overview of [existential graphs](https://en.wikipedia.org/wiki/Existential_graph) (EG), 
+	> [abstract reduction systems](https://en.wikipedia.org/wiki/Abstract_rewriting_system), 
+	> and the shortcomings of the EG system as a reduction system.  
 	
 	- [Logic and Reduction Systems](introduction.md###Logic_and_Reduction_Systems)
 		- Logic systems can be viewed as a type of abstract reduction system.  

@@ -91,29 +91,11 @@ public partial class ReductionRecord
     public int VarCount { get; set; }
 
 
-
-    /*************
-     * INFORMATION USED TO PROVE THAT WILDCARD ANALYSIS IS CORRECT (that reductions produce logically equivalent formulas)
-     *************/
-
     /// <summary>
-    /// Only used by the 'rule generation script'.
-    /// RR has a chicken and egg problem.
-    /// Wildcard analysis cant be used to generate rules until after its shown to work correctly.
-    /// So initially, rules are generated using truth tables.  
-    /// This column is only needed to prove that RR is correct and complete, its not required in a production database.
-    /// </summary>
-    public string TruthValue { get; set; }
-
-
-    /*************
-     * INFORMATION ABOUT THE FORMULAS' NEXT REDUCTION
-     *************/
-
-    /// <summary>
-    /// Points to the next reduction in the sequence of reductions that lead to this formulas' canonical startingFormula.
-    /// If the starting startingFormula is canonical then this field will eventually be set to a singleton reduction that serves as a 'completion marker'. 
-    /// This property is write-once, once the first reduction is found this property will never change.
+    /// Points to the next reduction in the sequence of reductions that lead to this expressions' canonical form.
+    /// If this expression is canonical then this.NextReductionId == this.Id.  
+    /// If the next reduction is not yet known then NextReductionId == null.
+    /// This property is write-once, once set then this property should never change.
     /// <see cref="IsComplete"/>
     /// </summary>
     public long NextReductionId 
@@ -122,9 +104,9 @@ public partial class ReductionRecord
         set
         {
 #if DEBUG
-            if (value == 0 || value == Id)
+            if (value == 0 || (value == Id && !IsCanonical))
             {
-                throw new TermSatException($"invalid {nameof(NextReductionId)}:{value}");
+                throw new TermSatException($"Invalid {nameof(NextReductionId)}:{value}");
             }
 #endif
             _nextReductionId = value;
@@ -156,28 +138,15 @@ public partial class ReductionRecord
     }
     private string _ruleDescriptor= null;
 
-    /// <summary>
-    /// Maps terms in NextReduction.Formula to terms in this.Formula. 
-    /// Used during term value analysis to associate terms in NextReduction.Formula with terms in this.Formula.
-    /// </summary>
-    public int[] Mapping { get; set; }
-
-    /*************
-     * INFORMATION ABOUT THE COMPLETE PROOF
-     *************/
-
-    public long CanonicalReductionId { get; set; }
-
-
-    /*************
-     * INFORMATION USED BY THE DATABASE COMPLETION PROCESS
-     *************/
 
     /// <summary>
-    /// Indicates that this startingFormula has been indexed, aka added to the Lookup table.
-    /// -1 = no value, 0 = false, 1 = true
+    /// The Id of the canonical form of this expression.  
+    /// If this expression is canonical then this.Id == this.CanonicalId.  
+    /// 
+    /// The canonical form of an expression is not usually known when an expression is inserted into the rule db 
+    /// and therefore CanonicalId is usually null when inserted.  
     /// </summary>
-    public int IsIndexed { get; set; } = -1;
+    public long CanonicalId { get; set; }
 
     /// <summary>
     /// Indicates that this startingFormula is known to be canonical.
@@ -188,8 +157,30 @@ public partial class ReductionRecord
         set
         {
             RuleDescriptor = ReductionRecord.PROOF_IS_COMPLETE;
+            CanonicalId = NextReductionId = Id;
         }
     }
+
+
+    /// <summary>
+    /// Only used by the 'rule generation script'.
+    /// RR has a chicken and egg problem.
+    /// Wildcard analysis cant be used to generate rules until after its shown to work correctly.
+    /// So initially, rules are generated using truth tables.  
+    /// This column is only needed to prove that RR is correct and complete, its not required in a production database.
+    /// </summary>
+    public string TruthValue { get; set; }
+
+
+    /// <summary>
+    /// Indicates that this startingFormula has been indexed, aka added to the Lookup table.
+    /// -1 = no value, 0 = false, 1 = true
+    /// 
+    /// This property is not used by the LE reduction process, 
+    /// it's used by the <see cref="NandReduction.Scripts.RunNandRuleGenerator"/> script to 
+    /// index expressions concurrently while generating rules.
+    /// </summary>
+    public int IsIndexed { get; set; } = -1;
 
     /// <summary>
     /// A marker that indicates that this rule, aka non-canonical formula, 
@@ -235,25 +226,20 @@ public partial class ReductionRecord
             VarCount = allVariables.Select(_ => _.Number).Max();
         }
         _startingFormula = startingFormula;
-        Mapping = Enumerable.Repeat(-1, Length).ToArray();
+        //Mapping = Enumerable.Repeat(-1, Length).ToArray();
         if (isCanonical)
         {
             RuleDescriptor = ReductionRecord.PROOF_IS_COMPLETE;
         }
     }
 
-    public ReductionRecord(Formula startingFormula, int varCount, string truthValue, int[] mapping = null)
+    public ReductionRecord(Formula startingFormula, int varCount, string truthValue)
     {
         Text = startingFormula.ToString();
         Length = startingFormula.Length;
         VarCount = varCount;
         TruthValue = truthValue;
         _startingFormula = startingFormula;
-        Mapping = mapping;
-        if (Mapping == null)
-        {
-            Mapping = Enumerable.Repeat(-1,Length).ToArray();
-        }
     }
     private ReductionRecord()
     {
@@ -273,7 +259,7 @@ public partial class ReductionRecord
         modelBuilder.Entity<ReductionRecord>().Property(f => f.Text).IsRequired();
         modelBuilder.Entity<ReductionRecord>().Property(f => f.VarCount).IsRequired();
         modelBuilder.Entity<ReductionRecord>().Property(f => f.Length).IsRequired();
-        modelBuilder.Entity<ReductionRecord>().Property(f => f.Mapping);
+        //modelBuilder.Entity<ReductionRecord>().Property(f => f.Mapping);
         //modelBuilder.Entity<FormulaRecord>().Property(f => f.TruthValue).IsRequired();
         //modelBuilder.Entity<FormulaRecord>().Property(f => f.Subsumed).HasDefaultValue(-1);
         //modelBuilder.Entity<FormulaRecord>().Property(f => f.Evaluated).HasDefaultValue(-1);
@@ -291,7 +277,7 @@ public partial class ReductionRecord
         modelBuilder.Entity<ReductionRecord>().HasIndex(f => f.TruthValue);
         modelBuilder.Entity<ReductionRecord>().HasIndex(f => f.NextReductionId);
         modelBuilder.Entity<ReductionRecord>().HasIndex(f => f.RuleDescriptor);
-        modelBuilder.Entity<ReductionRecord>().HasIndex(f => f.CanonicalReductionId);
+        modelBuilder.Entity<ReductionRecord>().HasIndex(f => f.CanonicalId);
         modelBuilder.Entity<ReductionRecord>().HasIndex(_ => new { _.VarCount, _.Length, _.Text }); // startingFormula order
         modelBuilder.Entity<ReductionRecord>().HasIndex(_ => new { _.TruthValue, _.VarCount, _.Length, _.Text });
 

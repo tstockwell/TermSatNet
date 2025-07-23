@@ -33,10 +33,14 @@ public class LucidDbContext : DbContext
     public DbSet<CofactorRecord> Cofactors { get; set; }
 
     /// <summary>
-    /// A trie-like table that indexes all known rewrite and makes it possible 
-    /// to efficiently apply the rules to a given expression.  
+    /// A trie-like table that indexes all known expressions and makes it possible 
+    /// to efficiently apply all known rewrite rules to a given expression.  
     /// </summary>
     public DbSet<FormulaIndex.Node> Lookup { get; set; }
+
+    /// <summary>
+    /// For saving configuration values and such.
+    /// </summary>
     public DbSet<MetaRecord> Meta { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

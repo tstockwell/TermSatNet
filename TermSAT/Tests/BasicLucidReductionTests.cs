@@ -176,15 +176,15 @@ namespace TermSAT.Tests
         {
 
             {
-                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1T");
-                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T.1");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|TT");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("F");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
                 var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
             {
-                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|TT");
-                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("F");
+                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1T");
+                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T.1");
                 Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
                 var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
@@ -203,14 +203,8 @@ namespace TermSAT.Tests
                 var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
-            {
-                var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1T");
-                var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T.1");
-                Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
-                var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
-                Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
-            }
-            await SimplestWildcardFormula();
+            await SimplestDeiterationTake1();
+            await SimplestDeiterationTake2();
             {
                 var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.2|.1T");
                 var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.2|T.1");
@@ -300,7 +294,7 @@ namespace TermSAT.Tests
                 Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
             }
 
-            await SimpleDeiterationTake2();
+            await ComputedCofactorDeiteration();
 
             // |||T.2|T.3|.3|T||T.1|T.2
             {
@@ -735,8 +729,10 @@ namespace TermSAT.Tests
         //      |||T.1|TT||.1.3|.2.3
         //      |||T.1F||.1.3|.2.3
         //      |T||.1.3|.2.3
+        // Note that cofactor used to reduce ||13|23 can be computed
+        // from the cofactors for |13 and |23
         //
-        // ///////// 2024
+        // ///////// 12/1/2024
         // DebugAssertException: 'an instance of the subterm should have been found
         // Caused by the wildcard tracer returning wildcard position of 5 instead of 4
         //  => test .1seq -> T
@@ -756,7 +752,7 @@ namespace TermSAT.Tests
         //  => |.3||.1T|.2T
         //  => |.3||T.1|T.2
         [TestMethod]
-        public async Task SimpleDeiterationTake2()
+        public async Task ComputedCofactorDeiteration()
         {
             var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|||T.1|T.3||.1.3|.2.3");
             var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T||.1.3|.2.3");
@@ -975,7 +971,27 @@ namespace TermSAT.Tests
         }
 
         [TestMethod]
-        public async Task SimplestWildcardFormula()
+        public async Task SimplestDeiterationTake1()
+        {
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1.1");
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|T.1");
+            Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
+            Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
+        }
+
+        [TestMethod]
+        public async Task SimplestDeiterationTake2()
+        {
+            var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1|T.1");
+            var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("T");
+            Assert.AreEqual(TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
+            var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
+            Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
+        }
+
+        [TestMethod]
+        public async Task SimplestDeiterationTake3()
         {
             var nonCanonicalformula = await Lucid.GetMostlyCanonicalRecordAsync("|.1|.1.2");
             var canonicalRecord = await Lucid.GetMostlyCanonicalRecordAsync("|.1|T.2");
@@ -1141,6 +1157,7 @@ namespace TermSAT.Tests
         /// 
         /// 
         /// ###### 1/24/25
+        /// Previous attempt didn't work.  
         /// For now, this rule is just hardcoded, see NandReducerCommutativeRules.
         /// It might be necessary to implement a generalized form of this type of wildcard swapping 
         /// in order for the reduction algorithm to cover all the formulas in the base RR rule database
@@ -1234,6 +1251,19 @@ namespace TermSAT.Tests
         /// is equivalent to this...
         ///     (T ((1 (1 2)) (2 (1 2)))) ; note that (1 2) is an easily, mechanically identifiable f-grounding f-cofactor
         /// 
+        /// ########### UPDATE 6/10/2025
+        /// Cofactors have been reworked to remove 'unified' cofactors and use equalities instead.
+        /// So this expression is now solvable using cofactors like so...
+        ///     Since (T ((1 (1 2)) ((1 2) 2))) == (T ((1 (T 2)) ((T 1) 2))) 
+        ///         and are therefore equivalent
+        ///     and since...   
+        ///         (T ((1 (1 2)) ((1 2) 2)))[(1 2)<-F] =>* T, and 
+        ///         (T ((1 (T 2)) ((T 1) 2)))[T<-F] =>* T, 
+        ///     Then T and (1 2) are swappable, resulting in a simpler expression.
+        /// Note...
+        /// When the cofactors are computed for (1 (T 2)), a tgf-cofactor is computed for (1 (1 2))[(1 2)<-F].
+        /// When cofactors are computed for ((1 (T 2)) ((T 1) 2)), an fgf-cofactor is computed from 
+        /// the tgf-cofactors for (1 (1 2)) and (2 (1 2)).
         /// 
         /// ########### UPDATE 4/28/2025
         /// 
@@ -1244,11 +1274,6 @@ namespace TermSAT.Tests
         /// Then T and (1 2) are swappable.
         /// 
         /// ### Notes
-        /// This expression requires LE to examine the expressions direct cofactors 
-        /// rather than the cofactors of its sides using this rule...
-        ///     > If an expression E has two cofactors with the same replacement and the same conclusion 
-        ///     then the two subterms may be swapped.
-        /// 
         /// This expression also requires 'cofactor unification' to minimize.
         /// After extending LE with 'cofactor unification' then LE computes the following tgf-cofactors...
         ///     (1 (T 2))[(1 2)<-F] =>* T
@@ -1415,7 +1440,18 @@ namespace TermSAT.Tests
                 var falseId = await Lucid.GetConstantExpressionIdAsync(false);
                 var nandOneTwo = await GetMostlyCanonicalRecordAsync("|.1.2");
                 var ifOneThenTwo = await GetMostlyCanonicalRecordAsync("|.1|T.2");
-                var ifNotOneThenNotTwo = await GetMostlyCanonicalRecordAsync("||T.1.2");
+
+
+                // (1 2) should be a tgf-cofactor of some iteration of (1 (T 2))
+                {
+                    var cofactors = await Lucid.Expressions.Where(_ => _.Id == ifOneThenTwo.Id  || _.CanonicalId == ifOneThenTwo.Id)
+                        .Join(Lucid.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
+                        .Where(_ => _.SubtermId == nandOneTwo.Id)
+                        .Where(_ => _.ReplacementId == falseId)
+                        .Where(_ => _.ConclusionId == trueId)
+                        .ToArrayAsync();
+                    Assert.IsTrue(cofactors.Any());
+                }
 
                 // replacing T with F in |.1|T.2 does NOT reduce the expression to T
                 {
@@ -1428,22 +1464,16 @@ namespace TermSAT.Tests
                     Assert.IsFalse(invalidCofactors.Any());
                 }
 
-
-                // (1 2) should be a tgf-cofactor of (1 (T 2)) and ((T 1) 2)
+                // (1 2) should be a tgf-cofactor of some iteration of ((T 1) 2)
                 {
-                    var matches = await Lucid.Cofactors
-                        .Where(_ => _.ExpressionId == ifOneThenTwo.Id && _.UnifiedSubtermId == nandOneTwo.Id)
+                    var ifNotOneThenNotTwo = await GetMostlyCanonicalRecordAsync("||T.1.2");
+                    var cofactors = await Lucid.Expressions.Where(_ => _.Id == ifNotOneThenNotTwo.Id  || _.CanonicalId == ifNotOneThenNotTwo.Id)
+                        .Join(Lucid.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
+                        .Where(_ => _.SubtermId == nandOneTwo.Id)
                         .Where(_ => _.ReplacementId == falseId)
                         .Where(_ => _.ConclusionId == trueId)
                         .ToArrayAsync();
-                    Assert.IsTrue(matches.Any());
-
-                    matches = await Lucid.Cofactors
-                        .Where(_ => _.ExpressionId == ifNotOneThenNotTwo.Id && _.UnifiedSubtermId == nandOneTwo.Id)
-                        .Where(_ => _.ReplacementId == falseId)
-                        .Where(_ => _.ConclusionId == trueId)
-                        .ToArrayAsync();
-                    Assert.IsTrue(matches.Any());
+                    Assert.IsTrue(cofactors.Any());
                 }
 
 
@@ -1454,12 +1484,13 @@ namespace TermSAT.Tests
 
                 // (1 2) should be a fgf-cofactor of ((1 (T 2)) ((T 1) 2))
                 {
-                    var matches = await Lucid.Cofactors
-                        .Where(_ => _.ExpressionId == subRecord.Id && _.UnifiedSubtermId == nandOneTwo.Id)
+                    var cofactors = await Lucid.Expressions.Where(_ => _.Id == subRecord.Id  || _.CanonicalId == subRecord.Id)
+                        .Join(Lucid.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
+                        .Where(_ => _.SubtermId == nandOneTwo.Id)
                         .Where(_ => _.ReplacementId == falseId)
                         .Where(_ => _.ConclusionId == falseId)
                         .ToArrayAsync();
-                    Assert.IsTrue(matches.Any());
+                    Assert.IsTrue(cofactors.Any());
                 }
             }
 
