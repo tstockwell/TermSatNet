@@ -1435,6 +1435,11 @@ namespace TermSAT.Tests
         [TestMethod]
         public async Task SimpleWildcardSwapRequiringUnification()
         {
+
+            //var falseId = await Lucid.GetConstantExpressionIdAsync(false);
+            //var subsequentRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|T.1"); 
+            //Lucid.Cofactors.Where(_ => _.ExpressionId == subsequentRecord.Id && _.ConclusionId == falseId);
+
             {
                 var trueId = await Lucid.GetConstantExpressionIdAsync(true);
                 var falseId = await Lucid.GetConstantExpressionIdAsync(false);
@@ -1444,7 +1449,7 @@ namespace TermSAT.Tests
 
                 // (1 2) should be a tgf-cofactor of some iteration of (1 (T 2))
                 {
-                    var cofactors = await Lucid.Expressions.Where(_ => _.Id == ifOneThenTwo.Id  || _.CanonicalId == ifOneThenTwo.Id)
+                    var cofactors = await Lucid.Expressions.Where(_ => _.Id == ifOneThenTwo.Id || _.NextReductionId == ifOneThenTwo.Id || _.CanonicalId == ifOneThenTwo.Id)
                         .Join(Lucid.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
                         .Where(_ => _.SubtermId == nandOneTwo.Id)
                         .Where(_ => _.ReplacementId == falseId)
@@ -1467,7 +1472,7 @@ namespace TermSAT.Tests
                 // (1 2) should be a tgf-cofactor of some iteration of ((T 1) 2)
                 {
                     var ifNotOneThenNotTwo = await GetMostlyCanonicalRecordAsync("||T.1.2");
-                    var cofactors = await Lucid.Expressions.Where(_ => _.Id == ifNotOneThenNotTwo.Id  || _.CanonicalId == ifNotOneThenNotTwo.Id)
+                    var cofactors = await Lucid.Expressions.Where(_ => _.Id == ifNotOneThenNotTwo.Id || _.NextReductionId == ifNotOneThenNotTwo.Id || _.CanonicalId == ifNotOneThenNotTwo.Id)
                         .Join(Lucid.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
                         .Where(_ => _.SubtermId == nandOneTwo.Id)
                         .Where(_ => _.ReplacementId == falseId)
@@ -1477,14 +1482,14 @@ namespace TermSAT.Tests
                 }
 
 
-                var subRecord = await GetMostlyCanonicalRecordAsync("||.1|T.2||T.1.2");
-                var canonicalSubRecord = await Lucid.GetCanonicalRecordAsync(subRecord);
-                Assert.AreEqual(subRecord, canonicalSubRecord);
-                Assert.AreEqual(TruthTable.GetTruthTable(subRecord.Formula).ToString(), TruthTable.GetTruthTable(canonicalSubRecord.Formula).ToString());
-
                 // (1 2) should be a fgf-cofactor of ((1 (T 2)) ((T 1) 2))
                 {
-                    var cofactors = await Lucid.Expressions.Where(_ => _.Id == subRecord.Id  || _.CanonicalId == subRecord.Id)
+                    var subRecord = await GetMostlyCanonicalRecordAsync("||.1|T.2||T.1.2");
+                    var canonicalSubRecord = await Lucid.GetCanonicalRecordAsync(subRecord);
+                    Assert.AreEqual(subRecord, canonicalSubRecord);
+                    Assert.AreEqual(TruthTable.GetTruthTable(subRecord.Formula).ToString(), TruthTable.GetTruthTable(canonicalSubRecord.Formula).ToString());
+
+                    var cofactors = await Lucid.Expressions.Where(_ => _.Id == subRecord.Id || _.NextReductionId == subRecord.Id || _.CanonicalId == subRecord.Id)
                         .Join(Lucid.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
                         .Where(_ => _.SubtermId == nandOneTwo.Id)
                         .Where(_ => _.ReplacementId == falseId)
@@ -1494,16 +1499,14 @@ namespace TermSAT.Tests
                 }
             }
 
+
             var nonCanonicalformula = await GetMostlyCanonicalRecordAsync("|T||.1|T.2||T.1.2"); // id=456
             var canonicalRecord = await GetMostlyCanonicalRecordAsync("||.1.2||T.1|T.2");
             Assert.AreEqual(
-                TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(), 
+                TruthTable.GetTruthTable(nonCanonicalformula.Formula).ToString(),
                 TruthTable.GetTruthTable(canonicalRecord.Formula).ToString());
             var reducedRecord = await Lucid.GetCanonicalRecordAsync(nonCanonicalformula);
 
-            //var falseId = await Lucid.GetConstantExpressionIdAsync(false);
-            //var subsequentRecord = await Lucid.GetMostlyCanonicalRecordAsync("||.1|T.2|.2|T.1"); 
-            //Lucid.Cofactors.Where(_ => _.ExpressionId == subsequentRecord.Id && _.ConclusionId == falseId);
 
             Assert.AreEqual(canonicalRecord.Formula, reducedRecord.Formula);
         }

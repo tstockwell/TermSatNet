@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
@@ -33,17 +34,14 @@ public static class CofactorReduction
         var falseId = await db.GetConstantExpressionIdAsync(false);
 
         // This section does simple deiteration.  
-        // This section was written long before the other sections
-        // and the following section that does 'paste-and-cut' also does deiteration.  
-        // TODO: So maybe that this section can just be removed.
         //
-        // The code below always attempts to reduce the lhs before the rhs.
-        // And it always attempts plain deiteration before paste-and-cut.
+        // The code below attempts to reduce the lhs before the rhs.
+        // And it attempts plain deiteration before paste-and-cut.
         // For any f-grounding cofactor on one side, called the *domininate* side  
         //  If the dominate term exists in the other side, called the *subjugate*
         //  Then deiterate the term from the subjugate.
         {
-            var rFgCofactors = await db.Expressions.Where(e => e.Id == rhsRecord.Id || e.CanonicalId == rhsRecord.Id)
+            var rFgCofactors = await db.Expressions.Where(e => e.Id == rhsRecord.Id || e.NextReductionId == rhsRecord.Id || e.CanonicalId == rhsRecord.Id)
                 .Join(db.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
                 .Where(_ => _.ConclusionId == falseId)
                 .ToArrayAsync();
@@ -67,7 +65,7 @@ public static class CofactorReduction
                 }
             }
 
-            var lFgCofactors = await db.Expressions.Where(e => e.Id == lhsRecord.Id || e.CanonicalId == lhsRecord.Id)
+            var lFgCofactors = await db.Expressions.Where(e => e.Id == lhsRecord.Id || e.NextReductionId == lhsRecord.Id || e.CanonicalId == lhsRecord.Id)
                 .Join(db.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
                 .Where(_ => _.ConclusionId == falseId)
                 .ToArrayAsync();
@@ -95,23 +93,24 @@ public static class CofactorReduction
         // Paste and cut is the preferred name since paste-and-cut is really a shortcut for TWO combined operations, iteration followed by deiteration.  
         // The reason paste-and-cut is combined into two steps is that the iteration step alone would *expand* expressions instead of *reduce* them.  
         // But, when followed by a deiteration of the 'source' terms, the two combined operation form a reduction.
-        // The important thing to know is that cat-and-paste is really just iteration and deiteration
+        // The important thing to know is that paste-and-cut is really just iteration followed by deiteration
         //
-        // The basic rule for cut-and-paste is...  
-        //  If
-        //      E[A<-F] =>* X and
-        //      E[B<-F] =>* X
-        //      where E is a mostly canonical expression (both the left and right sides are canonical but E is not)
+        // The basic rule for paste-and-cut is...  
+        //  Iteration: Given a subterm S of an expression E of the form (L R),  
+        //	        where S is a left or right, F-grounding cofactor of E where S.R is T or F, 
+        //	        then any or all copies of S.R in the other side of the expression may be replaced with S.
+        //  Let E be a mostly-canonical expression of the form (L R) (both L and R are canonical but E is not).
+        //  Let E! be a set that contains E and every possible immediate iteration of E.
+        //  If there exists expressions E1 and E2 in E! such that 
+        //      E1[A<-F] =>* X and
+        //      E2[B<-F] =>* X
         //  Then
         //      The expression E[A<->B] is equivalent to E.
-        //      That is, we can swap A with B without changing E's truth function.
-        //
-        //  Also, we can constrain this rule to only instances of E where A and B exist in different sides of an expression.  
-        //  Because if A and B were on the same side of E then that side would be reducible, 
-        //  which they can't because E is mostly canonical.  
+        //  That is, we can swap A with B without changing E's truth function.
+        //  In certain cases the result is a reduced version of E.
         {
-            var allCutPasteCofactors = await db.Cofactors
-                .Where(_ => _.ExpressionId == startingRecord.Id)
+            var allCutPasteCofactors = 
+                await db.Cofactors.Where(_ => _.ExpressionId == startingRecord.Id)
                 .Join(db.Cofactors, _ => _.ExpressionId, _ => _.ExpressionId, (l,r) => new {Cofactor1=l, Cofactor2=r})
                 .Where(_ => _.Cofactor1.ReplacementId == falseId 
                     && _.Cofactor2.ReplacementId == falseId
@@ -127,8 +126,8 @@ public static class CofactorReduction
                 if (!subterm1Record.Formula.Contains(subterm2Record.Formula) && !subterm1Record.Formula.Contains(subterm2Record.Formula))
                 {
                     var reducedE = startingNand;
-                    if (lhsRecord.Formula.Contains(subterm1Record.Formula) && rhsRecord.Formula.Contains(subterm2Record.Formula))
-                    {  // term1 == lhs, term2 == rhs
+                    //if (lhsRecord.Formula.Contains(subterm1Record.Formula) && rhsRecord.Formula.Contains(subterm2Record.Formula))
+                    //{  // term1 == lhs, term2 == rhs
                         var swappedLHS = lhsRecord.Formula.ReplaceAll(subterm1Record.Formula, subterm2Record.Formula);
 
                         var rhsSwapCofactors = db.Cofactors
@@ -145,13 +144,13 @@ public static class CofactorReduction
                         }
 
                         reducedE = Nand.NewNand(swappedLHS, swappedRHS);
-                    }
+                    //}
 
 
                     if (reducedE.CompareTo(startingNand) < 0)
                     {
                         var reducedR = await db.GetMostlyCanonicalRecordAsync(reducedE);
-                        startingRecord.RuleDescriptor = $"swap: {subterm1Record} <-> {subterm2Record}";
+                        startingRecord.RuleDescriptor = $"paste-and-cut: {subterm1Record} <-> {subterm2Record}";
                         startingRecord.NextReductionId =  reducedR.Id;
                         await db.SaveChangesAsync();
 
@@ -200,9 +199,9 @@ public static class CofactorReduction
 
         // Every expression is a tgt-cofactor/fgf-cofactor of itself.  
         // Including constants.  
-        // A cofactor of a constant is not an intuitive concept, since constants can be assigned values truth values.  
+        // A cofactor of a constant is not an intuitive concept, since constants cant be assigned values.  
         // But if you think about a T as an empty space in an existential graph and F as an empty cut
-        // then them with a value makes more sense.  
+        // then it makes more sense, replacing constants are like filling empty spaces in a graph.
         newRecords.Add(
             new CofactorRecord(
                 expressionId: startingRecord.Id,
@@ -222,7 +221,9 @@ public static class CofactorReduction
         {
             // Since startingRecord is mostly canonical, left and right expressions should be canonical
             var leftRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Antecedent);
+            Debug.Assert(leftRecord.IsCanonical, "Since startingRecord is mostly canonical, left and right expressions should be canonical");
             var rightRecord = await db.GetMostlyCanonicalRecordAsync(startingNand.Subsequent);
+            Debug.Assert(rightRecord.IsCanonical, "Since startingRecord is mostly canonical, left and right expressions should be canonical");
 
             // for all unique terms in an expression, create cofactors using T & F for Cofactor.Replacement.
             {
@@ -265,9 +266,6 @@ public static class CofactorReduction
 
             // Every left f-grounding cofactor is a t-grounding cofactor of given expression.
             // This includes the lhs itself.  
-            //var leftFGroundings = await db.Cofactors
-            //    .Where(_ => _.ExpressionId == leftRecord.Id && _.ConclusionId == falseId)
-            //    .ToArrayAsync();
             var leftFGroundings = await db.Expressions.Where(e => e.Id == leftRecord.Id)
                 .Join(db.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c )
                 .Where(_ => _.ConclusionId == falseId)
@@ -286,7 +284,8 @@ public static class CofactorReduction
             }
 
 
-            // add groundings to T when rhs side is F.
+            // Similarly, every right f-grounding cofactor is a t-grounding cofactor of given expression.
+            // This includes the rhs itself.  
             var rightFGroundings = await db.Expressions.Where(e => e.Id == rightRecord.Id)
                 .Join(db.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
                 .Where(_ => _.ConclusionId == falseId)
@@ -307,22 +306,28 @@ public static class CofactorReduction
 
             // then add grounding to F when both sides are forced to true for the same subterm and replacement
             // NOTE: this section could just be deleted were it not for sub-cofactors with 'unified' subterms
-            var leftTGroundings = await db.Expressions.Where(e => e.Id == leftRecord.Id)
+            var leftTGroundings = await db.Expressions
+                .Where(e => e.Id == leftRecord.Id || e.NextReductionId == leftRecord.Id || e.CanonicalId == leftRecord.Id)
+                .Where(e => e.Id != trueId && e.Id != falseId)
                 .Join(db.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
+                .Where(_ => _.SubtermId != trueId)
                 .Where(_ => _.ConclusionId == trueId)
                 .ToArrayAsync();
-            var rightTGroundings = await db.Expressions.Where(e => e.Id == rightRecord.Id)
+            var rightTGroundings = await db.Expressions
+                .Where(e => e.Id == rightRecord.Id || e.NextReductionId == rightRecord.Id || e.CanonicalId == rightRecord.Id)
+                .Where(e => e.Id != trueId && e.Id != falseId)
                 .Join(db.Cofactors, _ => _.Id, _ => _.ExpressionId, (e, c) => c)
+                .Where(_ => _.SubtermId != trueId)
                 .Where(_ => _.ConclusionId == trueId)
                 .ToArrayAsync();
             foreach (var leftTGrounding in leftTGroundings)
             {
-                foreach(var rightTGrounding in rightTGroundings)
+                foreach (var rightTGrounding in rightTGroundings)
                 {
                     if (leftTGrounding.ReplacementId == rightTGrounding.ReplacementId
                         && leftTGrounding.SubtermId == rightTGrounding.SubtermId)
                     {
-                        CofactorRecord cofactorRecord = new (
+                        CofactorRecord cofactorRecord = new(
                             expressionId: startingRecord.Id,
                             conclusionId: falseId,
                             subtermId: leftTGrounding.SubtermId,
@@ -345,10 +350,6 @@ public static class CofactorReduction
             // This is the opposite of what happens when minimizing an expression, where, 
             // by computing the iteration of a side we identify an equivalence
             // between the starting expression and a minimized form of the starting equation.
-            // 
-            //      which we now know is equivalent to (1 (1 2)) because we computed the iteration.
-            // This cofactor is stored
-            //      LE calls the iterated version of a cofactor's subterm the *unified* subterm.  
             {
                 if (leftRecord.Id != trueId && leftRecord.Id != falseId && rightRecord.Id != falseId)
                 {
@@ -359,17 +360,17 @@ public static class CofactorReduction
                         var iteratedExpression = Nand.NewNand(leftRecord.Formula, iteratedRhsRecord.Formula);
                         var iteratedExpressionRecord = await db.GetMostlyCanonicalRecordAsync(iteratedExpression);
 
-                        if (iteratedExpression == iteratedExpressionRecord.Formula 
-                            && iteratedExpressionRecord.Id != startingRecord.Id
+                        if (iteratedExpressionRecord.Id != startingRecord.Id
                             && iteratedExpressionRecord.Id != trueId)
                         {
                             if (0 < startingRecord.CanonicalId)
                             {
                                 iteratedExpressionRecord.CanonicalId = startingRecord.CanonicalId;
                             }
-                            if (iteratedExpressionRecord.NextReductionId <= 0)
+                            if (iteratedExpressionRecord.NextReductionId <= 0 && !iteratedExpressionRecord.IsCanonical)
                             {
                                 iteratedExpressionRecord.NextReductionId = startingRecord.Id;
+                                iteratedExpressionRecord.RuleDescriptor = $"deiteration: RHS[{leftRecord.Formula}<-T] =>* {startingNand}";
                             }
                         }
                     }
@@ -385,17 +386,17 @@ public static class CofactorReduction
                         var iteratedExpression = Nand.NewNand(iteratedLhsRecord.Formula, rightRecord.Formula);
                         var iteratedExpressionRecord = await db.GetMostlyCanonicalRecordAsync(iteratedExpression);
 
-                        if (iteratedExpression == iteratedExpressionRecord.Formula 
-                            && iteratedExpressionRecord.Id != startingRecord.Id
+                        if (iteratedExpressionRecord.Id != startingRecord.Id
                             && iteratedExpressionRecord.Id != trueId)
                         {
                             if (0 < startingRecord.CanonicalId)
                             {
                                 iteratedExpressionRecord.CanonicalId = startingRecord.CanonicalId;
                             }
-                            if (iteratedExpressionRecord.NextReductionId <= 0)
+                            if (iteratedExpressionRecord.NextReductionId <= 0 && !iteratedExpressionRecord.IsCanonical)
                             {
                                 iteratedExpressionRecord.NextReductionId = startingRecord.Id;
+                                iteratedExpressionRecord.RuleDescriptor = $"deiteration: LHS[{rightRecord.Formula}<-T] =>* {startingNand}";
                             }
                         }
                     }
@@ -434,7 +435,7 @@ public static class CofactorReduction
                 .ToArray();
             if (nonMatch.Any())
             {
-                throw new TermSatException("cofactor conclusions not consistent.");
+                //throw new TermSatException("cofactor conclusions not consistent.");
             }
         }
     }

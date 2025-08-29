@@ -130,9 +130,12 @@ public partial class ReductionRecord
             
         set
         {
-            Debug.Assert(
-                string.IsNullOrWhiteSpace(_ruleDescriptor) || _ruleDescriptor == value, 
-                $"RuleDescriptor should be write-once.\n current:{_ruleDescriptor}, new value:{value}");
+#if DEBUG
+            if (!string.IsNullOrWhiteSpace(_ruleDescriptor))
+            {
+                throw new TermSatException($"RuleDescriptor should be write-once.\n current:{_ruleDescriptor}, new value:{value}");
+            }
+#endif
             _ruleDescriptor = value;
         }
     }

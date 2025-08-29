@@ -1,24 +1,9 @@
-# Lucid Expressions: Normalizable in Polynomial Time
+# Structural Expressions, a logic system with a polynomially bounded proof system.
 
-Lucid Expressions are a form of [Existential Graph](https://en.wikipedia.org/wiki/Existential_graph) 
-that can be reduced to their normal/canonical form in polynomial time.  
+The SE system is a formal system of structural logic inspired by [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph).  
+The SE system is designed for automated reasoning on a computer and includes a polynomially bounded proof procedure.  
 
-This document has three sections... 
-- Section 1: Introduction to Lucid Expressions
-	> Describes a system of logic based that's similar to Existential Graphs.  
-	- The LE system is shown to be sound and complete.
-- Section 2: The Rewrite Rule (RR) System : A Reduction System That Reduces LEs To Canonical Form In Polynomial Time.
-    > Describes a system with an infinite set of rewrite rules, rules generated using the Knuth-Bendix completion method.  
-	> Its shown that the rules can reduce expressions to their canonical form in polynomial time.  
-	- The generated rewrite rules are shown to terminate and to be confluent.  
-	- Each rule reduces a mostly-canonical expression to a canonical expression.
-	- Expressions are reduced from the bottom up.  
-	- Expressions can be fully reduced to their canonical form in a quadradic number of rewrites in the worst case.
-- Section 3: LE Cofactor Reduction 
-    > Describes a system that rewrites expressions in the same way as the RR System, 
-		but uses dynamically computed cofactors instead of pre-generated rewrite rules.  
-	- A cofactor is an expression produced by replacing a subterm of an expression with a constant (T or F).
-	- Expressions can be fully reduced to their canonical form by computing a polynomial number of cofactors in the worst case.
+The purpose of this document is to describe the SE system and its proof system.   
 
 ## Cheat Sheet
 
@@ -51,15 +36,10 @@ This section is an overview of, and guide to, the rest of this document.
 
 		- The fact that the rules are not all reversible destroys confluence in EGs.  
 
-- [Lucid Expressions](lucid-expressions.md)  
-	This section explains LEs by way of describing the differences between LEs and EGs.  
-
-	LE is a system of logic similar to existential graphs.  
-	Unlike the EG system, which prioritize the readability of graphs, 
-	the LE system is also designed to be a good reduction system.
+- [Structured Expressions](lucid-expressions.md)  
 
 	- [Notation/Syntax](lucid-expressions.md###_Syntax):  
-		LEs uses a linear, textual notation, as opposed to EGs.  
+		Unlike EGs, SEs uses a linear, textual notation.  
 		- LEs use the constants T and F to represent an empty 'sheet of assertion' and an empty cut.
 		- Variable are lower-case hexadecimal numbers 
 		- Expressions may be wrapped in parentheses and separated by a space: 
@@ -67,8 +47,7 @@ This section is an overview of, and guide to, the rest of this document.
 	        The parentheses are supposed to look like the edges of a cut in an EG.
 
 			> EG interprets (a b) as NOT(AND(a,b)) because this makes things easier for humans.  
-			> LE interprets (a b) as NAND(a,b) because doing so instantly reduces the number of operators in expressions while preserving functional comnpleteness.  
-
+			> LE interprets (a b) as NAND(a,b) because doing so reduces the number of operators in expressions while preserving functional completeness.  
 
 	- [Inference Rules](lucid-expressions.md###_Inference_Rules)
 		- Insertion/Erasure: Insert and erase double cuts anywhere in an expression.
@@ -84,12 +63,6 @@ This section is an overview of, and guide to, the rest of this document.
 			> E[(X(R) R)] => E[(X(R->T) R)] 
 
 		> These six rewrite rules are sound, complete, and reversible(symmetric).  
-
-	- [LEs are ordered](lucid-expressions.md###_Ordering)  
-
-		> For example, (T (a (b c)) is a simpler expression than (((c b) a) T).  
-
-		> Defining a [rewrite order](https://en.wikipedia.org/wiki/Rewrite_order)) makes it possible to guarantee that rules only simplify expressions, and guarantees that reduction terminates.  
 
 
 	

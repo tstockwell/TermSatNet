@@ -102,7 +102,7 @@ Rule 1: T and F come before any other expressions
 Rule 1: 1 comes before 2, comes before (1 2), comes before 3, comes before a
 Rule 2: (a a) comes before (a (a a))
 Rule 3: F before T, (1 (T 1)) comes before (1 (1 1)), comes before ((T 1) 1)
-Rule 4: F comes before T
+Rule 4: T comes before F (because F =>* (T T))
 
 ## Decrement
 	

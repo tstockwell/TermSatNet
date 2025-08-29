@@ -39,7 +39,7 @@ public static class CommutativeRules
                 var reducedFormula = Formulas.Nand.NewNand(startingNand.Subsequent, startingNand.Antecedent);
                 var nextReduction = await db.GetMostlyCanonicalRecordAsync(reducedFormula);
 
-                startingRecord.RuleDescriptor = "|.2.1 => |.1.2";
+                startingRecord.RuleDescriptor = "ordering: |.2.1 => |.1.2";
                 startingRecord.NextReductionId =  nextReduction.Id;
 
                 await db.SaveChangesAsync();
