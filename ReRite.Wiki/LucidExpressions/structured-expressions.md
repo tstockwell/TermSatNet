@@ -392,39 +392,6 @@ Expressed as a rewrite rule...
 
 This rule produces a reduction or a deduction depending on the entropies of the cofactor subterms 
 and the # of times each term is iterated.  
-	
-
-## Normalization
-
-Normalization is the process of rewriting expressions to reduce the entropy of the expressions.  
-A normal form is any category of expressions that exhibits a given property.  
-For instance, one normal form has already been presented, the canonical form.  
-
-In the SE system the inference rules form a hierarchy of normal forms 
-that define categories of expressions with less and less entropy.  
-In this section we'll define a normal form for each inference rule.  
-
-The SE system has four normal forms...
-- ordered    
-	> Given a completely unnormalized expression, repeatedly apply order rule until all subterms are ordered.  
-	> easy for humans to identify matching terms
-	> admissible, this form is much easier for a human to grok
-- compacted
-	> Given an ordered expression, repeatedly apply ground rules until as much empty space is removed as possible.  
-- linear
-	> Repeatedly apply deiteration rule until no *clones* of any terms remain.  
-	> All join points in an expression are identified by T, and all T's in an expression represent join points.  
-	> Linear expressions have a single instance of any given term in any branch of an expression.  
-- canonical  
-	> Expressions that are as simple as possible.
-	> No opportunities to apply exchange remain.
-
-These forms are very useful because each one defines a category of expressions that are easier to reduce.    
-By defining these normal forms we can reduce the problem of minimalizing an expression to the problem 
-of transforming a linear expression to a canonical expression, a much easier problem.
-
-It will be shown that, for all normal forms, expressions can be transformed from one form to the next in polynomial time.  
-Most form transformations are linear, the transform from linear to canonical forms is quadratic.
 
 ### Join Points
 
@@ -432,7 +399,7 @@ A *join point* is any term in an expression that could be the target of iteratio
 
 And, more importantly...  
 - A join point is often the target of *multiple* possible terms.  
-- And most often the way to reduce an expression is to *unify* join points in such a way as to create subterms 
+- And, most often, *the way* to reduce an expression is to *unify* join points in such a way as to create subterms 
 with f-grounding cofactors that provide opportunities for reductive iteration, deiteration, or exchange.  
 
 A join point is like a placeholder that can be filled with a clone of another term, via iteration.  
@@ -452,27 +419,186 @@ Consider these expressions...
 These are all all equivalent expressions but (1 (T 2)) makes it clear where the join point is.  
 Cloning the 1 in (1 (T 2)) produces (1 (1 2)), and cloning the 2 produces (1 (2 2)).
 
-### Deiterated Expressions
+	
+## Normal Forms
 
-Given a random expression, it's easier for a human to identify all the join points in the expression if 
-all the join points in the expression are cleared and set to T.  
+A normal form is a category of expressions that exhibits a given property.  
+For instance, one normal form has already been presented...  
+the canonical form, which are expressions with the lowest entropy.
 
-Since empty join points (T) are easily identified by the human visual system, 
-humans don't have to do iteration in their heads to see them.  
+In the SE system the inference rules form a hierarchy of normal forms 
+that define categories of expressions with less and less entropy.  
+In this section we'll define a normal form for each inference rule.  
 
-When an expression is clone-free *all* instances of T in the expression identify *all* the join points in the expressions.  
-A clone-free expression is completely devoid of any opportunity to use the deiteration rule 
-and therefore a clone-free expression is called a *deiterated expression*.  
+It's very useful to present these forms here, 
+because it's very difficult to describe the SE proof procedure without referring to them. 
 
-#### Contraction Procedure
+The SE system defines these normal forms...
 
-Shown next is a simple procedure for de-cloning an expression for the purpose of identifying all the join points in the expression.  
-This procedure scans an expression and looks for simple deiteration opportunities between all sibling pairs.  
+- Unnormalized
+Any given expression.
 
+- Ordered    
+Given a completely unnormalized expression, repeatedly apply order rule until all subterms are ordered.  
+Ordering is admissible/redundant.
+That is, expressions don't need to be ordered to fully normalize them,  
+but it's much easier for a human to grok expressions when terms are ordered,  
+and ordering makes the definition of the inference rules much less tedious.  
+This documentation, and the inference rules defined here, assume that expressions are ordered.  
+
+- Compressed
+Given an expression E, repeatedly order E and apply ground rules until as much empty space is removed from E as possible.  
+Similar to compressing a BDD (Binary Decision Diagram), compression reduces the size of the expression.  
+Ground rules *always* reduce the length of an expression, can can potentially reduce an expression to ground in linear time.  
+Therefore, ground rules are the fastest way to reduce an expression, 
+and every opportunity to apply a ground rule should be taken at every opportunity.  
+
+- Disjoint
+Given an expression E, repeatedly compress E and apply deiteration until all join points have been identified.  
+In a disjoint expression all the join points in an expression are identified by T, and all T's in an expression represent join points.  
+Disjoint expressions have a single instance of any given term in any branch of an expression.  
+Similar in concept to Reduced Ordered BDD, where redundant sub-diagrams are merged.  
+Another way to think about disjoint expressions is that every join point has a single source of truth.  
+
+- Canonical  
+Given an expression E, repeatedly make E disjoint and perform exchange until the expression is canonical.  
+When no opportunities to apply any inference rules are left the expression must be canonical.
+
+In the next sections it will be shown that...  
+given a non-canonical, compressed expression E...  
+that a reduced expression of E, E', can be found in linear time.  
+
+Discovering reductions to compressed expressions is done by 
+modeling the structural logic in an expression using horn logic, 
+and then computing the transitive closure of the model.  
+After the model is completed reductions to the modeled expression 
+are easily identified by looking for clauses that represent grounding cofactors.  
+Such cofactors identify opportunities for applying iteration, deiteration, and/or exchange.
+
+The process of modeling an expression is called *cofactor modeling*.  
+The process of computing the transitive completion of a model called *cofactor identification*.  
+
+## Cofactor Modeling
+
+A *cofactor model* M is a set of horn clauses that model the relationships between the terms of a mostly-canonical expression E 
+such that if there exists an expression E', that is equivalent to E, and has a grounding cofactor S 
+then the clauses E==E', and one of S->!E' or !S->E' is derivable from the model.
+
+In other words, if there exists a grounding cofactor S of E then either M |- (S -> E'), or  M |- (S -> !E') and M |- E == E'.  
+
+### Modeling Expressions
+
+A cofactor model is a model of the relationships between the subterms of an expression.  
+
+To build a cofactor model for an expression E, unique identifiers are assigned to all the subterms in E 
+and to all the expressions reachable from E via iteration and deiteration.  
+Nothing is relevant about identifiers except that they be unique.  
+
+When discussing cofactor models, it's convenient to use a subterm's position in an expression's flatterm as an id.  
+
+Consider the expression (l r) and its flatterm...  
+subterm 		index	
+------------	-----	
+(l r)		 	0		
+l				1       
+r				2		
+
+In the cofactor model of (l r), the subterm l has an id 1, and (l r) has aan id of 0.
+
+The fact that l is a T-grounding F-cofactor of E is represented by the formula !1 -> 0.  
+
+When building a cofactor model for the expression (l r),  the formula !1 -> 0 will be an axiom of the cofactor model.  
+r is also T-grounding F-cofactor of E, and so !2 -> 0 will also be an axiom of the cofactor model.  
+
+### Modeling a Context
+
+Consider the expression (l r) and its flatterm...  
+subterm 		index	
+------------	-----	
+(l r)		 	0		
+l				1       
+r				2		
+
+The structural relationships in (l r) can be expressed with these clauses...  
+
+- !1 -> 0; when the term at index 1 (l) has the value false then the term at index 0 must have the value true.
+	> !l -> (l r)
+- !2 -> 0; when the term at index 2 (r) has the value false then the term at index 0 must have the value true.
+	> !r -> (l r)
+- (1 & 2) -> !0; when the terms at indexes 1 and 2 have the value true then the term at index 0 must have the value false.
+	> Note: (1 & 2) is equivalent to (T (l r)).  
+	> So this rule is another way of saying (T (l r)) -> !(l r).  
+
+
+It's a problem that the last clause has three variables.  
+If we can find a way to keep the # of variables to 2 or fewer then we can easily prove the 
+polynomial limit on the complexity of cofactor logic.  
+3 variables makes proving the polynomial limit very difficult.  
+
+Here's how SE solves this problem...
+Let a cofactor model of (l r) be a model of all relationships between all the terms in all the expressions 
+reachable from (T (l r)) using only iteration and deiteration.   
+There are a polynomial # of such expressions.  
+(todo:all such expressions can be generated by join point discovery algorithm in linear time).  
+
+The flatterm for (T (l r)) is...
+subterm 		index	
+------------	-----	
+(T (l r))		0		
+T				1	
+(l r)			2
+l				3       
+r				4		
+
+All the structural relationships in (l r) can now be expressed with these clauses...  
+- !3 -> 2	; when !l then (l r), same as 1st rule in previous example
+- !4 -> 2   ; when !r then (l r), same as 2nd rule in previous example
+- 0 == !2   ; (T (l r)) == !(l r), subsumes last rule in previous example but now with fewer variables
+
+
+### Example
+Find the f-grounding f-cofactor in ((1 (1 2)) ((1 2) 2)).  BTW its (1 2).
+Given (T ((1 (1 2)) ((1 2) 2))), use cofactor modeling to show that (1 2) -> !((1 (1 2)) ((1 2) 2))  
+
+a horizontal flatterm...
+```
+(T ((1 (1 2)) ((1 2) 2)))  
+01 234 56 7   891 1  1  
+        		0 1  2  
+```
+Axioms
+-----------------------------
+identify equivalent terms...  
+4 == 6  
+4 == 10
+5 == 9
+7 == 11  
+7 == 12 
+identify negations...		
+2 != 0
+identify implications... ; these clauses are independent of the values of join points
+!3 -> 2
+!4 -> 3
+!5 -> 3
+!7 -> 5
+!8 -> 2
+!9 -> 8
+!12 -> 8
+
+The goal is to generate a formula of the form !x -> !2 
+
+proof
+!2
+3
+8
+
+####
 Let 
 Let CONTEXTS be a stack of expressions.
 Let E be an expression of the form (L R)
 
+
+--------------crappola begin--------------------
 
 
 ### Groundable Expressions
