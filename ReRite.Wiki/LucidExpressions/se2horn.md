@@ -7,7 +7,7 @@ and that any boolean expression can be expressed with just nand functions.
 It's also known that determining the satisfiability of a nand-only expression is an NP-complete problem.  
 
 In this document it is shown that 
-the structural logic of nand-only expressions can be modeled with Krom clauses 
+the structural logic of nand-only expressions can be modeled with disjunctive clauses 
 such that the model is satisfiable if and only if the expression is satisfiable.
 Thus, the satisfiability of nand-only expressions can be determined in polynomial time.
 
@@ -102,25 +102,63 @@ For instance, given an expression C of the form [l r], the clause (!l || C) can 
 
 In a general sense, a cofactor records how facts in an expression are related to each other.  
 Cofactors can be used to model the relationships between the parts of an expression.  
-Note that cofactors can be expressed as *Krom clauses*, disjunctive clauses with no more than 2 variables.  
-Krom clauses are easy to reason about, and sets of Krom clauses, known as 2-SAT problems, 
-are known to be solvable in polynomial time using propositional resolution.  
 
 In this document it will shown how to efficiently determine the satisfiability of nand expressions 
 using cofactors to model the expression.
 
 ## Cofactor Models
 
-A cofactor model is a model of the relationships between the subterms of an expression  
+A cofactor model is a set of disjunctive clauses that model the cofactor relationships between the subterms of an expression  
 such that the cofactor model is satisfiable if and only if the expression is satisfiable.  
+
+After building a cofactor model, propositional [resolution](https://en.wikipedia.org/wiki/Resolution_(logic)) is used to determine if the model is satisfiable.  
+It will be shown that the satisfiability of a cofactor model can be determined by only generating clauses with two or fewer clauses.  
+In this way it will be shown that there is a polynomial limit on the number of clauses that need to be resolved in order to prove satisfiability.  
 
 To build a cofactor model for an expression E, unique identifiers must be assigned to all the subterms in E.  
 Nothing is relevant about identifiers except that they're unique.  
 
 > Note...
 > In this document a subterm's position in an expression's flatterm is often used as an id because it's convenient to do so.  
-> However, a complete cofactor model will have N^2 clause, where N is the number of 
+> However, a complete cofactor model will include clauses that represent every subterm, and its negation, in an expression.    
 
+### Modeling an Expression
+
+To build a cofactor model for an expression E...
+
+1. Unique Ids: Assign unique ids to every subterm of E and, while building the cofactor model, to every expression associated with a join point.
+2. Model Variables: Add equality clauses for every pair of subterms that represent the same variable.
+3. Model Contexts: Add clauses that represent the relationship between the terms in every context.
+4. Model Join Points: Add clauses that represent the unification of join points.  
+
+Nothing is relevant about identifiers except that they be unique.  
+
+When discussing cofactor models, it's convenient to use a subterm's position in an expression's flatterm as an id.  
+
+Consider the expression [l r] and its flatterm...  
+subterm 		index	
+------------	-----	
+[l r]		 	0		
+l				1       
+r				2		
+
+In the cofactor model of [l r], the subterm l has an id 1, and [l r] has an id of 0.
+
+The fact that l is a T-grounding F-cofactor of E is represented by the formula !1 -> 0.  
+
+### Modeling Variables
+
+Variables are modeled by adding equalities that constrain subterms that represent variables to be equivalent.  
+
+Consider the expression [a a] and its flatterm...  
+subterm 		index	
+------------	-----	
+[a a]		 	0		
+a				1       
+a				2		
+
+In the cofactor model of [a a], the clauses 1 -> 2, and !1 -> !2 are added to the model 
+so that the value of term 1 will always be equal to the value of term 2.
 
 ### Modeling A Context
 
@@ -154,12 +192,38 @@ Note that...
 - if we want to test E for un-satisfiability then we make contradiction the goal by asserting !0 in the model and resolving the remaining clauses.
 
 Note that, once a goal is chosen for a context then the context model reduces to an instance of 2-SAT, clauses with just 2 or fewer variables.  
-That is, when 0 is asserted (that is, E is true) then the cofactor model collapses to ```0 && (!1 || !2))```.  
-Similarly, when !0 is asserted (E is false) then the cofactor model collapses to ```!0 && (1 && 2)```.  
-Note that when the value of the out
-It is known that 2-SAT problems can be transitively completed in O(N^2) steps.  
+That is, when 0 is asserted (that is, when we want to prove that E can be true) then the cofactor model collapses to ```0 && (!1 || !2))```.  
+Similarly, when !0 is asserted (when we want to prove that E can be false) then the cofactor model collapses to ```!0 && (1 && 2)```.  
 
-Now let's talk about to use these clauses to determine the satisfiability of an expression.
+
+### Modeling Join Points
+
+Let E be a context of the form [[l r]
+
+Consider the expression [l r] and its flatterm...  
+subterm 		index	
+------------	-----	
+[l r]		 	0		
+l				1       
+r				2		
+
+
+
+
+
+### Determining the Satisfiability of a Cofactor Model
+
+This section outlines how a cofactor model is used to determine the satisfiability of an expression.
+
+Cofactor models are examples of [3-SAT](https://en.wikipedia.org/wiki/Boolean_satisfiability_problem#3-satisfiability) problems, 
+where clauses can have up to 3 literals.  
+
+It will be shown that the problem of determining the satisfiability of cofactor model 
+can be broken down into N [2-SAT](https://en.wikipedia.org/wiki/2-satisfiability) problems, 
+where N is the length of the modeled expression. 
+
+And since 2-SAT is polynomial, and since cofactor models can be broken down into a linear number of 2-SAT problems, 
+the satisfiability of cofactor models can be determined in polynomial time.
 
 Let SAT(E) be a function that returns true iif there is an assignment of variables in an expression E that causes E to resolve to T.
 Let UNSAT(E) be a function that returns true iif there is an assignment of variables in an expression E that causes E to resolve to F.
@@ -170,12 +234,21 @@ Theorem: SAT([l r]) = UNSAT(l) || UNSAT(r)
 	> If neither l nor r can ever be false then both l and r must always both be true, 
 	> and thus E is always false and thus not satisfiable.
 
-Theorem: UNSAT(E) = SAT([T E])
+The significance of this theorem is that the problem of determining the satisfiability of a nand expression 
+can be broken down into two simpler, completely independent, subproblems.
+
+Theorem: UNSAT([l r]) = SAT(l && r) = SAT([T [l r]])
+	> Proof: If l can be false then [l r] can be true.  
+	> Otherwise, if r can be false then [l r] can be true.  
+	> If neither l nor r can ever be false then both l and r must always both be true, 
+	> and thus E is always false and thus not satisfiable.
+
+Theorem: UNSAT(E) = SAT([T E])                                   
 	> Proof: The only way that [T E] can be satisfiable is if there is an assignment that makes E false.  
 
 Corollary: SAT([l r]) = SAT([T l]) || SAT([T r])
 
-This corollary is very significant, it says that, for contexts, 
+This corollary is very significant, it says that for nand expressions, 
 the SAT problem can be reduced to checking the negation of its subterms.  
 
 Let's consider what this corollary means from the perspective of a cofactor model.  
@@ -186,29 +259,13 @@ this means that to determine the satisfiability of ```((0 || 1) && (0 || 2) && (
 it's only necessary to check the satisfiability of ```(1 && (0 || 2) && (!2 || !0))```, 
 and possibly necessary to also check ```(2 && (0 || 1) && (!1 || !0))```.  
 
-
-It can be verified with the truth table below that...
-- when one of  L or R is true then M is always true, and
-- when both L and R are false then M is always false
-
-```
-0	1	2	(0 || 1)	(!0 || !1)	L	(0 || 2)	(!0 || !2)	R	(!1 || !2 || !0)	M	THEOREM
---	--	--	-- 
-T	T	T	T			F			F	T			F			F	F					F	F
-T	T	F	T 			F			F	T			T			T	T					T	F
-T	F	T	T			T			T	T			F			F	T					T	F	
-T	F	F	T			T			T	T			T			T	T					T	F
-F	T	T	T			T			T	T			T			T	T					T	F
-F	T	F	T			T			T	F			T			F	T					F	F
-F	F	T	F			T			F	T			T			T	T					F	F
-F	F	F	F			T			F	F			T			F	T					F	F
-```
-
+Notice that the problem of determining satisfiability went from a single problem with clauses with up to 3 literals, 
+to two problems with clauses only up to two literals.
 
 The advantage of dividing the SAT problem like this is that it allows one to avoid ever using the 3-variable clauses in any SAT proof, 
 because all SAT problems with a 3-variable clause can be translated into two simple 2-SAT problems that dont contain that clause.  
 
-Theorem: All SAT problems with more than one context divide into exactly N-1 SAT subproblems.  
+Theorem: All SAT problems with more than one context divides into exactly N-1 SAT subproblems.  
 > Proof: A NAND expression is a context with exactly N-1 sub-contexts, where N is the number of contexts in the expression.  
 
 Theorem: NANDSAT has a complexity of O(N^3).  
@@ -217,42 +274,73 @@ Theorem: NANDSAT has a complexity of O(N^3).
 > it takes no more than O(N^2) steps to complete any subproblem.  
 > Thus, the complexity of NANDSAT is O(N) * O(N^2) = O(N^3)
 
+### Examples...
+
+[a [a b]]
+01 23 4
+
+context models...
+((0 || 1) && (0 || 2) && (!1 || !2 || !0))
+((2 || 3) && (2 || 4) && (!3 || !4 || !2))
+structural...
+
+equalities...
+1==3
+
+remove equalities...
+((0 || 1) && (0 || 2) && && (!1 || !2 || !0))
+((2 || 1) && (2 || 4) &&  (!1 || !4 || !2))
+0	; axiom, cause model to reduce to 2-SAT
+	((1 || 2) && (!1 || !2))
+	((2 || 4))
+(!1 || 4)	 ; at this point no more clauses can be produced.
+			 ; No contradiction deduced, therefore satisfiable
+
+1; goal, a = true
+4; b = true; therefore a = b = true is a solution
+
+!1; goal, a = false, when a is false it doesnt matter what b is 
+
+NOTE THAT AFTER SETTING THE GOAL THE ENTIRE MODEL REDUCED TO 2-SAT
+
+
+### Examples...
+
+[[a b] [c d]]
+012 3  45 6
+
+context models...
+((0 || 1) && (0 || 4) && (!0 || !1 || !4))
+((1 || 2) && (1 || 3) && (!1 || !2 || !3))
+((4 || 5) && (4 || 6) && (!4 || !5 || !6))
+equalities...none
+0	; axiom, cause model to reduce to 2-SAT
+	((!1 || !4))
+	((1 || 2) && (1 || 3) && (!1 || !2 || !3))
+	((4 || 5) && (4 || 6) && (!4 || !5 || !6))
+(!1 || 4)	 ; at this point no more clauses can be produced.
+			 ; No contradiction deduced, therefore satisfiable
+
+1; goal, a = true
+4; b = true; therefore a = b = true is a solution
+
+!1; goal, a = false, when a is false it doesnt matter what b is 
+
+NOTE THAT AFTER SETTING THE GOAL THE ENTIRE MODEL REDUCED TO 2-SAT
+
+[[a b] [c d]] is true if [a b] is unsatisfiable or [cd] is unsat
 
 
 
 
 
-All SAT proofs only resolve Because all SAT proofs are divided into other SAT proofs that don't contain 3-variables clauses.  
-Therefore SAT proofs are polynomial, because proofs that only use 2-variable clauses are polynomial.  
-
-
-Theorem: The length of all SAT proofs must be polynomial.  
-	> Proof: Since only 2-variable clauses with ever be used in a proof, the length of all SAT proofs must be polynomial.  
 
 
 
 
 
 
-Reduce a SAT problem to two easier problems...
-SAT([l r]) 
-	= UNSAT(l) || UNSAT(r && l);
-	= UNSAT([ll lr]) || UNSAT([rl rr] && l);
-	= SAT([T [ll lr]]) || UNSAT([T ([rl rr] && l)]);
-	= SAT([T [ll lr]]) || UNSAT([T [T [[rl rr] l]]]);
-	= SAT([T [ll lr]]) || SAT([T [[rl rr] l]]);
 
-
-
-
-SAT([l r]) 	= UNSAT(l) || UNSAT(r);
-
-
-	= UNSAT(l) || UNSAT(r && l);
-	= UNSAT(l) || UNSAT(r && l);
-	= SAT([T l]) || UNSAT([T (r && l)]);
-	= SAT([T l]) || UNSAT([T [T [r l]]]);
-	= SAT([T l]) || SAT([T [r l]]);
 
 In the next section we will show that the goal chosen for a context depends solely on the depth of the context.  
 That is, contexts at even depths, that are assigned a goal, will be assigned a truth goal.  
@@ -334,7 +422,7 @@ Note that to test the
 Theorem: If M is a cofactor model of a context E, then M is satisfiable if and only if E is satisfiable.  
 
 Let E be a context of the form [l r].  
-Let M be a model of E, where M is represented by the expression ```((!0 || 1) && (!0 || 2) && (!1 || !2 || 0))```.
+Let M be a model of E, where M is represented by the expression ```((0 || 1) && (0 || 2) && (!1 || !2 || !0))```.
 
 Note that this theorem *is not* stating that a model of a context is equivalent to a context,  
 it's just stating that, as far as a satisfiability check, they will both will yield the same answer.  
@@ -346,20 +434,21 @@ To prove the theorem we will show that...
 
 First, note 1 == l is a true statement since, by definition, l is the expression at position 1 in the expression [l r].
 Same reasoning applies to 2 == r.  
-Therefore, we can rewrite the context model as ```(!0 || l) && (!0 || r) && (!l || !r || 0)```.  
+Therefore, we can rewrite the context model as ```(0 || l) && (0 || r) && (!l || !r || !0)```.  
 
 And doing so makes it easier to check truth functions...  
 ```
-0	l	r	(!0 || l)	(!0 || r)	(!l || !r || 0)	&&		[l r]	Theorem
---	--	--	--------	--------	------------	--		-----	--
-T	T	T	T			T			T				T		F		T, theorem always true when E is false
-T	T	F	T			F			T				F		T		choose 0 == F to satisfy the model
-T	F	T	F			T			T				F		T		choose 0 == F to satisfy the model
-T	F	F	F			F			T				F		T		choose 0 == F to satisfy the model
-F	T	T	T			T			F				F		F		T, theorem always true when E is false
-F	T	F	T			T			T				T		T		T
-F	F	T	T			T			T				T		T		T
-F	F	F	T			T			T				T		T		T
+			!l -> 0		!r -> 0		(l && r) -> !0 
+0	l	r	(0 || l)	(0 || r)	(!l || !r || !0)	&&		[l r]	Theorem
+--	--	--	--------	--------	------------		--		-----	--
+T	T	T	T			T			F					F		F		choose 0 == F when [l r] == F
+T	T	F	T			T			T					T		T		
+T	F	T	T			T			T					T		T		
+T	F	F	T			T			T					T		T		
+F	T	T	T			T			T					T		F		
+F	T	F	T			F			T					F		T		choose 0 == T when [l r] == T
+F	F	T   F			T			T					F		T		choose 0 == T when [l r] == T
+F	F	F	F			F			T					F		T		choose 0 == T when [l r] == T
 ```
 Note that, whenever ```[l r]``` is true then there is no value of 0 that makes ```((!0 || l) && (!0 || r) && (!l || !r || 0))``` true.  
 Thus, if E is not satisfiable then the context model of E is not satisfiable.  

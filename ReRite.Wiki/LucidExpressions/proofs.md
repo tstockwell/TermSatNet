@@ -1,3 +1,268 @@
+Ugh, I was asking because I suspect that even if my claim is true (that it's possible to minimize in polytime) 
+that it doesn't necessarily mean that P = NP (I did a poor job of saying that).  
+I strongly suspect that there might be a professional out there that already knows that, that's why I was asking.
+
+
+Whatever, I have taken the time to put together a somewhat coherent outline.  
+I have a C# implementation of everything described here, and several attempts to build a concrete minimization algorithm, in a private github project. 
+This outline is ripped from the inline code documentation.
+I might do something with this project if I dont get totally torched doing this :-).  
+But torch away....
+
+-------------------
+
+First, a simple system of propositional logic will be presented.  
+
+Then a confluent set of reduction rules that can minimize the expressions of that system is constructed/derived.  
+This set of reduction rules is derived using a custom version of the Knuth/Bendix Completion method that has been specifically 
+designed to enumerate the reduction rules of the logic system.  
+
+Then it will be shown that the reduction rules can minimize expressions of the logic system in a polynomial number of steps,  
+where each step is an application of a inference rule of the system.  
+
+
+---------------
+# System T
+Let system T be a system of propositional logic.
+
+In system T the constants T and F (represented by the numbers 1 and 2) are expressions.  
+Variables are also expressions (represented as numbers, starting with 3).  
+An expression may also be composed of nand operator and two expressions, the lhs (left hand side) and the rhs (right hand side).  
+
+There are two things that make system T different than other logic systems...
+- Expressions are ordered
+- The structural inference rules are only applied to special terms called 'cofactors'
+
+# Contexts
+In System T the nand operator '|' is not used.  
+Instead of writing nand operations with a '|', nand operations are denoted with parentheses, like so... (x y).
+A pair of parentheses is called a *context*.  
+I agree with Charles Pierce, the man that invented Existential Graphs, that grouping is easier for humans to understand than operators.  
+I think its because grouping engages a human's pattern matching and gestalt abilities more than operators.
+
+## Canonical and Mostly-Canonical
+The concept of minimization, or proof, can be simplified right now, before we continue further, 
+by realizing the consequences of nesting in expressions.  
+
+Given an expression E of the form (L R), reducing an expression comes down either reducing L, R, or E.  
+At some point L and R will not have any subterms and the only way to simplify E is to simply E.  
+(1 1) is an example of a reducible expression where the subterms are not reducible, it reduces to (T 1).  
+
+By noticing this recursion we can simplify the proof procedure by making the procedure recursive.    
+We will start by defining two important kinds of expressions...  
+- *Canonical*, an expression where there is no expression X such that X is equivalent to E and X is simpler than than E.  
+- *Mostly-Canonical*, an expression E of the form (L R) where L and R are canonical but E is not.  
+> Note that the concept of *simple* has not been defined yet, *entropy* will be defined later.  
+
+What's important in these definitions is the idea that canonical expressions are the *simplest* expressions 
+and that mostly-canonical expressions are the *next simplest* kind of expressions.  
+That is, mostly-canonical expressions are one proof step away from canonical expressions.
+
+The name 'mostly-canonical' was inspired by the concept of being mostly dead, 
+because there's a big difference between being mostly dead and all dead.  
+*All* the real work in a proof is done by converting mostly-canonical expressions into canonical expressions.  
+
+## Cofactors
+The expression E[S=>R] |- C means that if you replace S in E with R then the result is C.
+A *cofactor* is an implication between terms in an expression, such that E[S=>R] |- C, where...  
+- E is a mostly-canonical expression 
+- S is a subterm in E, S is canonical since E is mostly-canonical 
+- R (aka replacement), is a minimized expression, aka axiomatic
+- C (aka conclusion), is a minimized expression, aka axiomatic
+
+The structural inference rules in system T are only applied to subterms of an expression that are cofactors.
+Doing so makes it possible to use cofactors to discover and reverse applications of the structural inference rules.  
+
+In a general sense, a cofactor records how the terms of an expression are related to each other.
+
+### F and T cofactors
+An *F-cofactor* is a cofactor of the form E[S=>F] |- C, that is, a cofactor where all instances of S are replaced by F.
+A *T-cofactor* is a cofactor of the form E[S=>T] |- C, that is, a cofactor where all instances of S are replaced by T.
+
+### F-grounding and T-grounding cofactors
+An *F-grounding* cofactor is a cofactor where the conclusion is F.
+A *T-grounding* cofactor is a cofactor where the conclusion is T.
+
+### Left and Right Cofactors
+Given an expression E of the form (L R) then...  
+- A left cofactor occurs in L, the left-hand side of an expression.  
+- A right cofactor occurs in R, the right-hand side of an expression.  
+
+
+## Ordering
+
+System T also includes an ordering of expressions based on entropy/simplicity...  
+- Constants have the least entropy, T has the least, then F  
+- All variables have higher entropy than constants.  
+- A variable represented by a higher number has more entropy than a variable with a lower number.  
+- All other things being equal, expressions with the lowest numbered variables have less entropy  
+- All other things being equal, expressions with the highest numbered variables have more entropy  
+- All other things being equal, shorter expressions have less entropy than longer expressions 
+- All other things being equal, expressions with lower entropy on the left side have less entropy  
+
+## Inference Rules
+
+System T has the following inference rules...
+- ordering. Example (2 1) => (1 2).   Orders terms in an expression according to their emtropy.
+- empty context elimination.  (T T) => F. Same as empty cut elimination in existential graph
+- double negation elimination. (T (T x)) => x
+- erasure.  (F Q) => T 
+- insertion.  T => (F Q)
+- iteration, aka weakening.  Example: (T x) => (x x)
+	Iteration makes copies of a term within an expression without changing the truth function of the expression
+
+	Rule: Given a subterm S of an expression E of the form (L R),  
+		where S is a left or right, F-grounding F-cofactor of E then 
+		any or all copies of T in the other side of the expression may be replaced with S.  
+	 						
+	Expressed as rewrite rules...  
+
+	1. (L[T] R[S]) => (L[T=>S] R[S]), or  
+	2. (L[S] R[T]) => (L[S] R[T=>S])
+
+	Since it reduces the left-hand side rather than the right-hand side,  
+	rule 1. is guaranteed to reduce an expression more than rule 2.  
+	Therefore, if an expression can be reduced using either one of these rules then rule 1 is preferred.  
+	In this sense, the rules are ordered.  
+	
+	Note that when R[S] == S, or L[S] == S then generalized iteration is similar to classic EG iteration.  
+	Note that when R[S] == F, or L[S] == F then generalized iteration is similar to classic EG insertion  
+
+- deiteration, aka contraction.  Example: (x x) => (T x)
+	Deiteration removes unnecessary terms from an expression without changing the truth function of the expression.
+
+    Given a subterm S of an expression E of the form (L R),  
+	where S is an f-grounding f-cofactor of either L or R
+	then any or all instances of S in the other side of the expression may be replaced with T.  
+	 						
+	Expressed as rewrite rules...  
+
+	1. (L[S] R[S]) => (L[S=>T] R[S]), or  
+	2. (L[S] R[S]) => (L[S] R[S=>T])
+
+	Note that when R[S] == S, or L[S] == S then generalized iteration is similar to classic EG deiteration.  
+	Note that when R[S] == F, or L[S] == F then generalized iteration is similar to classic EG erasure.  
+
+- exchange (aka permutation.  Example: (T ((1 (1 2)) ((1 2) 2))) => ((1 2) ((1 T) (T 2)))
+	The exchange rule exchanges terms between the sides of a context in a way that doesn't change the truth function of the expression.  
+
+	Let E be an expression E of the form (L R).  
+	If there is an F-grounding cofactor X of L,  
+	and if there is an F-grounding cofactor Y of R,  
+	then an expression E' may be produced from E by...
+	- replacing X.S in L with !Y.S and 
+	- replacing Y.S in R with !X.S
+
+
+	Expressed as a rewrite rule...  
+
+	1. (L[X.S] R[Y.S]) => (L[X.S <- !Y.S]  R[Y.S <- !X.S]) 
+
+	This rule produces a reduction or a deduction depending on the entropies of the cofactor subterms 
+	and the # of times each term is iterated.  
+
+## System T is equivalent to Existential Graphs.
+> This can be proved by translating to/from both systems.  
+> In such translation, nand operators become cuts, T's become empty spaces, F represents an empty cut.  
+> Complete proof upon request :-)
+Existential Graphs are known to be complete and consistent, see Dau.  
+Therefore T is complete and consistent.  
+
+----------------------------
+# RULES
+
+Now, a set of reduction rules for the system will be constructed, using a method that is a custom version of the Knuth-Bendix Completion method.  
+
+Let RULES be a prefix tree of every known reduction rule, initially empty.
+The prefix tree itself encodes the left-hand sides of rules, and the leaf nodes of tree include the RHS of a rule.  
+Thus, the tree implements a mapping from the lhs of a rule to the rhs of the rule.  
+To find a rule that can be applied to a given expression, the tree and the expression are simultaneously navigated, 
+and unification is used to match the lhs of a rule to the expression.  
+A match is found by navigating all the way down to a leaf node that provides the rhs of the corresponding reduction rule.
+Its already known that prefix tree lookup has a linear time complexity, even for an infinite list, 
+the use of unification in this procedure doesn't change that.
+
+The process starts by enumerating all expressions, from the simplest possible expressions to more complex expressions.  
+
+> Code provided upon request :-)
+> Basically, all possible expressions can be enumerated, in order, by....
+> - enumerating them in a way that respects the system's expression ordering.  
+> - Producing the transitive closure of every expression combined with itself and every other expression that comes before in the ordering.  
+
+Let E be an expression in the enumeration.
+If E can be reduced by any rule in RULES then continue to the next expression in the enumeration.  
+If E can't be reduced by any rule in RULES *and* there is no inference rule that can be applied to any term in E 
+then 
+	E is canonical, the simplest expression of a truth function.
+	Continue to next expression in the enumeration
+However, if E can't be reduced by any rule in RULES but *can be** reduced by an application of an inference rule  
+then 
+	E represents a new reduction rule.   
+	Let D be the expression to which E can be reduced (by an inference rule, not by an existing reduction rule)
+	Let R be a new reduction rule of the form E => D.  
+	Add R to RULES.  
+	Continue to next expression in the enumeration
+
+This procedure will run forever, producing an infinite list of reduction rules.
+We are interested in the infinite list of RULES generated by this procedure because the rules in the RULES list are globally confluent.  
+That is...
+- the list is complete (though not realizable because its infinite).  
+	> in other words, all the reduction rules we'll ever need are in the RULES list.
+- the rules may be applied in any order and we'll always end up with the same canonical expression.  
+> Proof provided upon request :-).  
+> Proved by showing that if we start the traditional Knuth-Bendix method with a completed RULES list then the method will never produce a new rule.  
+> In other words, the starting set of rules was already complete and therefore the set of rules generated by the above method is complete.
+
+----------------------------
+# Minimization Procedure
+
+Now assume that Apollo, the god of logic and reason, has run the rule discovery procedure to completion and made the RULES tree available to us.  
+In short, if a given expression can be reduced then we will be able to find a matching reduction rule in RULES in linear time!
+
+The procedure to minimize an expression then works like this...
+Given an expression E
+While there is a term S in E that can be reduced by a rule in the RULES tree
+	Let R = the result of apply the rule to S
+	Let E' = E[S=>R], that is, replace all instances of S in E with R.
+	Set E to E' and repeat.
+When E is no longer reducible then E is canonical
+
+The question is... how many reductions can it take to reduce an expression to its canonical form?
+It takes at most O(N^2) reductions, here's why... 
+Almost every reduction reduces the length of the expression.  
+The only time that an expression is not reduced in length by a reduction rule 
+is when the canonical form of the expression is the same length as the non-canonical expression.
+
+So... if a reduction rule is applied to an expression, and the result is the same length as the expression, 
+then you know the result is canonical and cannot be further reduced.  
+Thus, the most reductions required to reduce the length of an expression is N, the # of terms in the expression, also the length of the expression.  
+
+And at most you could repeat this process N-1 times before the expression has a length of 1.
+Therefore it can take at most N * (N -1) reductions to reduce an expression to it canonical form.
+
+----------------------------
+# Summmary
+
+An expression ordering is necessary in order to define what 'simple' is.  
+And cofactors are necessary in order to make the inference rules reversible.
+Thus, the expression ordering and the cofactors are what makes expressions in system T easily minimizable.  
+
+However, you have to have this magical RULES tree to do it.  
+
+A real-world minimization algorithm would minimize expressions from the bottom up and somehow efficiently keep track of all the cofactors, 
+which are needed to efficiently discover exchanges (discovering potential applications of all the other inference rules is easy).  
+I have created real-world minimization algorithms that *seem* to work efficiently but I haven't been able to produce a proof that they're actually efficient.  
+Thus I'm starting to wonder if just because expression are efficiently minimizable in a non-constructive way that P = NP.
+
+
+
+
+
+
+
+
+
+
 # Proofs
 
 All of the structural rules in the SE system use cofactors to constrain and guide their application.  

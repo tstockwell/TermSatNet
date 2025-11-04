@@ -45,13 +45,37 @@
     <Compile Remove="RuleDatabase\RuleRepository.cs" />
     <Compile Remove="RuleDatabase\TruthTables.cs" />
     <Compile Remove="Scripts\Scripts.cs" />
-    <Compile Remove="Solver\CompletionGenerator.cs" />
-    <Compile Remove="Solver\Solver.cs" />
     <Compile Remove="Tests\CompletionTests.cs" />
     <Compile Remove="Tests\Nand_NoConstants_ReductionTests.cs" />
     <Compile Remove="Tests\RuleDatabaseTests.cs" />
     <Compile Remove="Tests\RuleReductionTests.cs" />
     <Compile Remove="Tests\RuleRepositoryTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Tests\cnf-example-1.txt" />
+    <None Remove="Tests\cnf-example-2.txt" />
+    <None Remove="Tests\eq.atree.braun.12.unsat.cnf" />
+    <None Remove="Tests\rpoc_xits_08_UNSAT.cnf" />
+    <None Remove="Tests\SAT_dat.k45.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Tests\cnf-example-1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tests\cnf-example-2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tests\eq.atree.braun.12.unsat.cnf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tests\rpoc_xits_08_UNSAT.cnf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tests\SAT_dat.k45.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

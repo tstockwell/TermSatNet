@@ -1,6 +1,6 @@
-# Structural Expressions  
+# Structured Expressions  
 
-The SE system is a formal system of structural logic inspired by [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph)(EG).  
+The Structured Expressions system (SE) is a formal system of structural logic inspired by [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph)(EG).  
 The SE system is primarily designed to minimize any given expression to its canonical form in a polynomially bounded # of steps.  
 
 Like the EG system, the SE system is equivalent to classical propositional calculus.  
@@ -9,10 +9,10 @@ where a two-way translation between the formulas and derivations of both systems
 
 SE is presented by way of describing the differences between SE and EG...
 - Syntax
-	> The EG system is a structural logic system that doesnt have a textual notation, it that groups symbols on a page by drawing lines around them.  
-	> SE is designed to be used in modern programming languages and embedded in document formats like Markdown.  
+	> The EG system is a system of logic that doesnt have a textual notation, it groups symbols on a page by drawing lines around them.  
+	> SE has a textual notation that is designed to be used in modern programming languages and embedded in document formats like Markdown.  
 	> In SE, a pair of parentheses define a *context*. Example: (a b).  A context is semantically the same as NAND(a,b).
-	> SE uses parentheses instead of operators because SE is a structural system and not an algebraic system.   
+	> SE uses parentheses instead of operators because SE is a structural logic system and not an algebraic system.   
 	> Similar to EG, contexts may be nested.  
 - Binary
 	> SE restricts contexts to just two symbols.
@@ -194,9 +194,9 @@ The SE proof process is designed to transition expressions to a lower entropy in
 
 Cofactors are *very* important in the SE system.  
 
-The structural rules in the SE system (...) are designed to use cofactors to guide the application of the rules 
+The structural inference rules in the SE system (1) are designed to use cofactors to guide the application of the rules 
 in such a way that it's possible to use cofactors to discover and reverse the applications.  
-> ...the structural rules are presented later
+> 1. the SE inference rules are presented later
 
 A *cofactor* is an implication between terms in an expression, such that E[S=>R] |- C, where...  
 - E is a mostly-canonical expression 
@@ -205,11 +205,6 @@ A *cofactor* is an implication between terms in an expression, such that E[S=>R]
 - C (aka conclusion), is a minimized expression, aka axiomatic
 
 In a general sense, a cofactor records how facts are related to each other.
-
-The structural rules of the SE system attempt to find subterms in both sides of a context that, 
-when assigned a value,  
-cause that side of the context to reduce to F,  
-and such that, when exchanged, produce a new context with lower entropy.  
 
 ### Example
 Consider this expression... (T ((1 (1 2)) ((1 2) 2))).  
@@ -228,10 +223,8 @@ It's not so easy for a human to figure out that (T ((1 (T 2)) ((T 1) 2))) also r
 That's because reducing this formula requires a human to perform logic in their head to 'unify' the contexts with T's in them.  
 The needed deductions are relatively simple for a machine but very tedious and error prone for a human to execute.  
 An implication graph can make the job simple, so can binary decision diagrams, and so can hypergraphs.  
-Krom formulas are another way to represent an implication graph that is more convenient to use in text-based documents.  
-So, as a computer programmer, the author prefers to represent cofactors using Krom formulas.  
 
-The process of discovering cofactors using Krom formulas is fully documented in (Proofs)[proofs.md].  
+The SE system uses 'cofactor models', a set of disjunctive clauses, to represent a implication graphs.  
 
 ### F and T cofactors
 
@@ -250,13 +243,14 @@ Given an expression E of the form (L R) then...
 - A left cofactor occurs in L, the left-hand side of an expression.  
 - A right cofactor occurs in R, the right-hand side of an expression.  
 
+
+
 ## Inference Rules
 
 SE has the following inference rules...
 - ordering
-- ground
-- iteration/deiteration
-- exchange
+- ground rules
+- iteration/deiteration/exchange (the *structural* rules)
 
 Rules should only ever applied to a mostly-canonical or canonical expression.  
 The proof procedure minimizes expressions from the bottom up, so enforcing this rule is easy.  
@@ -269,6 +263,11 @@ To reduce an expression, the proof procedure starts by repeatedly applies the or
 until there are no more opportunities to reduce the expression.  
 At this point the expression is in *ordered normal form*, an expression where all its 
 subterms are correctly ordered.  
+
+The SE structural inference rules are based on cofactors...  
+- The iteration rule makes clones of terms that are f-grounding cofactors.
+- The deiteration rule removes clones of terms that are f-grounding cofactors.
+- The exchange rule swaps terms in a context, terms that are f-grounding cofactors.
 
 ### SE Inference is Sound and Complete
 A proof that the inference rules are sound is included in an appendix.  
@@ -395,31 +394,57 @@ and the # of times each term is iterated.
 
 ### Join Points
 
-A *join point* is any term in an expression that could be the target of iteration or deiteration in a proof.  
-
-And, more importantly...  
-- A join point is often the target of *multiple* possible terms.  
-- And, most often, *the way* to reduce an expression is to *unify* join points in such a way as to create subterms 
-with f-grounding cofactors that provide opportunities for reductive iteration, deiteration, or exchange.  
+A *join point* is any term in an expression that could be the target of iteration or deiteration.  
 
 A join point is like a placeholder that can be filled with a clone of another term, via iteration.  
-The *domain* of any particular join point is the set of terms that may be validly cloned to the join point via iteration.  
+The *domain* of any particular join point is the set of unifying terms that may be validly cloned to the join point via iteration.  
 
-A joint point can be emptied of any such clone via deiteration.  
+A join point can be emptied of any such clone via deiteration.  
 An empty join point is an empty space (T).  
 
 Every instance of T in an expression is a join point, 
 because every instance of T can be a target of the iteration rule.  
 
-#### Example
-Consider these expressions...
-- (1 (T 2))
-- (1 (1 2))
-- (1 (2 2))
-These are all all equivalent expressions but (1 (T 2)) makes it clear where the join point is.  
-Cloning the 1 in (1 (T 2)) produces (1 (1 2)), and cloning the 2 produces (1 (2 2)).
+Later in this document a normal form is introduced, 
+called the *disjoint* normal form, 
+where any and all join points are identified by T.
 
-	
+Join points are important because *unifying* joint points can identify 
+equivalent, unified expressions with grounding cofactors that identify opportunities for iteration, deiteration, or exchange.  
+*Join point unification* is a sound and complete way to identify any and all opportunities for iteration, deiteration, or exchange.  
+
+
+#### Identifying Join Points
+
+Every T in a context is a join point, because the T can be replaced by its sibling via iteration.  
+
+Given an expression E of the form [a b].  
+Let LC be any f-grounding f-cofactor of a.  
+Let RC be any f-grounding f-cofactor of b.  
+
+Any instance l of LC in b is a join point since l can be replaced with T via deiteration.
+
+If RC is not also an f-grounding f-cofactor of a then   
+any instance r of RC in a is a join point since r can be replaced with T via deiteration.
+
+There are no other join points other than those that are already represented by a T 
+and those that can be replaced by a T via deiteration.  
+
+
+#### Example
+Consider the expression [1 [1 2]].  
+The rightmost 1 is aan iteration target of the leftmost 1, therefore [1 [1 2]] is equivalent to [1 [T 2]].  
+All the expressions that can be generated via iteration from [1 [T 2]] are...
+- [1 [T 2]]
+- [1 [1 2]]
+- [1 [2 2]]
+These are all equivalent expressions but [1 [T 2]] makes it clear where the join point is.  
+Cloning the 1 in [1 [T 2]] produces [1 [1 2]], and cloning the 2 produces [1 [2 2]].  
+{1,2} is the set of all unifiers for the join point, aka the *domain* of the join point.  
+The set of terms that can be constructed from a join point and its unifiers is called the join point's unification, or set of unified terms.  
+In the above, the terms [T 2], [1 2], and [2 2] are the join point's unified terms.
+
+
 ## Normal Forms
 
 A normal form is a category of expressions that exhibits a given property.  
@@ -439,26 +464,29 @@ The SE system defines these normal forms...
 Any given expression.
 
 - Ordered    
-Given a completely unnormalized expression, repeatedly apply order rule until all subterms are ordered.  
+An ordered expression is an expression E of the form [l r] where...
+- l and r are also ordered expressions 
+- l <= r, ie l has the same or less entropy than r.  
+> See the Entropy section for the details of how expressions are ordered.
+
 Ordering is admissible/redundant.
 That is, expressions don't need to be ordered to fully normalize them,  
 but it's much easier for a human to grok expressions when terms are ordered,  
 and ordering makes the definition of the inference rules much less tedious.  
+
 This documentation, and the inference rules defined here, assume that expressions are ordered.  
 
 - Compressed
-Given an expression E, repeatedly order E and apply ground rules until as much empty space is removed from E as possible.  
+A compressed expression is an ordered expression where all instances of ground rules have been removed.    
 Similar to compressing a BDD (Binary Decision Diagram), compression reduces the size of the expression.  
-Ground rules *always* reduce the length of an expression, can can potentially reduce an expression to ground in linear time.  
+Ground rules *always* reduce the length of an expression, and can potentially reduce an expression to ground in linear time.  
 Therefore, ground rules are the fastest way to reduce an expression, 
 and every opportunity to apply a ground rule should be taken at every opportunity.  
 
 - Disjoint
-Given an expression E, repeatedly compress E and apply deiteration until all join points have been identified.  
+A disjoint expression is a compressed expression where any and all join points are identified by T.
 In a disjoint expression all the join points in an expression are identified by T, and all T's in an expression represent join points.  
 Disjoint expressions have a single instance of any given term in any branch of an expression.  
-Similar in concept to Reduced Ordered BDD, where redundant sub-diagrams are merged.  
-Another way to think about disjoint expressions is that every join point has a single source of truth.  
 
 - Canonical  
 Given an expression E, repeatedly make E disjoint and perform exchange until the expression is canonical.  
@@ -466,191 +494,216 @@ When no opportunities to apply any inference rules are left the expression must 
 
 In the next sections it will be shown that...  
 given a non-canonical, compressed expression E...  
-that a reduced expression of E, E', can be found in linear time.  
+that an equivalent disjoint expression of E, E', can be created in linear time.  
 
-Discovering reductions to compressed expressions is done by 
-modeling the structural logic in an expression using horn logic, 
-and then computing the transitive closure of the model.  
-After the model is completed reductions to the modeled expression 
+Discovering reductions to disjoint expressions is done by 
+modeling the structural logic in an expression using disjunctive clauses, 
+and then computing the transitive closure of the model via resolution.  
+After the model is complete, reductions to the disjoint expression 
 are easily identified by looking for clauses that represent grounding cofactors.  
 Such cofactors identify opportunities for applying iteration, deiteration, and/or exchange.
 
 The process of modeling an expression is called *cofactor modeling*.  
 The process of computing the transitive completion of a model called *cofactor identification*.  
 
-## Cofactor Modeling
+## Cofactor Models
 
-A *cofactor model* M is a set of horn clauses that model the relationships between the terms of a mostly-canonical expression E 
-such that if there exists an expression E', that is equivalent to E, and has a grounding cofactor S 
-then the clauses E==E', and one of S->!E' or !S->E' is derivable from the model.
+A *cofactor model* M is a set of disjunctive clauses that model the relationships between the terms a disjoint expression E 
+such that if there exists a unified/deiterated version, E', that has a grounding cofactor S 
+then one of the clauses S->E or !S->E is derivable from the model.  
+
+After building a cofactor model M, [propositional resolution](https://en.wikipedia.org/wiki/Resolution_(logic)) 
+is used to determine if M |- S->E or M |- !S->E.  
+
+To build a cofactor model for an expression E, unique identifiers must be assigned to all the subterms in E.  
+Nothing is relevant about identifiers except that they're unique.  
+
+> Note...
+> In this document a subterm's position in an expression's flatterm is often used as an id because it's convenient to do so.  
+> However, a complete cofactor model will also include clauses that represent iterated subterms.   
 
 In other words, if there exists a grounding cofactor S of E then either M |- (S -> E'), or  M |- (S -> !E') and M |- E == E'.  
 
-### Modeling Expressions
 
-A cofactor model is a model of the relationships between the subterms of an expression.  
+### Modeling an Expression
 
-To build a cofactor model for an expression E, unique identifiers are assigned to all the subterms in E 
-and to all the expressions reachable from E via iteration and deiteration.  
+To build a cofactor model for an expression E...
+
+1. Unique Ids: Assign unique ids to every subterm of E and, while building the cofactor model, to every expression associated with a join point.
+2. Model Variables: Add equality clauses for every pair of subterms that represent the same variable.
+3. Model Contexts: Add clauses that represent the relationship between the terms in every context.
+4. Model Join Points: Add clauses that represent the unification of join points.  
+
 Nothing is relevant about identifiers except that they be unique.  
 
 When discussing cofactor models, it's convenient to use a subterm's position in an expression's flatterm as an id.  
 
-Consider the expression (l r) and its flatterm...  
+Consider the expression [l r] and its flatterm...  
 subterm 		index	
 ------------	-----	
-(l r)		 	0		
+[l r]		 	0		
 l				1       
 r				2		
 
-In the cofactor model of (l r), the subterm l has an id 1, and (l r) has aan id of 0.
+In the cofactor model of [l r], the subterm l has an id 1, and [l r] has an id of 0.
 
 The fact that l is a T-grounding F-cofactor of E is represented by the formula !1 -> 0.  
 
-When building a cofactor model for the expression (l r),  the formula !1 -> 0 will be an axiom of the cofactor model.  
-r is also T-grounding F-cofactor of E, and so !2 -> 0 will also be an axiom of the cofactor model.  
 
-### Modeling a Context
+### Modeling Variables
 
-Consider the expression (l r) and its flatterm...  
+Variables are modeled by adding equalities that constrain subterms that represent variables to be equivalent.  
+
+Consider the expression [a a] and its flatterm...  
 subterm 		index	
 ------------	-----	
-(l r)		 	0		
+[a a]		 	0		
+a				1       
+a				2		
+
+In the cofactor model of [a a], the clauses 1 -> 2, and !1 -> !2 are added to the model 
+so that the value of term 1 will always be equal to the value of term 2.
+
+### Modeling a Context
+Let E be a context of the form [l r]
+
+Consider the expression [l r] and its flatterm...  
+subterm 		index	
+------------	-----	
+[l r]		 	0		
 l				1       
 r				2		
 
-The structural relationships in (l r) can be expressed with these clauses...  
+The cofactor relationships in [l r] can be expressed with these clauses...  
 
-- !1 -> 0; when the term at index 1 (l) has the value false then the term at index 0 must have the value true.
-	> !l -> (l r)
-	> (1 || !0) 
-- !2 -> 0; when the term at index 2 (r) has the value false then the term at index 0 must have the value true.
-	> !r -> (l r)
-	> (2 || !0) 
-- (1 & 2) -> !0; when the terms at indexes 1 and 2 have the value true then the term at index 0 must have the value false.
-	> Note: (1 & 2) is equivalent to (T (l r)).  
-	> So this rule is another way of saying (T (l r)) -> !(l r).  
-	> (!1 || !2 || 0) 
+- !1 -> 0; when the term at index 3, l, has the value false then the term at index 0 must have the value true.
+	> Equivalent to: !l -> [l r].
+	> Expressed as a disjunction: (0 || 1).
+- !2 -> 0; when the term at index 4, r, has the value false then the term at index 0 must have the value true.
+	> Equivalent to: !r -> [l r]
+	> Expressed as a disjunction: (0 || 2).  
+- (1 && 2) -> !0; when the terms at indexes 1 and 2 have the value true then the term at index 0 must have the value false.
+	> Equivalent to: (l && r) -> [T [l r]]
+	> Expressed as a disjunction: (!1 || !2 || !0).
 
-Notice that these are *horn clauses*.   
-The satisfiability of a conjunction of horn clauses can be determined in linear time.
+A set of clauses that model a context is called a *context model*.  
+The expression ```((0 || 1) && (0 || 2) && (!1 || !2 || !0))``` is a context model of the expression E = [l r].  
+Another way to interpret the above expression is "if E then !l or !r, but if not E then l and r".  
 
- 
+Note that...  
+- if we want to test E for satisfiability then we make truth the goal by asserting 0 in the model and resolving the remaining clauses.
+- if we want to test E for un-satisfiability then we make contradiction the goal by asserting !0 in the model and resolving the remaining clauses.
+
+Note that, once a goal is chosen for a context then the context model reduces to an instance of 2-SAT, clauses with just 2 or fewer variables.  
+That is, when 0 is asserted (that is, when we want to prove that E can be true) then the cofactor model collapses to ```0 && (!1 || !2))```.  
+Similarly, when !0 is asserted (when we want to prove that E can be false) then the cofactor model collapses to ```!0 && (1 && 2)```.  
+
+### Modeling Join Points
+
+In the SE system, all valid expressions are derived from ground using just ordering, ground, and structural inference rules.  
+The satisfiability of an expression can be determined by reversing the rules used to derive it.  
+Cofactor models easily model the ground rules and they will be eliminated through resolution.  
+It turns out that it's also easy to identify applications of iteration, deiteration, and exchange by identifying common cofactors between subterms of a context.  
+And it turns out that unifying join points is the way to identify common cofactors.  
+And it turns out that it's easy to model join points in a cofactor model.  
+
+Join points are modeled by adding all of a join point's unified terms to the cofactor model.  
+In this way, all the alternatives for a join point are build into the cofactor model.   
+
+#### Example
+Consider the expression [a [T b] and its flatterm...  
+
+subterm 		index	
+------------	-----	
+[a [T b]]		0		
+a				1       
+[T b]			2		
+T				3
+b				4		
+[a b]			5	;a unified instance of the join point at position 2
+[b b]			6	;a unified instance of the join point at position 2
+
+The join point relationships in an expression are modeled by adding clauses that represent the possible unifications of the join point.  
+Note that two unified terms that have been added to the cofactor model, [a b] and [b b].  
+
+- First, context models are added for each unified term...
+	- ```((5 || 1) && (5 || 4) && (!1 || !4 || !5))```
+	- ```((6 || 4) && (!4 || !6))```
+	
+- Then, the context model for term 0 is extended with these clauses that extend the context model for [a [T b]] to include the unified terms... 
+	- ```((0 || 5) && (!1 || !5 || !0))``` 
+	- ```((0 || 6) && (!1 || !6 || !0))``` 
 
 
 ### Example
-Find the f-grounding f-cofactor in ((1 (1 2)) ((1 2) 2)).  BTW its (1 2).
-Given (T ((1 (1 2)) ((1 2) 2))), use cofactor modeling to show that (1 2) -> !((1 (1 2)) ((1 2) 2))  
+Find the f-grounding f-cofactor in ((1 (T 2)) ((T 1) 2)).  BTW its (1 2).
 
 a horizontal flatterm...
 ```
-(T ((1 (1 2)) ((1 2) 2)))  
-01 234 56 7   891 1  1  
-        		0 1  2  
+term						id
+----						--
+(T ((1 (T 2)) ((1 T) 2)))   0
+T							1
+((1 (T 2)) ((1 T) 2))		2
+(1 (T 2))					3
+1							4
+(T 2)						5
+((1 T) 2)					6
+(1 T)						7
+2							8
+(1 2)						9
+(2 2)						10
+(1 1)						11
 ```
-Axioms
------------------------------
-identify equivalent terms...  
-4 == 6		4 && !6 -> F, !4 && 6 -> F	;(!4 || 6 || T), (4 || 6)
-4 == 10
-5 == 9
-7 == 11  
-7 == 12 
-identify negations...		
-2 != 0	;!2 -> 0, 2 -> !0
-identify implications... ; these clauses are independent of the values of join points
-!3 -> 2			
-!4 -> 3
-!5 -> 3
-!7 -> 5
-!8 -> 2
-!9 -> 8
-!12 -> 8
-3 & 8 -> !2
-4 & 5 -> !3
-6 & 7 -> !5
-9 & 12 -> !8
-10 && 11 -> !9
 
-The goal is to generate a formula of the form !x -> !2 
+The proof basically goes like this....  
+!9 -> 3, !9 -> 6, (!3 || !6 || !2) |- !9 -> !2
 
-statement			; evidence
-!5 & 8 -> !2		; 3 & 8 -> !2, !5 -> 3
-!5 & !9 -> !2		; !5 & 8 -> !2, !9 -> 8
-!5 & !5 -> !2		; !5 & !9 -> !2, 5 ==9
-!5 -> !2			; contraction
+Also can show satisfiability....
+0 (goal), 2 -> !0 |- !2, 3, 6, -4 (1 == F), 8 (2 == T)
 
-Deriving the statement !5 -> !2 is proof that (1 2) is an f-grounding cofactor of ((1 (1 2)) ((1 2) 2)).  
-Notice that we did it without deriving any clauses with more than 3 variables.  
+### Resolving Cofactor Models
 
-We can also use these clauses to test for satisfiability...
-goal == 
-statement			; evidence
-2					; axiom, goal
-!3 || !8			; 2, 3 & 8 -> !2
-4 || !8				; !3 || !8, !4 -> 3
-!3 || 9				; !3 || !8, !9 -> 8
-5 || 9				; !3 || !8, !5 -> 3
-5					; 5 || 9, 5 == 9
-9					; 5 || 9, 5 == 9
-!3 || 12			; !3 || !8, !12 -> 8
-
-
-
-That's a consequence of the simplicity of structured expressions...  
-since logic is an emergent property of the structure of an expression,  
-and since the SE expressions are composed of just two values, variables, and a binary relation,   
-the logic embedded in structured expressions is also simple.
-
-
-
-### Example
-Find a satisfying valuation of (T ((1 (1 2)) ((1 2) 2))) .  
-
-```
-(T ((1 (1 2)) ((1 2) 2)))  
-01 234 5  7   89          		  
-```
-NOTES...
-- equality cant be represented in horn clauses, equivalence is handled by reusing the index of variable terms
-- inequality works as-is
-
-Axioms		
------------------------------
-2 -> !0 
-!2 -> 0 
-
-!3 -> 2			
-!8 -> 2
-3 & 8 -> !2
-
-!4 -> 3
-!5 -> 3
-4 & 5 -> !3
-
-!7 -> 5
-!4 -> 5
-4 & 7 -> !5
-
-!5 -> 8
-!7 -> 8
-5 & 7 -> !8
+Theorem: Given a disjoint expression E of the form [L R], E is canonical iff 
+there is no unified version of E, E' of the form [L' R'], 
+where 
+- at least one of L' or R' has an an f-grounding f-cofactor C, and  
+- C occurs in the other side of E'
 
 Proof...
-```
-0	; goal
-!2	;0, 2 -> !0
-3	;!2, !3 -> 2
-8	;!2, !8 -> 2
-!4	; goal var(1)=F
-5	;
-!7  ; var(2)=F
-```
+By induction of the # of contexts.
 
-Therefore, because !4 and !7, 1=F and 2=F is a satisfying solution.  
-We could have chosen !5 as a goal instead of !4, 
-in which case we would have derived 4 and 7 instead of !4 and !7.  
+The theorem is true for a single context.   
+This is shown by enumerating the forms of all possible single context expressions, creating their cofactor models,  
+and demonstrating that non-canonical expressions have f-grounding f-cofactors while canonical expression do not.  
+> Reminder: Disjoint expressions are not reducible via ground rules, therefore single context expressions composed of just constants may be ignored.  
 
+- [T a]
+> term	id
+> ----	--
+> [T a]	0
+> a		1
+> T		2
+> [a a] 3
+> ------- cofactor model --------
+> (0 || 1), (0 || 2), (!1 || !2 || !0) ; cofactor model of [T a]
+> (!3 || 1), (!1 || 3) ; 1 == !3; cofactor model of [a a]
+> (0 || 3), (!3 || !0) ; 0 == 3; iteration of [T a] 
+> No f-grounding cofactors of the starting expression may be derived.
+
+
+- [a a]
+> term	id
+> ----	--
+> [T a]	0
+> a		1
+> T		2
+> [a a] 3
+> ------- cofactor model --------
+> (0 || 1), (0 || 2), (!1 || !2 || !0) ; cofactor model of [T a]
+> (!3 || 1), (!1 || 3) ; 1 == !3; cofactor model of [a a]
+> (0 || 3), (!3 || !0) ; 0 == 3; iteration of [T a] 
+> Since !1 -> !1 (a is an f-grounding f-cofactor of a), and a occurs in the other side of [a a] then [a a] may be reduced to [T a]
 
 
 
