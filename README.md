@@ -37,12 +37,6 @@ The application of the commutivity rules is constrained by the expression orderi
 Proofs in C are based on proving equivalence, and work by rewriting/reducing expressions to thier simplest form.  
 Proofs in C are heuristic, requiring inferences to be combined in just the right way to reach a conclusion.  
 
-When constructing a proof the most effort goes into discovering or computing cofactors, 
-which is more easily done by machine than by a human.  
-It's also easier for machines to recognize the order of expressions. 
-Thus, when more than one rule is applicable,  
-it's easier for machines to identify choices that actually make an expression simpler.  
-
 It is shown that the inference rules are sound.  
 It is shown that C is complete, by demonstrating an equivalence to classic propositional calculus.  
 
