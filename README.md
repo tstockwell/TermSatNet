@@ -36,24 +36,25 @@ this is more easily done by machine than by a human.
 Proofs in C are heuristic, requiring inferences to be combined in just the right way to reach a conclusion.  
 However, its easier to construct proofs in C because...
 - there are far fewer ways to construct proofs, the expression ordering is highly constraining
-- and when more than one rule is applicable, it easy to identify applications that move the proof closer to the goal.  
+- and, when more than one rule is applicable, it's easy to identify choices that move the proof closer to the goal.  
 
 It is shown that the inference rules are sound.  
 It is shown that C is complete, by demonstrating an equivalence to classic propositional calculus.  
 
 ## [System X](https://github.com/tstockwell/TermSatNet/wiki/system-x)
 System X is an extended version of System C.  
+X represents expressions as [e-graphs](https://en.wikipedia.org/wiki/E-graph).  
+X uses equality saturation to build an e-graph from a *root expression*.  
+E-graphs represent the *congruence closure* of an expression.  
 
-
-X includes all the inference rules from System C and adds the rules of commutivity and exchange.  
-
-X represents expressions as e-graphs that represent the *congruence closure* of an expression.  
-E-graphs make it possible to efficiently find cofactors in the *congruence closure* of an expression,  
-which is required to find exchanges.    
+X includes all the inference rules from System C and adds the structural rule of exchange.  
+Exchange is guided by the same cofactors constraints as iteration and deiteration but 
+exchange looks for cofactors in it's e-graph.  
+E-graphs make it possible to efficiently find cofactors in the *congruence closure* of an expression.    
 
 X includes an algorithm that guides the proof process, thus the proof process is automatic.  
 
-## Proof Complexity in System X
+## [Proof Complexity in System X](https://github.com/tstockwell/TermSatNet/wiki/complexity)
 Expressions are reduced from the bottom up,  
 and thus only *standard* or *minimal* expressions are ever included in an e-graph.  
 A standard expression is a non-minimal expression where every subterm is minimal.  
