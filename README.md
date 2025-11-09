@@ -53,6 +53,7 @@ X represents expressions as saturated [e-graphs](https://en.wikipedia.org/wiki/E
 X uses [equality saturation](https://en.wikipedia.org/wiki/E-graph#Equality_saturation) to build a saturated e-graph from a *root expression*.  
 > A minimal expression is an expression that cannot be reduced further by any inference rule.  
 > A standard expression is an expression where every subterm is minimal.  
+
 E-graphs in X represent the set, called the [*congruence closure*](https://www.bodunhu.com/blog/posts/congruence-closure/), of all standard expressions that are equivalent to the root expression with the exact same number of variables.  
 
 X includes all the inference rules from System C and adds the structural rule of exchange.  
