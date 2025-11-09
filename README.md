@@ -47,7 +47,7 @@ X represents expressions as saturated [e-graphs](https://en.wikipedia.org/wiki/E
 X uses [equality saturation](https://en.wikipedia.org/wiki/E-graph#Equality_saturation) to build a saturated e-graph from a *root expression*.  
 > A minimal expression is an expression that cannot be reduced further by any inference rule.  
 > A standard expression is an expression where every subterm is minimal.  
-Only standard and minimal expressions are represented in an e-graph.  
+> Because expressions ae reduced from the the bottom up, only standard and minimal expressions need ever be included in an e-graph.
 
 E-graphs in X represent the set, called the [*congruence closure*](https://www.bodunhu.com/blog/posts/congruence-closure/), of all standard expressions that are equivalent to the root expression with the exact same number of variables.  
 
@@ -60,8 +60,6 @@ exchange looks for cofactors throughout an e-graph, not just in a single express
 X includes an algorithm that guides the proof process, thus the proof process is automatic.  
 
 ## [Proof Complexity in System X](https://github.com/tstockwell/TermSatNet/wiki/complexity)
-
-It is shown that, by reducing expressions from the bottom up, only standard and minimal expressions need ever be included in an e-graph.
 
 It is shown that the number of expressions in a saturated e-graph is limited to a quadradic function of the size of the root expression. 
 > In other words, to find the cofactors required to reduce an expression you only need to look at a polynomial number of other expressions.  
