@@ -31,6 +31,7 @@ C uses the inference rules from existential graphs; [double negation elimination
 The application of the structural rules, iteration and deiteration, is guided by logical constraints called *cofactors* that must be present in the expression in order to apply the rule.  
 > A cofactor is a subterm of an expression that entails the expression.  
 > That is, replacing the subterm with a constant creates an expresssion that is equivalent to a constant.  
+
 The application of the commutivity rules is constrained by the expression ordering.  
 
 Proofs in C are based on proving equivalence, and work by rewriting/reducing expressions to thier simplest form.  
@@ -50,7 +51,8 @@ System X is an extended version of System C that includes the structural rule of
 
 X represents expressions as saturated [e-graphs](https://en.wikipedia.org/wiki/E-graph).  
 X uses [equality saturation](https://en.wikipedia.org/wiki/E-graph#Equality_saturation) to build a saturated e-graph from a *root expression*.  
-A standard expression is an expression where every subterm is minimal.  
+> A minimal expression is an expression that cannot be reduced further by any inference rule.  
+> A standard expression is an expression where every subterm is minimal.  
 E-graphs in X represent the set, called the [*congruence closure*](https://www.bodunhu.com/blog/posts/congruence-closure/), of all standard expressions that are equivalent to the root expression with the exact same number of variables.  
 
 X includes all the inference rules from System C and adds the structural rule of exchange.  
