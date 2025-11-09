@@ -49,7 +49,7 @@ X uses [equality saturation](https://en.wikipedia.org/wiki/E-graph#Equality_satu
 > A standard expression is an expression where every subterm is minimal.  
 > Because expressions ae reduced from the the bottom up, only standard and minimal expressions need ever be included in an e-graph.
 
-E-graphs in X represent the set, called the [*congruence closure*](https://www.bodunhu.com/blog/posts/congruence-closure/), of all standard expressions that are equivalent to the root expression with the exact same number of variables.  
+E-graphs in X represent the set, called the [*congruence closure*](https://www.bodunhu.com/blog/posts/congruence-closure/), of all standard expressions, with the exact same number of variables as the root expression, that are equivalent to the root expression.  
 
 X includes all the inference rules from System C and adds the structural rule of exchange.  
 Since exchange is admissible, an exchange step is equivalent to many steps using the other rules.  
