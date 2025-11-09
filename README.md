@@ -41,7 +41,7 @@ It is shown that the inference rules are sound.
 It is shown that C is complete, by demonstrating an equivalence to classic propositional calculus.  
 
 ## [System X](https://github.com/tstockwell/TermSatNet/wiki/system-x)
-System X is an extended version of System C that includes the structural rule of exchange to make proofs even shorter.  
+System X (for eXchange) is an extended version of System C in which proofs can be very efficient.  
 
 X represents expressions as saturated [e-graphs](https://en.wikipedia.org/wiki/E-graph).  
 X uses [equality saturation](https://en.wikipedia.org/wiki/E-graph#Equality_saturation) to build a saturated e-graph from a *root expression*.  
@@ -52,24 +52,18 @@ Only standard and minimal expressions are represented in an e-graph.
 E-graphs in X represent the set, called the [*congruence closure*](https://www.bodunhu.com/blog/posts/congruence-closure/), of all standard expressions that are equivalent to the root expression with the exact same number of variables.  
 
 X includes all the inference rules from System C and adds the structural rule of exchange.  
+Since exchange is admissible, an exchange step is equivalent to many steps using the other rules.  
 Exchange is also guided by cofactor constraints, like iteration and deiteration, but 
 exchange looks for cofactors throughout an e-graph, not just in a single expression.  
-Using e-graphs to represent expressions make it possible for a machine 
-to efficiently find cofactors in the congruence closure of an expression.    
+> Exchange is a kind of shortcut that makes proofs much shorter.
+
+> Using e-graphs to represent expressions makes it possible to efficiently find cofactors in the congruence closure of an expression.    
 
 X includes an algorithm that guides the proof process, thus the proof process is automatic.  
 
 ## [Proof Complexity in System X](https://github.com/tstockwell/TermSatNet/wiki/complexity)
 
 It is shown that, by reducing expressions from the bottom up, only standard and minimal expressions need ever be included in an e-graph.
-
-It is shown that an exchange step represents many iteration/deiteration steps.  
-> That makes exchange a good tactic for making proofs shorter.
-
-It is further shown that there's never a need to use iteration in a proof 
-because there's a shorter proof that uses exchange.  
-> Note... that's not the same as saying that iteration is admissible, 
-> iterations are used to build e-graphs but not used in proofs.
 
 It is shown that the number of expressions in a saturated e-graph is limited to a quadradic function of the size of the root expression. 
 > In other words, to find the cofactors required to reduce an expression you only need to look at a polynomial number of other expressions.  
@@ -85,7 +79,7 @@ where every step in the proof gets you closer to the goal, the minimal form of t
 
 The exchange rule acts as a shortcut in a proof that would otherwise would require iteration, a step away from the goal.  
 But finding exchanges has a cost, it may require looking through the entire confluence closure of an expression for the right cofactors.  
-By using e-graphs, exchanges can be found efficiently.  
+By using e-graphs to represent expressions, all the information required to find cofactors efficiently is maintained as a proof progresses.  
 
 Finally, proofs in System X use all forms of reasoning (deductive, inductive, and abductive), and I don't think that's a coincidence.  
 
