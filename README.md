@@ -18,16 +18,25 @@ The documentation presents two systems of logic that work by minimizing expressi
 and shows that proofs in the latter system have a maximum length that is a polynomial function of the length of the axiom.  
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
-System C (for cofactors) is a system of propositional logic inspired by existential graphs.  
+System C (for cofactors) is a system of propositional logic,
+inspired by [existential graphs](https://en.wikipedia.org/wiki/Existential_graph), 
+but unlike existential graphs is designed for machines instead of humans.  
 
 Basic expressions are composed of the constant T, variables, and nand operators.  
 
-C uses 4 inference rules; double negation elimination, erasure, deiteration, and iteration.  
+C defines a set of expression orderings (aka path orderings) that define what makes one expression simpler than another.
+
+C uses 5 inference rules; commutivity, double negation elimination, erasure, deiteration, and iteration.  
 
 The use of the structural rules, iteration and deiteration, is guided by logical constraints called *cofactors* that must be present in the expression in order to apply the rule.  
 
 Proofs in C are based on proving equivalence, and work by rewriting/reducing expressions to simpler/reduced expressions.  
+When constructing a proof the most effort goes into discovering or computing cofactors, 
+this is more easily done by machine than by a human.  
 Proofs in C are heuristic, requiring inferences to be combined in just the right way to reach a conclusion.  
+However, its easier to construct proofs in C because...
+- there are far fewer ways to construct proofs, the expression ordering is highly constraining
+- and when more than one rule is applicable, it easy to identify applications that move the proof closer to the goal.  
 
 It is shown that the inference rules are sound.  
 It is shown that C is complete, by demonstrating an equivalence to classic propositional calculus.  
@@ -35,7 +44,6 @@ It is shown that C is complete, by demonstrating an equivalence to classic propo
 ## [System X](https://github.com/tstockwell/TermSatNet/wiki/system-x)
 System X is an extended version of System C.  
 
-X defines a set of expression orderings that define what makes one expression simpler than another.
 
 X includes all the inference rules from System C and adds the rules of commutivity and exchange.  
 
