@@ -79,10 +79,8 @@ System T also includes an ordering of expressions based on entropy/simplicity...
 ## Inference Rules
 System T has the following inference rules...
 - ordering. Example (2 1) => (1 2).   Orders terms in an expression according to their emtropy.
-- empty context elimination.  (T T) => F. Same as empty cut elimination in existential graph
 - double negation elimination. (T (T x)) => x
-- erasure.  (F Q) => T 
-- insertion.  T => (F Q)
+- erasure.  ((T T) Q) => T 
 - iteration, aka weakening.  Example: (T x) => (x x)
 	Iteration makes copies of a term within an expression without changing the truth function of the expression.
 	Given a subterm S of an expression E of the form (L R),  where S is a left or right, F-grounding F-cofactor of E then any or all copies of T in the other side of the expression may be replaced with S.   						
@@ -99,7 +97,7 @@ System T has the following inference rules...
 	2. (L[S] R[S]) => (L[S] R[S=>T])
 	Note that when R[S] == S, or L[S] == S then generalized iteration is similar to classic EG deiteration.  
 	Note that when R[S] == F, or L[S] == F then generalized iteration is similar to classic EG erasure.  
-- exchange (aka permutation.  Example: (T ((1 (1 2)) ((1 2) 2))) => ((1 2) ((1 T) (T 2)))
+- exchange (aka permutation.  Example: (T ((x (T y)) ((T x) y))) => ((x y) ((T x) (T y)))
 	The exchange rule exchanges terms between the sides of a context in a way that doesn't change the truth function of the expression.  
 	Let E be an expression E of the form (L R).  
 	If there is an F-grounding cofactor X of L,  

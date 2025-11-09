@@ -97,6 +97,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="SystemS\" />
     <Folder Include="obj\" />
     <Folder Include="Scripts\" />
   </ItemGroup>
