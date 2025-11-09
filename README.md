@@ -57,8 +57,6 @@ Exchange is also guided by cofactor constraints, like iteration and deiteration,
 exchange looks for cofactors throughout an e-graph, not just in a single expression.  
 > Exchange is a kind of shortcut that makes proofs much shorter.
 
-> Using e-graphs to represent expressions makes it possible to efficiently find cofactors in the congruence closure of an expression.    
-
 X includes an algorithm that guides the proof process, thus the proof process is automatic.  
 
 ## [Proof Complexity in System X](https://github.com/tstockwell/TermSatNet/wiki/complexity)
@@ -78,8 +76,10 @@ Adding a path ordering to a logic system makes it possible to create proofs
 where every step in the proof gets you closer to the goal, the minimal form of the expression.  
 
 The exchange rule acts as a shortcut in a proof that would otherwise would require iteration, a step away from the goal.  
-But finding exchanges has a cost, it may require looking through the entire confluence closure of an expression for the right cofactors.  
-By using e-graphs to represent expressions, all the information required to find cofactors efficiently is maintained as a proof progresses.  
+But finding exchanges has a cost, it may require looking through the entire confluence closure of an expression for the right cofactors.   
+E-graphs makes finding cofactors efficient, though not simple ;-).  
+And the knowledge required to find cofactors efficiently is maintained as a proof progresses.  
+
 
 Finally, proofs in System X use all forms of reasoning (deductive, inductive, and abductive), and I don't think that's a coincidence.  
 
