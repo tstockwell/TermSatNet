@@ -66,18 +66,20 @@ to efficiently find cofactors in the congruence closure of an expression.
 X includes an algorithm that guides the proof process, thus the proof process is automatic.  
 
 ## [Proof Complexity in System X](https://github.com/tstockwell/TermSatNet/wiki/complexity)
-Expressions are reduced from the bottom up, and thus only standard and minimal expressions are ever included in an e-graph.  
+
+It is shown that, by reducing expressions from the bottom up, only standard and minimal expressions need ever be included in an e-graph.
 
 It is shown that an exchange step represents many iteration/deiteration steps.  
-That makes exchange a good tactic for making proofs shorter.
+> That makes exchange a good tactic for making proofs shorter.
 
 It is further shown that there's never a need to use iteration in a proof 
 because there's a shorter proof that uses exchange.  
-Note... that's not the same as saying that iteration is admissible, 
-iterations are used to build e-graphs but not used in proofs.
+> Note... that's not the same as saying that iteration is admissible, 
+> iterations are used to build e-graphs but not used in proofs.
 
 It is shown that the number of expressions in a saturated e-graph is limited to a quadradic function of the size of the root expression. 
-In other words, to find the cofactors required to reduce an expression you only need to look at a polynomial number of other expressions.  
+> In other words, to find the cofactors required to reduce an expression you only need to look at a 
+> polynomial number of other expressions.  
 
 It is shown that standard expressions can be reduced in length in no more than three steps.  
 
