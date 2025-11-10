@@ -10,15 +10,10 @@ When the code and docs are complete I'll remove this notice.
 
 I have convinced myself that it's possible to minimize boolean expressions in polynomial time.  
 I am currently writing documentation and building a SAT solver based on the automatic theorem prover I've designed.  
-I'm going to do this in public in case there's anyone out there that might have an interest.  
-
-Even if this system turns out to not be as efficient as I think, 
-I've already written enough code and tests to know that it's very powerful.  
-I originally developed these ideas to serve as the core engine of programming language.  
-What I have is good enough to move on, so I'm going to code this, write docs, and call it done.  
+I'm going to do this in public because I could definitely use some feedback.  
 
 What follows is an overview of the documentation so far.  
-It presents two systems of logic that work by minimizing expressions, 
+It presents two systems of logic that work by reducing expressions, 
 and shows that proofs in the latter system have a maximum length that is a polynomial function of the length of the axiom.  
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
@@ -33,8 +28,8 @@ C defines a set of expression orderings (aka [path orderings](https://en.wikiped
 C uses the inference rules from existential graphs; [double negation elimination, erasure, deiteration, and iteration](https://en.wikipedia.org/wiki/Existential_graph#Alpha), and adds [commutivity](https://www.philosophypages.com/lg/e11b.htm#:~:text=Commutation,any%20of%20the%20possible%20conditions.).  
 
 The application of the structural rules, iteration and deiteration, is guided by logical constraints called *cofactors* that must be present in the expression in order to apply the rule.  
-> A cofactor is a subterm of an expression that entails the expression.  
-> That is, replacing the subterm with a constant creates an expresssion that is equivalent to a constant.  
+> A cofactor is a subterm of an expression that [entails](https://en.wikipedia.org/wiki/Logical_consequence) the expression.  
+> Specifically, a cofactor is a subterm, that when replaced with constant, creates an expresssion that is equivalent to a constant.  
 
 The application of the commutivity rules is constrained by the expression ordering.  
 
@@ -81,11 +76,37 @@ Finally, it is shown that any expression can be minimized in a # of steps that i
 Adding a path ordering to a logic system makes it possible to create proofs 
 where every step in the proof gets you closer to the goal, the minimal form of the expression.  
 
-The exchange rule acts as a shortcut in a proof that would otherwise would require iteration, a step away from the goal.  
+The exchange rule acts as a shortcut in a proof that gets you closer to the goal.  
+A step that would otherwise would require iteration, a step away from the goal.  
 But finding exchanges has a cost, it may require looking through the entire confluence closure of an expression for the right cofactors.   
 E-graphs makes finding cofactors efficient, though not simple ;-).  
 And the knowledge required to find cofactors efficiently is maintained as a proof progresses.  
 
-
 Finally, proofs in System X use all forms of reasoning (deductive, inductive, and abductive), and I don't think that's a coincidence.  
+
+## Next
+
+Even if this system turns out to not be as efficient as I think, 
+I've already written enough code and tests to know that it's going to serve my purposes as the core of a rule-based programming language.
+
+Here's why...  
+System X is actually a compiled program, it's not something that I invented, I *derived* it.  
+I essentially wrote a specification of a program that can reduce boolean expressions and 'compiled' that specification into the X system.
+
+The syntax rules of the expressions in X define the shape of data, a different systax could be used.  
+The path ordering is a set of logically constrained rewrite rules 
+that define how data may be transformed.  
+In X, the path ordering transforms expressions from complex to simple.   
+Other programs are possible.  
+The inference rules are then *derived* by compiling the syntax specification and the program specification into a set of logically constrained rewrite rules, the inference rules in X.
+> Yes, the inference rules for System X were not *invented* by me, they were derived from the structure of the expressions.  
+> In other words, the rules of a logic are an emergent property of the expressions.  
+The proof procedure in X is an engine that runs the current program (the inference rules) against a starting expression.  
+
+I am obsessed with this idea because using rules is *way way way* more modular, reusable, customizable, scalable, and extensible than the languages we have now.
+
+And an engine that can do automated reasoning is powerful enough for generating web pages.  
+Next, I'm going to use this same system to build an engine for composing web pages in ways that will be revolutionary.  
+
+
 
