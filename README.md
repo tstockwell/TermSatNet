@@ -66,6 +66,9 @@ X includes an algorithm that guides the proof process, thus the proof process is
 It is shown that the number of expressions in a saturated e-graph is limited to a quadradic function of the size of the root expression. 
 > In other words, to find the cofactors required to reduce an expression you only need to look at a polynomial number of other expressions.  
 
+It is shown that any exchange step in a proof is equivalent to many steps using just iteration and deiteration. 
+> In other words, to find the cofactors required to reduce an expression you only need to look at a polynomial number of other expressions.  
+
 It is shown that standard expressions can be reduced in length in no more than three steps.  
 > The fact that this is possible is a measure of how powerful the structural rules are, especially exchange.
 
