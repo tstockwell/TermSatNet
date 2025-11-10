@@ -63,17 +63,21 @@ X includes an algorithm that guides the proof process, thus the proof process is
 
 ## [Proof Complexity in System X](https://github.com/tstockwell/TermSatNet/wiki/complexity)
 
-It is shown that any proof that uses iteration can be rewritten as a shorter proof that uses exchange instead. 
-> Corollary: Any proof can be rewritten so that every step in the proof makes the axiom simpler.  
+It is shown that any reductive proof with an iteration may be written as a shorter proof that uses exchange.
+> Therefore, every step in a proof can be a reduction.
 
-It is shown that the maximum number of expressions in a saturated e-graph is something less than the quadradic of the size of the root expression. 
-> In other words, to find the cofactors required to compute a reduction you only need to look at a polynomially limited number of other expressions.  
+It is shown that, when a standard expression is reduced, 
+that it's reduced according to the rules of the path ordering.  
+> Corollary: Every step in a proof either...  
+> - increases the number of constants in the expression, 
+> - reduces the length of the expression, 
+> - or reduces the # of variables in the expression.  
 
-It is shown that standard expressions that are reducible can be reduced in length in no more than three steps.  
-> The fact that this is possible is a measure of how powerful the structural rules are.  
+It is shown that, if an expression is reduced according to the path ordering 
+then it takes at most a number of steps that is a quadradic 
+function of the size of the expression.
 
-Finally, it is shown that any expression can be minimized in a # of steps that is limited to a polynomial function of the size of the expression. 
-> It's hard to believe that this is correct.  But even if it's not, I'm convinced that System X is worth building.  
+QED
 
 ## Summary
 
