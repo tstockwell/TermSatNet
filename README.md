@@ -1,20 +1,24 @@
 ## UNDER CONSTRUCTION
 
 Until further notice, be advised that this repository is under construction.  
-There's a ton of docs to complete, code to complete, etc.  
-But I always work from the top down so, when my plans for this project change, 
+I always work from the top down so, when my plans for this project change, 
 I change this page before I do anything else.
 
-Eventually you will find a complete SAT solver in the code and docs that show that it minimizes boolean expressions in polytime.  At that time I'll remove this notice.  
+When the code and docs are complete I'll remove this notice.  
 
 ## Overview 
 
 I have convinced myself that it's possible to minimize boolean expressions in polynomial time.  
-I would like to have my work reviewed but I have no academic credentials nor acquaintances I can press into service.  
-I have to start somewhere, so even though it's embarrassing as hell to show people what I do in my free time :-),  
-I invite you to take a look at the documentation and code I wrote for it.  
+I am currently writing documentation and building a SAT solver based on the automatic theorem prover I've designed.  
+I'm going to do this in public in case there's anyone out there that might have an interest.  
 
-The documentation presents two systems of logic that work by minimizing expressions, 
+Even if this system turns out to not be as efficient as I think, 
+I've already written enough code and tests to know that it's very powerful.  
+I originally developed these ideas to serve as the core engine of programming language.  
+What I have is good enough to move on, so I'm going to code this, write docs, and call it done.  
+
+What follows is an overview of the documentation.  
+It presents two systems of logic that work by minimizing expressions, 
 and shows that proofs in the latter system have a maximum length that is a polynomial function of the length of the axiom.  
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
