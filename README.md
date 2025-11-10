@@ -49,15 +49,16 @@ X uses [equality saturation](https://en.wikipedia.org/wiki/E-graph#Equality_satu
 > A standard expression is an expression where every subterm is minimal.  
 > Because expressions ae reduced from the the bottom up, only standard and minimal expressions need ever be included in an e-graph.
 
-E-graphs in X represent the set, called the [*congruence closure*](https://www.bodunhu.com/blog/posts/congruence-closure/), of all standard expressions, with the exact same number of variables as the root expression, that are equivalent to the root expression.  
+E-graphs in X represent a set, called the [*congruence closure*](https://www.bodunhu.com/blog/posts/congruence-closure/), of all 
+equivalent standard expressions with the exact same set of variables as the root expression.  
 
-X includes all the inference rules from System C and adds the structural rule of exchange.  
+X includes all the inference rules from System C and adds the structural rule of [exchange](https://en.wikipedia.org/wiki/Structural_rule).  
 Since exchange is admissible, an exchange step is equivalent to many steps using the other rules.  
-Exchange is also guided by cofactor constraints, like iteration and deiteration, but 
+Exchange is also guided by cofactor constraints, similar to iteration and deiteration, but 
 exchange looks for cofactors throughout an e-graph, not just in a single expression.  
 > Exchange is a kind of shortcut that makes proofs much shorter.
 
-X includes an algorithm that guides the proof process, thus the proof process is automatic.  
+X includes an algorithm that guides the proof process, thus the proof process is automatic. 
 
 ## [Proof Complexity in System X](https://github.com/tstockwell/TermSatNet/wiki/complexity)
 
