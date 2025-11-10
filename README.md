@@ -47,7 +47,7 @@ It is shown that the inference rules are sound.
 It is shown that C is complete, by demonstrating an equivalence to classic propositional calculus.  
 
 ## [System X](https://github.com/tstockwell/TermSatNet/wiki/system-x)
-System X (for eXchange) is an extended version of System C in which proofs can be very efficient.  
+System X (for eXchange) is an extended version of System C in .  
 
 X represents expressions as saturated [e-graphs](https://en.wikipedia.org/wiki/E-graph).  
 X uses [equality saturation](https://en.wikipedia.org/wiki/E-graph#Equality_saturation) to build a saturated e-graph from a *root expression*.  
@@ -74,7 +74,8 @@ It is shown that the number of expressions in a saturated e-graph is limited to 
 It is shown that standard expressions can be reduced in length in no more than three steps.  
 > The fact that this is possible is a measure of how powerful the structural rules are, especially exchange.
 
-Finally, it is shown that any expression can always be fully reduced in a polynomial # of steps.  
+Finally, it is shown that any expression can be minimized in a # of steps that is limited to a polynomial function of the size of the expression. 
+> It's hard to believe that this is correct.  But even if it's not, I'm convinced that System X is worth building.  
 
 ## Summary
 Adding a path ordering to a logic system makes it possible to create proofs 
