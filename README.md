@@ -18,7 +18,7 @@ and shows that proofs in the latter system have a maximum length that is a polyn
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
 System C (for cofactors) is a system of propositional logic,
-inspired by [existential graphs](https://en.wikipedia.org/wiki/Existential_graph) and the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
+inspired by [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph) and the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
 > But it's designed for machines instead of humans, and it's designed to produce shorter proofs.  
 
 Basic expressions are composed of the constant T, variables, and nand operators.  
@@ -78,16 +78,17 @@ Even if this system turns out to not be as efficient as I think,
 I've already written enough code and tests to know that it's going to serve my purposes as the core of a rule-based programming language.
 
 Here's why...  
-System X is actually a kind of compiled program, it's not something that I invented, I *derived* it.  
+System X itself is not something that I invented or created, 
+it's actually a kind of compiled program.  
+I *derived* it.  
 
-I essentially wrote a specification of a program that can reduce boolean expressions and 'compiled' that specification into the X system.  
-
+I essentially wrote a specification of a program that can reduce boolean expressions and 'compiled' that specification into a set of logically constrained rewrite rules that became the inference rules in X.  
 The expression syntax and the path ordering together are that specification.  
-These were 'compiled' into a set of logically constrained rewrite rules that became the inference rules in X.
-> That's right, the inference rules for System X were not *invented* by me, they were *derived* from the structure of the expressions and the path ordering.  
+The inference rules in System X are a generalized version of the derived rules.  
+> That's right, the inference rules for System X were not *invented* by me,  
+they were *derived* from the structure of the expressions and the path ordering.  
 
-One reason I am feeling confident in the work I've done here is precisely because it's 
-not something that I invented, it's something that I computed.  
+One reason I am feeling confident in the work I've done here is precisely because it's not something that I invented, it's something that I computed.  
 *Explaining* what you have computed is a whole other problem though :-).  
 I had to come up with a way to prove properties about the generated rules.  
 That's what the documentation is about.
