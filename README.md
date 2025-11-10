@@ -10,7 +10,7 @@ When the code and docs are complete I'll remove this notice.
 
 I have convinced myself that it's possible to minimize boolean expressions in polynomial time.  
 I am currently writing documentation and building a SAT solver based on the automatic theorem prover I've designed.  
-I'm going to do this in public because I could definitely use some feedback.  
+I'm going to do this in public because I hope to connect with folks that can provide feedback.  
 
 What follows is an overview of the documentation so far.  
 It presents two systems of logic that work by reducing expressions, 
@@ -63,14 +63,14 @@ X includes an algorithm that guides the proof process, thus the proof process is
 
 ## [Proof Complexity in System X](https://github.com/tstockwell/TermSatNet/wiki/complexity)
 
-It is shown that the number of expressions in a saturated e-graph is limited to a quadradic function of the size of the root expression. 
-> In other words, to find the cofactors required to reduce an expression you only need to look at a polynomial number of other expressions.  
+It is shown that any proof that uses iteration can be rewritten as a shorter proof that uses exchange instead. 
+> Corollary: Any proof can be rewritten so that every step in the proof makes the axiom simpler.  
 
-It is shown that any exchange step in a proof is equivalent to many steps using just iteration and deiteration. 
-> In other words, to find the cofactors required to reduce an expression you only need to look at a polynomial number of other expressions.  
+It is shown that the maximum number of expressions in a saturated e-graph is something less than the quadradic of the size of the root expression. 
+> In other words, to find the cofactors required to compute a reduction you only need to look at a polynomially limited number of other expressions.  
 
-It is shown that standard expressions can be reduced in length in no more than three steps.  
-> The fact that this is possible is a measure of how powerful the structural rules are, especially exchange.
+It is shown that standard expressions that are reducible can be reduced in length in no more than three steps.  
+> The fact that this is possible is a measure of how powerful the structural rules are.  
 
 Finally, it is shown that any expression can be minimized in a # of steps that is limited to a polynomial function of the size of the expression. 
 > It's hard to believe that this is correct.  But even if it's not, I'm convinced that System X is worth building.  
