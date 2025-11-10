@@ -23,8 +23,8 @@ and shows that proofs in the latter system have a maximum length that is a polyn
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
 System C (for cofactors) is a system of propositional logic,
-inspired by [existential graphs](https://en.wikipedia.org/wiki/Existential_graph).  
-> But unlike existential graphs is designed for machines instead of humans.  
+inspired by [existential graphs](https://en.wikipedia.org/wiki/Existential_graph) and the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
+> But it's designed for machines instead of humans, and it's designed to produce to shorter proofs.  
 
 Basic expressions are composed of the constant T, variables, and nand operators.  
 
@@ -40,6 +40,8 @@ The application of the commutivity rules is constrained by the expression orderi
 
 Proofs in C are based on proving equivalence, and work by rewriting/reducing expressions to thier simplest form.  
 Proofs in C are heuristic, requiring inferences to be combined in just the right way to reach a conclusion.  
+The expression ordering helps makes proofs shorter because, when more than one rule may be applied, 
+having an ordering makes it possible to choose the rule that moves the proof closest to the final goal.  
 
 It is shown that the inference rules are sound.  
 It is shown that C is complete, by demonstrating an equivalence to classic propositional calculus.  
@@ -54,12 +56,12 @@ X uses [equality saturation](https://en.wikipedia.org/wiki/E-graph#Equality_satu
 > Because expressions ae reduced from the the bottom up, only standard and minimal expressions need ever be included in an e-graph.
 
 E-graphs in X represent a set, called the [*congruence closure*](https://www.bodunhu.com/blog/posts/congruence-closure/), of all 
-equivalent standard expressions with the exact same set of variables as the root expression.  
+equivalent expressions with the exact same set of variables as the root expression.  
 
 X includes all the inference rules from System C and adds the structural rule of [exchange](https://en.wikipedia.org/wiki/Structural_rule).  
 Since exchange is admissible, an exchange step is equivalent to many steps using the other rules.  
 Exchange is also guided by cofactor constraints, similar to iteration and deiteration, but 
-exchange looks for cofactors throughout an e-graph, not just in a single expression.  
+exchange looks for cofactors in the congruence closure of an expression, not just in a single expression.  
 > Exchange is a kind of shortcut that makes proofs much shorter.
 
 X includes an algorithm that guides the proof process, thus the proof process is automatic. 
