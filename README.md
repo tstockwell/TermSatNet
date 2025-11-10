@@ -64,7 +64,7 @@ X includes an algorithm that guides the proof process, thus the proof process is
 ## [Proof Complexity in System X](https://github.com/tstockwell/TermSatNet/wiki/complexity)
 
 It is shown that any reductive proof with an iteration may be written as a shorter proof that uses exchange.
-> Therefore, every step in a proof can be a reduction.
+> Therefore, thanks to the exchange rule, every step in a proof can be a reduction.
 
 It is shown that, when a standard expression is reduced, 
 that it's reduced according to the rules of the path ordering.  
