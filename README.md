@@ -84,16 +84,18 @@ I essentially wrote a specification of a program that can reduce boolean express
 
 The expression syntax and the path ordering together are that specification.  
 These were 'compiled' into a set of logically constrained rewrite rules that became the inference rules in X.
-> That's right, the inference rules for System X were not *invented* by me, they were derived from the structure of the expressions and the path ordering.  
+> That's right, the inference rules for System X were not *invented* by me, they were *derived* from the structure of the expressions and the path ordering.  
 
 One reason I am feeling confident in the work I've done here is precisely because it's 
 not something that I invented, it's something that I computed.  
 *Explaining* what you have computed is a whole other problem though :-).  
+I had to come up with a way to prove properties about the generated rules.  
+That's what the documentation is about.
 
-I am obsessed with this idea because programming with rules is *way way way* more modular, reusable, customizable, scalable, and extensible than the languages and tools we have now.  
+I am obsessed with rewriting because programming with rules is *way way way* more modular, reusable, customizable, scalable, and extensible than the languages and tools we have now.  
 
 And an engine that can do automated reasoning is powerful enough for generating web pages.  
-Next, I'm going to use this same system to build an engine for composing web pages in ways that will be revolutionary.  
+When I'm done here I'm going to use this same system to build an engine for composing web pages in ways that will be revolutionary.  
 
 
 
