@@ -17,14 +17,14 @@ I've already written enough code and tests to know that it's very powerful.
 I originally developed these ideas to serve as the core engine of programming language.  
 What I have is good enough to move on, so I'm going to code this, write docs, and call it done.  
 
-What follows is an overview of the documentation.  
+What follows is an overview of the documentation so far.  
 It presents two systems of logic that work by minimizing expressions, 
 and shows that proofs in the latter system have a maximum length that is a polynomial function of the length of the axiom.  
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
 System C (for cofactors) is a system of propositional logic,
 inspired by [existential graphs](https://en.wikipedia.org/wiki/Existential_graph) and the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
-> But it's designed for machines instead of humans, and it's designed to produce to shorter proofs.  
+> But it's designed for machines instead of humans, and it's designed to produce shorter proofs.  
 
 Basic expressions are composed of the constant T, variables, and nand operators.  
 
@@ -47,7 +47,7 @@ It is shown that the inference rules are sound.
 It is shown that C is complete, by demonstrating an equivalence to classic propositional calculus.  
 
 ## [System X](https://github.com/tstockwell/TermSatNet/wiki/system-x)
-System X (for eXchange) is an extended version of System C in .  
+System X (for eXchange) is an extended version of System C with even shorter proofs.  
 
 X represents expressions as saturated [e-graphs](https://en.wikipedia.org/wiki/E-graph).  
 X uses [equality saturation](https://en.wikipedia.org/wiki/E-graph#Equality_saturation) to build a saturated e-graph from a *root expression*.  
