@@ -1,13 +1,4 @@
-In hindsight...
-- I should have known what the response would be :-).
-- I should have put *non-constructive* in the title.
-I'm serious though, I want to know if anyone sees value in this.
-I convinced that it should be possible to build an efficient, concrete minimization algorithm form this but I've concluded that I'm not the guy to do it.  
 
-I have a C# implementation of everything described here, and several attempts to build a concrete minimization algorithm in a private github project. 
-This outline is ripped from the code documentation.
-I might do something with this project if I dont get totally torched doing this :-).  
-But torch away....
 
 ----------
 This post contains a non-constructive proof that expressions in a certain system of propositional logic can be minimized in a polynomial # of steps.

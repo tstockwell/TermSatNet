@@ -8,17 +8,40 @@ When the code and docs are complete I'll remove this notice.
 
 ## Overview 
 
-I have convinced myself that it's possible to minimize boolean expressions in polynomial time.  
-I am currently writing documentation and building a SAT solver based on the automatic theorem prover I've designed.  
-I'm going to do this in public because I hope to connect with folks that can provide feedback.  
+I have been experimenting with rewrite systems as part of an effort to build a template processor.  
+System X is a rewrite system that reduces boolean expressions.
+I have convinced myself that this system can minimize boolean expressions in polynomial time.  
+I am currently rewriting documentation and building a SAT solver based on this system.  
+I've made this repository public because I hope to connect with folks that can provide feedback.  
 
-What follows is an overview of the documentation so far.  
-It presents two systems of logic that work by reducing expressions, 
-and shows that proofs in the latter system have a maximum length that is a polynomial function of the length of the axiom.  
+What follows is an overview of the documentation so far...
+- Some background on deriving inference rules is presented.
+- Then two systems of logic are presented.
+- Finally, a section that proves various theorems of the latter system.  
+
+## Syntax-Guided Rule Synthesis
+
+Until recently I didn't know that syntax-guided rule synthesis was a thing.  
+But essentially that's how the rules for systems presented here were developed.
+
+In other words, the inference rules for System X were not invented by nor designed by me.  
+The rules were derived.  The rules are derivable from an enumeration of expressions in the path order.  
+The thing is though, the number of rules grow exponentially as the number of variables increase, 
+and a complete set is infinite.  
+While exploring the derived rules I discovered that they had patterns, 
+and eventually I was able to describe the entire, infinite set of exponentially growing rules 
+as the inference rules in System X.  
+
+One reason I am feeling confident in the work I've done here is precisely because it's not something that I invented, it's a description of something that I computed.  
+*Explaining* what you have computed is a whole other problem though :-).  
+Also, I had to come up with a way to prove properties about the generated rules.  
+That's what this documentation is about.
+
+I'm obsessed with rewriting because programming with rules is *way way way* more modular, reusable, customizable, scalable, and extensible than the languages and tools we have now.  
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
 System C (for cofactors) is a system of propositional logic,
-inspired by [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph) and the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
+similar to [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph) and the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
 > But it's designed for machines instead of humans, and it's designed to produce shorter proofs.  
 
 Basic expressions are composed of the constant T, variables, and nand operators.  
@@ -29,13 +52,13 @@ C uses the inference rules from existential graphs; [double negation elimination
 
 The application of the structural rules, iteration and deiteration, is guided by logical constraints called *cofactors* that must be present in the expression in order to apply the rule.  
 > A cofactor is a subterm of an expression that [entails](https://en.wikipedia.org/wiki/Logical_consequence) the expression.  
-> Specifically, a cofactor is a subterm, that when replaced with constant, creates an expresssion that is equivalent to a constant.  
+> In X, a cofactor is a subterm that, when replaced with constant, creates an expresssion that is equivalent to a constant.  
 
-The application of the commutivity rules is constrained by the expression ordering.  
+The application of the commutivity rules is constrained by the path ordering.  
 
 Proofs in C are based on proving equivalence, and work by rewriting/reducing expressions to thier simplest form.  
 Proofs in C are heuristic, requiring inferences to be combined in just the right way to reach a conclusion.  
-The expression ordering helps makes proofs shorter because, when more than one rule may be applied, 
+The path ordering helps makes proofs shorter because, when more than one rule may be applied, 
 having an ordering makes it possible to choose the rule that moves the proof closest to the final goal.  
 
 It is shown that the inference rules are sound.  
@@ -73,37 +96,9 @@ that it's reduced according to the rules of the path ordering.
 > - reduces the length of the expression, 
 > - or reduces the # of variables in the expression.  
 
-It is shown that, if an expression is reduced according to the path ordering 
+Finally, it is shown that, if an expression is reduced according to the path ordering 
 then it takes at most a number of steps that is a quadradic 
 function of the size of the expression.
 
 QED
-
-## Summary
-
-Even if this system turns out to not be as efficient as I think, 
-I've already written enough code and tests to know that it's going to serve my purposes as the core of a rule-based programming language.
-
-Here's why...  
-System X itself is not something that I invented or created, 
-it's actually a kind of compiled program.  
-I *derived* it.  
-
-I essentially wrote a specification of a program that can reduce boolean expressions and 'compiled' that specification into a set of logically constrained rewrite rules that became the inference rules in X.  
-The expression syntax and the path ordering together are that specification.  
-The inference rules in System X are a generalized version of the derived rules.  
-> That's right, the inference rules for System X were not *invented* by me,  
-they were *derived* from the structure of the expressions and the path ordering.  
-
-One reason I am feeling confident in the work I've done here is precisely because it's not something that I invented, it's something that I computed.  
-*Explaining* what you have computed is a whole other problem though :-).  
-I had to come up with a way to prove properties about the generated rules.  
-That's what the documentation is about.
-
-I am obsessed with rewriting because programming with rules is *way way way* more modular, reusable, customizable, scalable, and extensible than the languages and tools we have now.  
-
-And an engine that can do automated reasoning is powerful enough for generating web pages.  
-When I'm done here I'm going to use this same system to build an engine for composing web pages in ways that will be revolutionary.  
-
-
 
