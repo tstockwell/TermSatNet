@@ -54,7 +54,7 @@ System C (for cofactors) is a system of propositional logic based on rewriting,
 similar to [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph) or the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
 > But it's designed for machines instead of humans, and it's designed to produce shorter proofs.  
 
-Basic expressions are composed of the constant T, variables, and nand operators.  
+Basic expressions are composed of the constants T and F, variables, and nand operators.  
 
 C defines a set of expression orderings (aka [path orderings](https://en.wikipedia.org/wiki/Path_ordering_(term_rewriting))) that define what makes one expression simpler than another.
 
