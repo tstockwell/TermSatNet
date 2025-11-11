@@ -7,7 +7,7 @@ When the code and docs are complete I'll remove this notice.
 
 ## Preface 
 
-I'm a retired computer programmer. 
+I'm a retired, un-degreed, computer programmer. 
 I have had a long-time interest in rewrite systems, and I use this repository for experimenting with rewriting and logic.  
 I intended to someday build a new kind of template processor for rendering html.  
 Instead, I have produced a logic system. 
@@ -44,14 +44,14 @@ and those rules are now the inference rules in System X.
 
 One reason I feel confident in the claims I make about System X is precisely because it's not something that I invented, it's a description of something that I computed.  
 *Explaining* what you have computed is a whole other problem though :-).  
-It took a lot of effort to translate the raw generated rewrite rules into inference rules.  
-Other than showing that my interpreted inference rules do in fact respect the path order, 
+It took a lot of effort to translate the raw generated rewrite rules into inference rules, AI has helped.  
+Other than showing that the inference rules in System X do in fact respect the path order, 
 the complexity theorems are straight-forward to prove (the only kind theorem that I am capable of proving :-)).  
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
 
-System C (for cofactors) is a system of propositional logic,
-similar to [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph) and the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
+System C (for cofactors) is a system of propositional logic capable of performing deep inferences,
+similar to [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph) or the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
 > But it's designed for machines instead of humans, and it's designed to produce shorter proofs.  
 
 Basic expressions are composed of the constant T, variables, and nand operators.  
