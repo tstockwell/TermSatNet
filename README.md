@@ -2,8 +2,7 @@
 
 Until further notice, be advised that this repository is under construction.  
 I always work from the top down so, when my plans for this project change, 
-I change this page before I do anything else.
-
+I change this page before I do anything else.  
 When the code and docs are complete I'll remove this notice.  
 
 ## Overview 
@@ -24,11 +23,12 @@ What follows is an overview of the documentation so far...
 Until recently I didn't know that syntax-guided rule synthesis was a thing.  
 But essentially that's how the rules for systems presented here were developed.
 
-In other words, the inference rules for System X were not invented by nor designed by me.  
+In other words, the inference rules for System X were not invented by, nor designed by me.  
 The rules were derived.  The rules are derivable from an enumeration of expressions in the path order.  
 The thing is though, the number of rules grow exponentially as the number of variables increase, 
 and a complete set is infinite.  
-While exploring the derived rules I discovered that they had patterns, 
+So the rules in thier explicit form are not very useful.  
+However, while exploring the derived rules I discovered that they had patterns, 
 and eventually I was able to describe the entire, infinite set of exponentially growing rules 
 as the inference rules in System X.  
 
@@ -40,6 +40,7 @@ That's what this documentation is about.
 I'm obsessed with rewriting because programming with rules is *way way way* more modular, reusable, customizable, scalable, and extensible than the languages and tools we have now.  
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
+
 System C (for cofactors) is a system of propositional logic,
 similar to [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph) and the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
 > But it's designed for machines instead of humans, and it's designed to produce shorter proofs.  
