@@ -2,42 +2,51 @@
 
 Until further notice, be advised that this repository is under construction.  
 I always work from the top down so, when my plans for this project change, 
-I change this page before I do anything else.  
+I change this page before I do anything else. 
 When the code and docs are complete I'll remove this notice.  
 
-## Overview 
+## Preface 
 
-I have been experimenting with rewrite systems as part of an effort to build a template processor.  
-System X is a rewrite system that reduces boolean expressions.
+I'm a retired computer programmer. 
+I have had a long-time interest in rewrite systems, and I use this repository for experimenting with rewriting and logic.  
+I intended to someday build a new kind of template processor for rendering html.  
+Instead, I have produced a logic system. 
+
+System X is a rewrite system that reduces boolean expressions.  
 I have convinced myself that this system can minimize boolean expressions in polynomial time.  
+
+Since I started taking this idea seriously I have been putting more work into this repository.  
 I am currently rewriting documentation and building a SAT solver based on this system.  
 I've made this repository public because I hope to connect with folks that can provide feedback.  
 
-What follows is an overview of the documentation so far...
-- Some background on deriving inference rules is presented.
-- Then two systems of logic are presented.
+What follows is an overview of what's in the documentation so far...
+- Some background on deriving inference rules.
+- Two systems of logic are presente; a simple system, and one designed to produce short proofs.
 - Finally, a section that proves various theorems of the latter system.  
 
 ## Syntax-Guided Rule Synthesis
 
-Until recently I didn't know that syntax-guided rule synthesis was a thing.  
-But essentially that's how the rules for systems presented here were developed.
+Until recently I didn't know that [syntax-guided rule synthesis](https://www.cis.upenn.edu/~alur/SyGuS13.pdf) was a thing.  
+But essentially that's how the inference rules for System X were developed.
 
-In other words, the inference rules for System X were not invented by, nor designed by me.  
-The rules were derived.  The rules are derivable from an enumeration of expressions in the path order.  
-The thing is though, the number of rules grow exponentially as the number of variables increase, 
-and a complete set is infinite.  
-So the rules in thier explicit form are not very useful.  
-However, while exploring the derived rules I discovered that they had patterns, 
-and eventually I was able to describe the entire, infinite set of exponentially growing rules 
-as the inference rules in System X.  
+In other words, the inference rules for System X were not invented, designed, nor selected by me.  
+The rules were derived.  
+My homegrown version of rule synthesis derives rules from an ordered enumeration of expressions, 
+and is designed to produce a minimal set of rules.  
+My process was inspired by the [Knuth-Bendix Completion](https://en.wikipedia.org/wiki/Knuth%E2%80%93Bendix_completion_algorithm) method.  
 
-One reason I am feeling confident in the work I've done here is precisely because it's not something that I invented, it's a description of something that I computed.  
+The synthesized rules in thier raw form are simple unconstrained rewrite rules.  
+The rules exhibit patterns that are obviously the result of some intelligence embedded in them.  
+Also, the number of raw, unconstrained rules grows exponentially as the number of variables increase, and a complete set of rules is infinite.  
+So the rules in thier raw form are not very useful.  
+But I've managed to boil the raw rules down to a handful of logically constrained rules, 
+and those rules are now the inference rules in System X.  
+
+One reason I feel confident in the work I've done here is precisely because it's not something that I invented, it's a description of something that I computed.  
 *Explaining* what you have computed is a whole other problem though :-).  
-Also, I had to come up with a way to prove properties about the generated rules.  
-That's what this documentation is about.
-
-I'm obsessed with rewriting because programming with rules is *way way way* more modular, reusable, customizable, scalable, and extensible than the languages and tools we have now.  
+It took a lot of effort to translate the raw generated rewrite rules into inference rules.  
+Other than showing that my interpreted inference rules do in fact respect the path order, 
+the complexity theorems are straight-forward to prove (the only kind theorem that I am capable of proving :-)).  
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
 
