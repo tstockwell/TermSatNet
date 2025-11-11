@@ -7,7 +7,7 @@ When the code and docs are complete I'll remove this notice.
 
 ## Preface 
 
-I'm a retired, un-degreed, computer programmer. 
+I'm a retired, un-degreed, computer programmer.  
 I have had a long-time interest in rewrite systems, and I use this repository for experimenting with rewriting and logic.  
 I intended to someday build a new kind of template processor for rendering html.  
 Instead, I have produced a logic system. 
@@ -50,7 +50,7 @@ the complexity theorems are straight-forward to prove (the only kind theorem tha
 
 ## [System C](https://github.com/tstockwell/TermSatNet/wiki/system-c)
 
-System C (for cofactors) is a system of propositional logic capable of performing deep inferences,
+System C (for cofactors) is a system of propositional logic based on rewriting, 
 similar to [Existential Graphs](https://en.wikipedia.org/wiki/Existential_graph) or the [Laws Of Form](https://en.wikipedia.org/wiki/Laws_of_Form).  
 > But it's designed for machines instead of humans, and it's designed to produce shorter proofs.  
 
@@ -61,7 +61,7 @@ C defines a set of expression orderings (aka [path orderings](https://en.wikiped
 C uses the inference rules from existential graphs; [double negation elimination, erasure, deiteration, and iteration](https://en.wikipedia.org/wiki/Existential_graph#Alpha), and adds [commutivity](https://www.philosophypages.com/lg/e11b.htm#:~:text=Commutation,any%20of%20the%20possible%20conditions.).  
 
 The application of the structural rules, iteration and deiteration, is guided by logical constraints called *cofactors* that must be present in the expression in order to apply the rule.  
-> A cofactor is a subterm of an expression that [entails](https://en.wikipedia.org/wiki/Logical_consequence) the expression.  
+> A cofactor is a subterm of an expression that has an implication relationship with the expression.  
 > In X, a cofactor is a subterm that, when replaced with constant, creates an expresssion that is equivalent to a constant.  
 
 The application of the commutivity rules is constrained by the path ordering.  
