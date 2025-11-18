@@ -9,6 +9,7 @@
 	  
 	<!-- put on standby instead of release to OS -->
 	<RetainVMGarbageCollection>true</RetainVMGarbageCollection>
+	<Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

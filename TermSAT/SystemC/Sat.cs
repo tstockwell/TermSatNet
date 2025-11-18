@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TermSAT.SystemX
+namespace TermSAT.SystemC;
+
+public class Sat
 {
-    internal class SystemX
-    {
-    }
 }

@@ -89,7 +89,7 @@ public static class LucidDbContextExtensions
         //        throw new Exception($"wtf, failed to create constant expressions or something");
         //    }
         //}
-        //return long.Parse(rec.Value);
+        //return long.Parse(rec.Number);
     }
 
     static public IQueryable<Formula> ToFormulas(this IQueryable<ReductionRecord>db) =>

@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Uses Kosaraju's algorithm to find strongly connected components.
+
+/// </summary>
 public class TwoSatSolver
 {
     private readonly int _numVariables;
@@ -124,7 +128,7 @@ public class TwoSatSolver
     /// Solves the 2-SAT problem and returns a satisfying assignment if one exists.
     /// </summary>
     /// <returns>An array of booleans representing the assignment, or null if unsatisfiable.</returns>
-    public bool[] Solve()
+    public bool[]? Solve()
     {
         // Step 1: Kosaraju's Algorithm to find SCCs
         for (int i = 0; i < 2 * _numVariables; i++)
