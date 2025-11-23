@@ -430,6 +430,11 @@ any instance r of RC in a is a join point since r can be replaced with T via dei
 There are no other join points other than those that are already represented by a T 
 and those that can be replaced by a T via deiteration.  
 
+All of the join points in an expression can be identified in linear time, in two sweeps of the expression, from left to right and back again.  
+On each pass, terms are collected, and when a term is encountered 
+that matches an existing term in the collection, 
+then the encountered term is actually a join point and be replaced with T.  
+
 
 #### Example
 Consider the expression [1 [1 2]].  
@@ -508,131 +513,92 @@ The process of computing the transitive completion of a model called *cofactor i
 
 ## Cofactor Models
 
-A *cofactor model* M is a set of disjunctive clauses that model the relationships between the terms a disjoint expression E 
-such that if there exists a unified/deiterated version, E', that has a grounding cofactor S 
-then one of the clauses S->E or !S->E is derivable from the model.  
+A *cofactor model* M is a set of disjunctive clauses that model the relationships between the terms a disjoint expression E such that,  
+if there exists an expression E' in the congruence closure of E that has a grounding cofactor S 
+then one of the clauses S->E, S->!E, !S->E, or !S->!E is derivable from the model.  
 
-After building a cofactor model M, [propositional resolution](https://en.wikipedia.org/wiki/Resolution_(logic)) 
-is used to determine if M |- S->E or M |- !S->E.  
+Expressing the problem of finding a reduction to an expression as a cofactor model 
+makes implementing a solution to the problem a lot easier.  
+It also makes it a lot easier to prove properties about the solution.  
+
+After building a cofactor model M of an expression E, [propositional resolution](https://en.wikipedia.org/wiki/Resolution_(logic)) is used to compute all the cofactors in the congruence closure of E.  
 
 To build a cofactor model for an expression E, unique identifiers must be assigned to all the subterms in E.  
 Nothing is relevant about identifiers except that they're unique.  
 
-> Note...
-> In this document a subterm's position in an expression's flatterm is often used as an id because it's convenient to do so.  
-> However, a complete cofactor model will also include clauses that represent iterated subterms.   
-
-In other words, if there exists a grounding cofactor S of E then either M |- (S -> E'), or  M |- (S -> !E') and M |- E == E'.  
-
-
 ### Modeling an Expression
 
-To build a cofactor model for an expression E...
+A cofactor model is built from the bottom up, 
+building a cofactor model from other completed cofactor models.
+Expressions are minimized as cofactors are discovered, 
+so that only mostly-minimized expressions are ever modeled.  
 
-1. Unique Ids: Assign unique ids to every subterm of E and, while building the cofactor model, to every expression associated with a join point.
-2. Model Variables: Add equality clauses for every pair of subterms that represent the same variable.
-3. Model Contexts: Add clauses that represent the relationship between the terms in every context.
-4. Model Join Points: Add clauses that represent the unification of join points.  
+To build a cofactor model for a disjoint expression E...
 
-Nothing is relevant about identifiers except that they be unique.  
+1. Unique Ids: Assign unique ids to every join point, and to every other unique subterm of E.  
+	> Assign an id to every term and use hash consing to avoid duplication.
+2. Model Implications: Add clauses that represent the implications/cofactors between the terms in every implication.
+3. Model Join Points: Add clauses that represent all the join points, and thus, 
+the congruence closure of the expression.  
 
-When discussing cofactor models, it's convenient to use a subterm's position in an expression's flatterm as an id.  
-
-Consider the expression [l r] and its flatterm...  
+### Modeling Implications
+Let E be an implication of the form [l r]
 subterm 		index	
 ------------	-----	
-[l r]		 	0		
 l				1       
 r				2		
-
-In the cofactor model of [l r], the subterm l has an id 1, and [l r] has an id of 0.
-
-The fact that l is a T-grounding F-cofactor of E is represented by the formula !1 -> 0.  
-
-
-### Modeling Variables
-
-Variables are modeled by adding equalities that constrain subterms that represent variables to be equivalent.  
-
-Consider the expression [a a] and its flatterm...  
-subterm 		index	
-------------	-----	
-[a a]		 	0		
-a				1       
-a				2		
-
-In the cofactor model of [a a], the clauses 1 -> 2, and !1 -> !2 are added to the model 
-so that the value of term 1 will always be equal to the value of term 2.
-
-### Modeling a Context
-Let E be a context of the form [l r]
-
-Consider the expression [l r] and its flatterm...  
-subterm 		index	
-------------	-----	
-[l r]		 	0		
-l				1       
-r				2		
+[l r]		 	3		
 
 The cofactor relationships in [l r] can be expressed with these clauses...  
 
-- !1 -> 0; when the term at index 3, l, has the value false then the term at index 0 must have the value true.
+- !1 -> 0; when the term at index 1, l, has the value false then the term at index 0 must have the value true.
 	> Equivalent to: !l -> [l r].
-	> Expressed as a disjunction: (0 || 1).
-- !2 -> 0; when the term at index 4, r, has the value false then the term at index 0 must have the value true.
-	> Equivalent to: !r -> [l r]
-	> Expressed as a disjunction: (0 || 2).  
-- (1 && 2) -> !0; when the terms at indexes 1 and 2 have the value true then the term at index 0 must have the value false.
-	> Equivalent to: (l && r) -> [T [l r]]
-	> Expressed as a disjunction: (!1 || !2 || !0).
+	> Expressed as a disjunction: (1 || 0).
+- 2 -> 0; when the term at index 2, r, has the value true then the term at index 0 must have the value true.
+	> Equivalent to: r -> [l r]
+	> Expressed as a disjunction: (!2 || 0).  
+- (1 && !2) -> !0; 
+	> Equivalent to: (l && !r) -> [T [l r]]
+	> Expressed as a disjunction: (!1 || 2 || !0).
 
-A set of clauses that model a context is called a *context model*.  
-The expression ```((0 || 1) && (0 || 2) && (!1 || !2 || !0))``` is a context model of the expression E = [l r].  
-Another way to interpret the above expression is "if E then !l or !r, but if not E then l and r".  
+A set of clauses that model an implication are called a *context model*.  
+The expression ```((1 || 0) && (!2 || 0) && (!1 || 2 || !0))``` is a context model of the expression E = [l r].  
 
 Note that...  
+If M is a cofactor model of an expression E, and 0 is E's index in M then...  
 - if we want to test E for satisfiability then we make truth the goal by asserting 0 in the model and resolving the remaining clauses.
 - if we want to test E for un-satisfiability then we make contradiction the goal by asserting !0 in the model and resolving the remaining clauses.
 
 Note that, once a goal is chosen for a context then the context model reduces to an instance of 2-SAT, clauses with just 2 or fewer variables.  
-That is, when 0 is asserted (that is, when we want to prove that E can be true) then the cofactor model collapses to ```0 && (!1 || !2))```.  
-Similarly, when !0 is asserted (when we want to prove that E can be false) then the cofactor model collapses to ```!0 && (1 && 2)```.  
+That is, when 0 is asserted (that is, when we want to prove that E can be true) then the cofactor model collapses to ```0 && (!1 || 2))```.  
+Similarly, when !0 is asserted (when we want to prove that E can be false) then the cofactor model collapses to ```!0 && (1 && !2)```.  
 
 ### Modeling Join Points
 
-In the SE system, all valid expressions are derived from ground using just ordering, ground, and structural inference rules.  
-The satisfiability of an expression can be determined by reversing the rules used to derive it.  
-Cofactor models easily model the ground rules and they will be eliminated through resolution.  
-It turns out that it's also easy to identify applications of iteration, deiteration, and exchange by identifying common cofactors between subterms of a context.  
-And it turns out that unifying join points is the way to identify common cofactors.  
-And it turns out that it's easy to model join points in a cofactor model.  
-
-Join points are modeled by adding all of a join point's unified terms to the cofactor model.  
-In this way, all the alternatives for a join point are build into the cofactor model.   
+Join points are modeled by extending clauses with additonal literals 
+that represent the terms that can be copied to a join point from an iteration source.
 
 #### Example
-Consider the expression [a [T b] and its flatterm...  
-
+Consider the expression [a [T b]...  
 subterm 		index	
 ------------	-----	
-[a [T b]]		0		
 a				1       
-[T b]			2		
-T				3
-b				4		
-[a b]			5	;a unified instance of the join point at position 2
-[b b]			6	;a unified instance of the join point at position 2
+T(2)   			2
+b				3		
+[T(2) b]		4		
+[a [T(2) b]]	5		
 
-The join point relationships in an expression are modeled by adding clauses that represent the possible unifications of the join point.  
-Note that two unified terms that have been added to the cofactor model, [a b] and [b b].  
 
-- First, context models are added for each unified term...
-	- ```((5 || 1) && (5 || 4) && (!1 || !4 || !5))```
-	- ```((6 || 4) && (!4 || !6))```
-	
-- Then, the context model for term 0 is extended with these clauses that extend the context model for [a [T b]] to include the unified terms... 
-	- ```((0 || 5) && (!1 || !5 || !0))``` 
-	- ```((0 || 6) && (!1 || !6 || !0))``` 
+First, context models are added for each term.  
+The join-point model for the join point at index 2 is equivalent to saying that  
+the term with the index 2 is equivalent to one or more of T, b, or a.  
+Put another way, if a is true then 
+
+As a clause...
+```(2 || !3 || !1)``` 
+> Same as 2 == T || 2 == 3 || 2 == 1
+
+
 
 
 ### Example
