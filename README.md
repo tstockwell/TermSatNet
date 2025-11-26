@@ -22,11 +22,9 @@ This stuff is not ready for primetime, I'm working on docs and code.
 But you're invited to [have a look](https://github.com/tstockwell/TermSatNet/wiki).  
 
 ## SystemC
-SystemC (C for cofactors), is a system of [implicational propositional logic](https://en.wikipedia.org/wiki/Implicational_propositional_calculus)
 
 ### Path Ordering
 SystemC has a [path ordering](https://en.wikipedia.org/wiki/Path_ordering_(term_rewriting)).  
-
 The path ordering relates expressions by thier *entropy*, from simpler to more complex.      
 
 ### Inference Rules
@@ -48,7 +46,6 @@ Exchange is a form of [cut](https://en.wikipedia.org/wiki/Cut-elimination_theore
 In SystemC, the application of the structural rules is constrained to terms called *cofactors*.  
 
 > From a logical perspective, cofactors identify redundant terms in an expression.    
-
 > From a rewriting perspective, cofactors represent *[critical terms](https://en.wikipedia.org/wiki/Critical_pair_(term_rewriting))* in an expression.  
 
 ### Proofs
@@ -61,14 +58,12 @@ It is shown, for any *valid* implication in SystemC, that the consequent comes b
 
 ### Soundness  
 > From a logical perspective, SystemC is sound because each rules maintains logical equivalence.  
-
 > From a rewrite perspective, SystemC is sound because each rules maintains local confluence.  
 
 It is shown that each rule maintains logical equivalence and local confluence.
 
 ### Completeness    
 > From a logical perspective, SystemC is complete because all equivalent expressions reduce to the same expression.  
-
 > From a rewrite perspective, SystemC is confluent because all expressions that can be derived from each other reduce to the same expression.   
 
 It is shown that SystemC is complete by showing that SystemC is equivalant to classic propositional calculus.  
