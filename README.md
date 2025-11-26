@@ -24,24 +24,27 @@ But you're invited to [have a look](https://github.com/tstockwell/TermSatNet/wik
 ## SystemC
 SystemC (C for cofactors), is a system of [implicational propositional logic](https://en.wikipedia.org/wiki/Implicational_propositional_calculus)
 
+### Path Ordering
 SystemC has a [path ordering](https://en.wikipedia.org/wiki/Path_ordering_(term_rewriting)).  
 
-> The path ordering relates expressions by thier *entropy*, from simpler to more complex.      
+The path ordering relates expressions by thier *entropy*, from simpler to more complex.      
+
+### Inference Rules
 
  SystemC uses the [structural inference rules](https://en.wikipedia.org/wiki/Structural_rule); iteration(weakening), deiteration(contraction), and exchange.  
     
->    From a logical perspective...
+> From a logical perspective...  
     - iteration weakens axioms and conclusions by replacing a constant with a redundant term.  
     - deiteration contracts axioms and conclusions by replacing a redundant term with a constant.  
     - an exchange is a chain of related weakenings and contractions.  
 
->    From a rewriting perspective...
+> From a rewriting perspective...  
     - iteration increases entropy by replacing a constant with a redundant term.  
-    - deiteration decreases entropy by replacing a redundant term with a constant.
+    - deiteration decreases entropy by replacing a redundant term with a constant.  
     - an exchange is a chain of related iterations and deiteraions.  
 
-> Exchange is a form of [cut](https://en.wikipedia.org/wiki/Cut-elimination_theorem) that can significantly shorten proofs.
-
+Exchange is a form of [cut](https://en.wikipedia.org/wiki/Cut-elimination_theorem) that can significantly shorten proofs.
+### Cofactors
 In SystemC, the application of the structural rules is constrained to terms called *cofactors*.  
 
 > From a logical perspective, cofactors identify redundant terms in an expression.    
@@ -50,9 +53,9 @@ In SystemC, the application of the structural rules is constrained to terms call
 
 ### Proofs
 
-> In SystemC, logical implication is the act of deriving simpler statements from more complex statements, and proofs work by reducing complex expressions to simpler expressions.
+In SystemC, logical implication is the act of deriving simpler statements from more complex statements, and proofs work by reducing complex expressions to simpler expressions.
 
-> Proofs in SystemC are heuristic, requiring inferences to be combined in just the right way to reach a conclusion.  
+Proofs in SystemC are heuristic, requiring inferences to be combined in just the right way to reach a conclusion.  
 
 It is shown, for any *valid* implication in SystemC, that the consequent comes before the antecedent in the path ordering.  
 
@@ -77,11 +80,11 @@ It is shown that each compact expression is no more than one deiteration or exch
 
 Is is shown that *if* you happen to already know the minimal form of an expression then you can always minimize the expression in a linear number of steps.  
 
-> That's because you'll be able to figure out the exact right set of exchanges to use.  
+That's because you'll be able to figure out the exact right set of exchanges to use.  
 Without such apriori knowledge, the secret to creating short proofs is to start at the bottom of an expression (where the terms are guaranteed to exist in the minimal form) 
 and use them to discover that exact right set of exchanges as you work your way up to the outermost form.  
 
-> Therefore, in order to produce short proofs, MiniC recursively builds extended [e-graphs](https://en.wikipedia.org/wiki/E-graph) for representing expressions, critical terms, and substitutions.  These graphs can be efficiently searched for exchanges.  
+Therefore, in order to produce short proofs, MiniC recursively builds extended [e-graphs](https://en.wikipedia.org/wiki/E-graph) for representing expressions, critical terms, and substitutions.  These graphs can be efficiently searched for exchanges.  
 
 MiniC efficiently minimizes an expression by...  
 - Reducing the task of minimizing an expression to the task of reducing many simpler, compact expressions.  
@@ -90,27 +93,27 @@ MiniC efficiently minimizes an expression by...
     - Discover new critical terms in a compact axiom that don't exist in its subterms.  
     - Extend critical terms in antecedent and consequent with new substitutions from each.  
 
-    From a logic perspective, this combining is a form of *unification*.  
-    From a rewriting perspective, this combining is a form of *completion*.  
+    > From a logic perspective, this combining is a form of *unification*.  
+    > From a rewriting perspective, this combining is a form of *completion*.  
 
 - Discover exchanges by searching a complete graph for a substitution that makes the expression a contradiction.
 
-    From a logic perspective, this search is a form of [*resolution*](https://en.wikipedia.org/wiki/Resolution_(logic)).      
+    > From a logic perspective, this search is a form of [*resolution*](https://en.wikipedia.org/wiki/Resolution_(logic)).      
     From a rewriting perspective, this search is a form of e-matching.  
 
 ### Complexity
 I've convinced myself that MiniC is cubic, O(B * (2 * (D + E)) * P) where...
 - B = the # of compact expressions produced by the bottom-up proof procedure
-> Linear complexity, because there must be L or fewer terms in the final conclusion, where L is length of the axiom.
+    > Linear complexity, because there must be L or fewer terms in the final conclusion, where L is length of the axiom.
 
 - D = steps required to discover new critical terms in a compact axiom that don't exist in its subterms.
-> Linear complexity, by sweeping the expression in both directions, all terms can be checked to see if they're a critical term in a linear number steps.  
+    > Linear complexity, by sweeping the expression in both directions, all terms can be checked to see if they're a critical term in a linear number steps.  
 
 - E = steps required to extend critical terms in antecedent and consequent with substitutions from each other.  
-> Linear complexity, by sweeping the expression in both directions, each critical term can be extended with any missing substitutions.
-> This could be done at the same time as discovering new critical terms.  
+    > Linear complexity, by sweeping the expression in both directions, each critical term can be extended with any missing substitutions.  
+    > This could be done at the same time as discovering new critical terms.  
 
 - P = Steps required to propagate a new substitution all critical terms in an expression
-> Linear complexity, because the new substitution is not propagated throughout all expressions in the graph, only throughout the subterms of the axiom, and there are only L of those.
+    > Linear complexity, because the new substitution is not propagated throughout all expressions in the graph, only throughout the subterms of the axiom, and there are only L of those.
 
 
