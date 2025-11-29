@@ -21,15 +21,13 @@ logic](https://en.wikipedia.org/wiki/Implicational_propositional_calculus).
     SystemC also has a path ordering (ie a concept of entropy).  
     SystemC works by rewriting expressions into simpler expressions, thus proving equivalence.  
 
-    > [Here](), it is shown that SystemC is *sound*.  
-    > [Here](), it is shown that SystemC is equivalent to classic propositional logic and is therefore *complete*..
+    > SystemC is [*sound*](Soundness).  
+    > SystemC is equivalent to classic propositional logic and is therefore [*complete*](Completeness)..
 
-    > [Here](), it is shown that if you know all the cofactors of an expression  
-    then you can minimize expressions in a quadradically-limited # of steps.  
+    > If you know all the cofactors of an expression  
+    then it's [guaranteed]() that you can minimize expressions in a quadradically-limited # of steps.  
     
-    > [Here](), it is shown that if you know all the cofactors of an expression,  
-    and you construct your proof in the right way,  
-    then you can fully minimize expressions in a linear # of steps.
+    > An expression can be minimized from the [bottom up]() in a linear number of steps.
 
 - [**MiniC**](https://github.com/tstockwell/TermSatNet/wiki/MiniC)  
     An automated, bottom up, proof procedure for SystemC.  
@@ -37,7 +35,7 @@ logic](https://en.wikipedia.org/wiki/Implicational_propositional_calculus).
 
     MiniC uses an extended version of equality saturation to compute all the cofactors  in an expression and thier possible substitutions.
 
-    > [Here](), it is shown that MiniC can compute all the cofactors in an expression in a polynomially-limited # of steps.
+    > The [MiniC equivalent to resolution](MiniC) can compute all the cofactors in an expression in a polynomially-limited # of steps.
 
 - **C SAT**  
     A SAT solver built with MiniC.  
