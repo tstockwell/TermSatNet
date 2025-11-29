@@ -474,11 +474,6 @@ An ordered expression is an expression E of the form [l r] where...
 - l <= r, ie l has the same or less entropy than r.  
 > See the Entropy section for the details of how expressions are ordered.
 
-Ordering is admissible/redundant.
-That is, expressions don't need to be ordered to fully normalize them,  
-but it's much easier for a human to grok expressions when terms are ordered,  
-and ordering makes the definition of the inference rules much less tedious.  
-
 This documentation, and the inference rules defined here, assume that expressions are ordered.  
 
 - Compressed
